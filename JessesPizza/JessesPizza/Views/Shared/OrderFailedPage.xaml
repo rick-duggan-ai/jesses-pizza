@@ -1,0 +1,19 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://xamarin.com/schemas/2014/forms"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="JessesPizza.Views.OrderFailedPage"
+             NavigationPage.HasNavigationBar="true"
+             Title="Transaction Failed"
+             BackgroundColor="{DynamicResource backgroundColor}">
+    <ContentPage.Content>
+        <StackLayout Margin="20"  VerticalOptions="CenterAndExpand" 
+                   HorizontalOptions="CenterAndExpand"  BackgroundColor="{DynamicResource backgroundColor}">
+            <Label Text="Unable to process order at this time, check your credit card balance and try again!"
+                   VerticalOptions="CenterAndExpand" 
+                   HorizontalOptions="CenterAndExpand" 
+                   FontSize="Title"
+                   HorizontalTextAlignment="Center"
+                   TextColor="{DynamicResource TextPrimaryColor}"></Label>
+        </StackLayout>
+    </ContentPage.Content>
+</ContentPage>

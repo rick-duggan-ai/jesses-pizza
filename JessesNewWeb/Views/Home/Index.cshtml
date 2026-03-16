@@ -1,0 +1,75 @@
+﻿@model OrderListModel
+@{
+    ViewData["Title"] = "Orders";
+
+}
+<script src="~/js/orders.js" asp-append-version="true"></script> 
+<link rel="stylesheet" href="css/orders.css" />
+<meta http-equiv="refresh" content="30">
+<div class="text-center">
+    <table>
+        <thead>
+        <th>Date</th>
+        <th>Name</th>
+        <th>Phone Number</th>
+        <th>Address</th>
+        <th>Total</th>
+        <th>Send / Sent</th>
+        </thead>
+        @foreach (var o in Model)
+        {
+            <tr id="@("row_" + @o.convergeTransactionId )">
+                <td>@o.date</td>
+                <td>@o.name</td>
+                <td>@o.phoneNumber</td>
+                <td>@o.address</td>
+                <td>@o.total</td>
+                @{ 
+                   if (string.IsNullOrEmpty(o.Message)) 
+                   { 
+                     <td rowspan="2"><button onclick="clickIt('@o.phoneNumber', '@o.convergeTransactionId')" id="@o.phoneNumber">Order Ready</button></td>
+                   }
+                   else 
+                   {
+                     <td rowspan="2">@o.Message</td> 
+                   }
+                 }
+            </tr>
+            <tr>
+               <td colspan="5">
+                 @{
+                    if (!string.IsNullOrEmpty(o.SpecialInstructionsForOrder)) {
+                      <p><b>Special Instructions For Order:</b> @o.SpecialInstructionsForOrder</p>
+                    }
+                 }
+                 @foreach (var i in o.shoppingCartItems) {
+                   if (!string.IsNullOrEmpty(i.Instructions)) {
+                      <p><b>Instructions for Item @i.Name :</b><br /><i>@i.Instructions</i> </p>
+                   }
+                 }
+               </td>
+            </tr>
+        }
+    </table>
+</div>
+<div>
+new KDS deployed 2023-09-15
+</div>
+<div id="pickTime" style="display:none">
+    <input type="text" pattern="\d*" id="hour" value="1" />
+    <input type="text" pattern="\d*" id="minute" value="2" />
+    <div>
+        <input type="radio" name="am_pm" id="am" checked="checked" />
+        <label for="am">AM</label>
+        <input type="radio" name="am_pm" id="pm" />
+        <label for="pm">PM</label>
+
+    </div>
+    <div>
+        <input type="radio" name="pickup" id="pickup" />
+        <label for="pickup">Pickup</label>
+        <input type="radio" name="pickup" id="delivery" checked="checked" />
+        <label for="delivery">delivery</label>
+    </div>
+    <button id="sendText" onclick="sendText()">send text</button>
+</div>

@@ -1,0 +1,50 @@
+
+<html>
+<body>
+    <script src="https://core.spreedly.com/iframe/express-2.min.js"></script>
+    <script type="text/javascript">
+
+    </script>
+
+</body>
+</html>
+<script type="text/javascript">
+    // A $( document ).ready() block.
+    var amount = jsBridge.amount();
+    myFunction();
+    function myFunction() {
+        var name = jsBridge.name();
+
+
+        var template = parse('{"amount": "%s","company_name": "Jesses Pizza","sidebar_top_description": "Best Pizza in Henderson, NV","sidebar_bottom_description": "Your order total today","full_name": "%s"}', amount,name);
+        template +=
+            '';
+        template = JSON.parse(template);
+        SpreedlyExpress.init("NID0FRr8CgGsWMznEn3ChLFLJbH", template);
+        //SpreedlyExpress.init("C7cRfNJGODKh4Iu5Ox3PToKjniY", {
+        //    "amount": "$9.83",
+        //    "company_name": "Acme Widgets",
+        //    "sidebar_top_description": "Providing quality widgets since 2015",
+        //    "sidebar_bottom_description": "Your order total today",
+        //    "full_name": "First Last"
+        //});
+
+
+    }
+    function parse(str) {
+        var args = [].slice.call(arguments, 1),
+            i = 0;
+
+        return str.replace(/%s/g, () => args[i++]);
+    }
+    SpreedlyExpress.onInit(function () {
+
+        SpreedlyExpress.openView();
+    });
+    SpreedlyExpress.onPaymentMethod(function(token, paymentMethod) {
+
+        // Send requisite payment method info to backend
+        var info = parse('{"token": "%s","amount": "%s"}',token,amount);
+        invokeCSharpAction(info);
+    });
+</script>

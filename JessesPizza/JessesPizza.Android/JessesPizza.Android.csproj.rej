@@ -1,0 +1,12 @@
+diff a/JessesPizza/JessesPizza.Android/JessesPizza.Android.csproj b/JessesPizza/JessesPizza.Android/JessesPizza.Android.csproj	(rejected hunks)
+@@ -30,10 +30,6 @@
+     <ErrorReport>prompt</ErrorReport>
+     <WarningLevel>4</WarningLevel>
+     <AndroidLinkMode>Full</AndroidLinkMode>
+-    <AotAssemblies>false</AotAssemblies>
+-    <EnableLLVM>false</EnableLLVM>
+-    <BundleAssemblies>false</BundleAssemblies>
+-    <EnableProguard>false</EnableProguard>
+   </PropertyGroup>
+   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+     <DebugSymbols>true</DebugSymbols>

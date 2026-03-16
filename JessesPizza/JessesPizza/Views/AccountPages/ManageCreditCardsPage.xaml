@@ -1,0 +1,17 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://xamarin.com/schemas/2014/forms"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:d="http://xamarin.com/schemas/2014/forms/design"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" xmlns:dataControls="clr-namespace:Telerik.XamarinForms.DataControls;assembly=Telerik.XamarinForms.DataControls" xmlns:listView="clr-namespace:Telerik.XamarinForms.DataControls.ListView;assembly=Telerik.XamarinForms.DataControls" xmlns:input="clr-namespace:Telerik.XamarinForms.Input;assembly=Telerik.XamarinForms.Input" xmlns:Helpers="clr-namespace:JessesPizza.Helpers"
+             mc:Ignorable="d"
+             x:Class="JessesPizza.Views.ManageCreditCardsPage"
+             Title="My credit cards">
+    <ContentPage.Content>
+        <StackLayout>
+            <Label Margin="5" x:Name="EmptyLabel" IsVisible="False"  Text="No cards are currently associated with your account" FontSize="Medium" FontAttributes="Bold" HorizontalTextAlignment="Center"></Label>
+            <ScrollView x:Name="CardView">
+            </ScrollView>
+            
+        </StackLayout>
+    </ContentPage.Content>
+</ContentPage>

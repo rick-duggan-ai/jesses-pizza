@@ -1,0 +1,76 @@
+﻿<?xml version="1.0" encoding="UTF-8"?>
+<ResourceDictionary xmlns="http://xamarin.com/schemas/2014/forms"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml" xmlns:converters="clr-namespace:JessesPizza.Converters"
+                    x:Class="JessesPizza.Styles.DarkTheme">
+
+
+    <Color x:Key="backgroundColor">#FFFFFFFF</Color>
+    <Color x:Key="TextPrimaryColor">#FF000000</Color>
+    <Color x:Key="TextSecondaryColor">#80000000</Color>
+    <Color x:Key="TextTernaryColor">#C8C8C8</Color>
+    <Color x:Key="ListViewSelectedColor">Orange</Color>
+    <Color x:Key="ListViewBackgroundColor">White</Color>
+
+    <Color x:Key="HeaderColor">#FFFFFFFF</Color>
+    <Color x:Key="NavigationPrimary">#930304</Color>
+    <Color x:Key="ListHeaderColor">#931303</Color>
+    <Color x:Key="FormBackgroundColor">White</Color>
+
+    <Style TargetType="NavigationPage">
+        <Setter Property="BarBackgroundColor" Value="{StaticResource NavigationPrimary}" />
+        <Setter Property="BarTextColor" Value="White" />
+    </Style>
+    <Style x:Key="ButtonStyle" TargetType="Button">
+        <Setter Property="FontSize" Value="Medium" />
+        <Setter Property="FontAttributes" Value="Bold" />
+        <Setter Property="CornerRadius" Value="10" />
+        <Setter Property="BorderWidth" Value="2" />
+        <Setter Property="BackgroundColor" Value="{StaticResource NavigationPrimary}"/>
+        <Setter Property="TextColor" Value="{StaticResource backgroundColor}" />
+        <Setter Property="BorderColor" Value="{StaticResource TextPrimaryColor}"/>
+    </Style>
+    <OnPlatform x:Key="MaterialFontFamily" x:TypeArguments="x:String">
+        <On Platform="iOS" Value="Material Design Icons" />
+        <On Platform="Android" Value="materialdesignicons-webfont.ttf#Material Design Icons" />
+    </OnPlatform>
+    <x:String x:Key="Phone">&#xf3f2;</x:String>
+    <x:String x:Key="Hours">&#xf953;</x:String>
+    <x:String x:Key="Facebook">&#xf20d;</x:String>
+    <Style x:Key="LabelStyle" TargetType="Label">
+        <Setter Property="FontAttributes" Value="Bold" />
+        <Setter Property="FontSize" Value="Medium" />
+        <Setter Property="TextColor" Value="{StaticResource TextPrimaryColor}" />
+
+
+    </Style>
+    <Style x:Key="TitleStyle" TargetType="Label">
+        <Setter Property="FontAttributes" Value="Bold" />
+        <Setter Property="FontSize">
+            <Setter.Value>
+                <OnPlatform
+                            x:TypeArguments="x:Double"
+                            Android="18"
+                            iOS="30"
+                            WinPhone="20" />
+            </Setter.Value>
+        </Setter>
+
+        <Setter Property="TextColor" Value="{StaticResource TextPrimaryColor}" />
+    </Style>
+    <Style x:Key="MasterDetailStyle" TargetType="Label">
+        <Setter Property="FontSize">
+            <Setter.Value>
+                <OnPlatform
+                            x:TypeArguments="x:Double"
+                            Android="18"
+                            iOS="30"
+                            WinPhone="20" />
+            </Setter.Value>
+        </Setter>
+        <Setter Property="FontAttributes" Value="Bold"></Setter>
+        <Setter Property="VerticalOptions" Value="Center"></Setter>
+        <Setter Property="TextColor" Value="{StaticResource TextPrimaryColor}" />
+    </Style>
+    <converters:BooleanToColorConverter x:Key="BoolToColorConverter" />
+
+</ResourceDictionary>

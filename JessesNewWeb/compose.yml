@@ -1,0 +1,27 @@
+services:
+  jesses-kds:
+    image: 344347147962.dkr.ecr.us-west-1.amazonaws.com/csd/jesses-pizza-kds:latest
+    container_name: jesses-kds
+    build: .
+    restart: unless-stopped
+    environment:
+      API_TOKEN: # Redacted
+      ASPNETCORE_ENVIRONMENT: Development # Should this be Production?
+    networks:
+      - internal
+      - traefik
+    ports:
+      - 80
+    deploy:
+      mode: replicated
+      replicas: 1
+      labels:
+        traefik.http.services.jesses-kds.loadbalancer.server.port: 80
+        traefik.http.routers.jesses-kds.rule: "Host(`jesses-kds.csd.dev`)"
+        traefik.http.routers.jesses-kds.tls: "true"
+        traefik.http.routers.jesses-kds.service: jesses-kds
+
+networks:
+  internal: {}
+  traefik:
+    external: true

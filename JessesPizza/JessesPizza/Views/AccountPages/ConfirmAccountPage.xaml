@@ -1,0 +1,33 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://xamarin.com/schemas/2014/forms"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:d="http://xamarin.com/schemas/2014/forms/design"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" xmlns:telerikInput="clr-namespace:Telerik.XamarinForms.Input;assembly=Telerik.XamarinForms.Input" xmlns:telerikDataForm="clr-namespace:Telerik.XamarinForms.Input.DataForm;assembly=Telerik.XamarinForms.Input" xmlns:telerikCommon="clr-namespace:Telerik.XamarinForms.Common;assembly=Telerik.XamarinForms.Common"
+             mc:Ignorable="d"
+             x:Class="JessesPizza.Views.ConfirmAccountPage" Title="Verify Account" BackgroundColor="{DynamicResource backgroundColor}">
+    <ContentPage.Content>
+        <StackLayout Margin="10,20,10,0" BackgroundColor="{DynamicResource backgroundColor}">
+            <Label Text="Enter the verification code we just sent to your phone"
+                HorizontalTextAlignment="Center"
+                HorizontalOptions="CenterAndExpand" Margin="10" Style="{DynamicResource TitleStyle}"/>
+            <telerikInput:RadDataForm CommitMode="Immediate"  FormValidationCompleted="DataFormValidationCompleted"  ValidationMode="Immediate" x:Name="DataForm" BackgroundColor="{DynamicResource backgroundColor}"  >
+                    <telerikInput:RadDataForm.GroupHeaderStyle>
+                        <telerikDataForm:DataFormGroupHeaderStyle IsCollapsible="False" TextAlignment="Center"/>
+                    </telerikInput:RadDataForm.GroupHeaderStyle>
+                <telerikInput:RadDataForm.EditorStyle>
+                    <telerikDataForm:DataFormEditorStyle Height="70" >
+                        <telerikDataForm:DataFormEditorStyle.Background>
+                            <telerikCommon:Background Fill="Transparent"/>
+                        </telerikDataForm:DataFormEditorStyle.Background>
+                    </telerikDataForm:DataFormEditorStyle>
+                </telerikInput:RadDataForm.EditorStyle>
+            </telerikInput:RadDataForm>
+            <Label Style="{DynamicResource LabelStyle}" TextColor="Red" Text="Resend code"  Margin="20,5,20,20" FontSize="Small">
+                <Label.GestureRecognizers>
+                    <TapGestureRecognizer Tapped="TapGestureRecognizer_Tapped"></TapGestureRecognizer>
+                </Label.GestureRecognizers>
+            </Label>
+            <telerikInput:RadButton VerticalOptions="EndAndExpand" IsEnabled="True" x:Name="SubmitButton" Text="CONTINUE" Style="{DynamicResource ButtonStyle}" Clicked="SubmitButton_Clicked" Margin="10,0,10,25" />
+            </StackLayout>
+    </ContentPage.Content>
+</ContentPage>

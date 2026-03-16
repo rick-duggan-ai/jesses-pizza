@@ -1,0 +1,39 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://xamarin.com/schemas/2014/forms"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="JessesPizza.Views.MenuPageGuest"
+            xmlns:ffimageloading="clr-namespace:FFImageLoading.Forms;assembly=FFImageLoading.Forms" 
+
+             Title="Menu">
+    <StackLayout VerticalOptions="FillAndExpand" BackgroundColor="{DynamicResource backgroundColor}" >
+        <StackLayout BackgroundColor="{DynamicResource NavigationPrimary}" >
+            <ffimageloading:CachedImage HeightRequest="100" Aspect="AspectFit" HorizontalOptions="FillAndExpand"  Source="jessespizza.png" CacheDuration="50" RetryCount="3" RetryDelay="600" DownsampleToViewSize="true" />
+        </StackLayout>
+        <ListView ItemSelected="ListViewMenu_ItemSelected" x:Name="ListViewMenu"
+                    HasUnevenRows="True" SeparatorVisibility="None" BackgroundColor="{DynamicResource backgroundColor}">
+            <ListView.ItemTemplate>
+                <DataTemplate>
+                    <ViewCell>
+                        <StackLayout HeightRequest="50" Orientation="Horizontal">
+                            <Label  Margin ="10,0,0,0" Text="{Binding Icon}"
+                                        FontSize="Title"
+                                       VerticalOptions="Center"
+                                       HorizontalOptions="End"
+                                        TextColor="{DynamicResource TextPrimaryColor}"
+                                        FontFamily="{StaticResource MaterialFontFamily}"
+                                ></Label>
+                            <Label Style="{DynamicResource MasterDetailStyle}" Text="{Binding Title}" VerticalOptions="CenterAndExpand"  Margin ="10,0,0,0"/>
+                        </StackLayout>
+                    </ViewCell>
+                </DataTemplate>
+            </ListView.ItemTemplate>
+        </ListView>
+        <Label  IsVisible="{Binding UserLoggedIn}" Text="{Binding UserName}"></Label>
+        <Button VerticalOptions="End" x:Name="LoginButton" Style ="{DynamicResource ButtonStyle}" Text="Login" Clicked="LoginButton_Clicked" Margin="10,0,10,25" ></Button>
+    </StackLayout>
+    <ContentPage.Resources>
+        <ResourceDictionary>
+
+        </ResourceDictionary>
+    </ContentPage.Resources>
+</ContentPage>

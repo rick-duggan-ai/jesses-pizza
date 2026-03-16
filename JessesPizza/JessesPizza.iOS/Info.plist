@@ -1,0 +1,78 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>UIDeviceFamily</key>
+	<array>
+		<integer>1</integer>
+		<integer>2</integer>
+	</array>
+	<key>UISupportedInterfaceOrientations</key>
+	<array>
+		<string>UIInterfaceOrientationPortrait</string>
+		<string>UIInterfaceOrientationLandscapeLeft</string>
+		<string>UIInterfaceOrientationLandscapeRight</string>
+	</array>
+	<key>UISupportedInterfaceOrientations~ipad</key>
+	<array>
+		<string>UIInterfaceOrientationPortrait</string>
+		<string>UIInterfaceOrientationPortraitUpsideDown</string>
+		<string>UIInterfaceOrientationLandscapeLeft</string>
+		<string>UIInterfaceOrientationLandscapeRight</string>
+	</array>
+	<key>MinimumOSVersion</key>
+	<string>8.0</string>
+	<key>CFBundleDisplayName</key>
+	<string>JessesPizza</string>
+	<key>CFBundleIdentifier</key>
+	<string>com.codexposed.jessesprod</string>
+	<key>UILaunchStoryboardName</key>
+	<string>LaunchScreen</string>
+	<key>CFBundleName</key>
+	<string>JessesPizza</string>
+	<key>NSAppTransportSecurity</key>
+	<dict>
+		<key>NSAllowsArbitraryLoads</key>
+		<true/>
+	</dict>
+	<key>CFBundleURLTypes</key>
+	<array>
+		<dict>
+			<key>CFBundleURLName</key>
+			<string>URL Type 1</string>
+		</dict>
+		<dict>
+			<key>CFBundleURLName</key>
+			<string>URL Type 2</string>
+		</dict>
+	</array>
+	<key>NSCalendarsUsageDescription</key>
+	<string>Need to access calendar</string>
+	<key>XSAppIconAssets</key>
+	<string>Assets.xcassets/AppIcons.appiconset</string>
+	<key>UIMainStoryboardFile~iphone</key>
+	<string></string>
+	<key>UIMainStoryboardFile~ipad</key>
+	<string></string>
+	<key>UIAppFonts</key>
+	<array>
+		<string>materialdesignicons-webfont.ttf</string>
+	</array>
+	<key>CFBundleDevelopmentRegion</key>
+	<string>Test</string>
+	<key>NSLocationAlwaysUsageDescription</key>
+	<string>Can we use your location to show you how to get to Jesses?</string>
+	<key>NSLocationWhenInUseUsageDescription</key>
+	<string>Can we use your location to show you how to get to Jesses?</string>
+	<key>NSLocationAlwaysAndWhenInUseUsageDescription</key>
+	<string>Can we use your location to show you how to get to Jesses?</string>
+	<key>UIUserInterfaceStyle</key>
+	<string>Light</string>
+	<key>CFBundleVersion</key>
+	<string>7.0</string>
+	<key>UIRequiresFullScreen</key>
+	<true/>
+	<key>CFBundleShortVersionString</key>
+	<string>7.0</string>
+</dict>
+</plist>

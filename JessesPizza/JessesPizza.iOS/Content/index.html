@@ -1,0 +1,44 @@
+
+<html>
+<body>
+    <script src="https://core.spreedly.com/iframe/express-2.min.js"></script>
+<script src="http://code.jquery.com/jquery-2.1.4.min.js"></script>
+
+
+</body> 
+</html>
+<script type="text/javascript">
+
+            var amountJS;
+
+    function parse(str) {
+        var args = [].slice.call(arguments, 1),
+            i = 0;
+
+        return str.replace(/%s/g, () => args[i++]);
+    }
+    SpreedlyExpress.onInit(function () {
+
+        SpreedlyExpress.openView();
+    });
+    SpreedlyExpress.onPaymentMethod(function(token, paymentMethod) {
+
+        var info = parse('{"token": "%s","amount": "%s"}',token,amountJS);
+        invokeCSharpAction(info);
+    });
+    function getCSharpData(myamount)
+    {
+        AmountJS=myamount;
+        //NameJS = myname;
+    }
+        function displayToken(amount,name)
+        {
+        amountJS = amount;
+        var template = parse('{"amount": "%s","company_name": "Jesses Pizza","sidebar_top_description": "Best Pizza in Henderson, NV","sidebar_bottom_description": "Your order total today","full_name": "%s"}', amount,name);
+        template +=
+            '';
+        template = JSON.parse(template);
+        SpreedlyExpress.init("NID0FRr8CgGsWMznEn3ChLFLJbH", template);
+
+        }
+</script>

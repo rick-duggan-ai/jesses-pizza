@@ -1,0 +1,168 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>netstandard2.0</TargetFramework>
+    <ReleaseVersion>1.0</ReleaseVersion>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
+    <DebugType>portable</DebugType>
+    <DebugSymbols>true</DebugSymbols>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <Compile Remove="Models\Transactions\**" />
+    <EmbeddedResource Remove="Models\Transactions\**" />
+    <None Remove="Models\Transactions\**" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Acr.UserDialogs" Version="7.1.0.446" />
+    <PackageReference Include="Flurl" Version="2.8.2" />
+    <PackageReference Include="Flurl.Http" Version="2.4.2" />
+    <PackageReference Include="Microsoft.AspNetCore.SignalR.Client" Version="3.1.6" />
+    <PackageReference Include="MongoDB.Driver" Version="2.10.4" />
+    <PackageReference Include="sqlite-net-pcl" Version="1.7.335" />
+    <PackageReference Include="Telerik.UI.for.Xamarin" Version="2020.2.624.1" />
+    <PackageReference Include="Telerik.UI.for.Xamarin.Common" Version="2020.2.624.1" />
+    <PackageReference Include="Telerik.UI.for.Xamarin.DataControls" Version="2020.2.624.1" />
+    <PackageReference Include="Telerik.UI.for.Xamarin.Primitives" Version="2020.2.624.1" />
+    <PackageReference Include="Telerik.UI.for.Xamarin.SkiaSharp" Version="2020.2.624.1" />
+    <PackageReference Include="Xamarin.FFImageLoading.Forms" Version="2.4.11.982" />
+    <PackageReference Include="Xamarin.Forms" Version="5.0.0.2545" />  
+    <PackageReference Include="Newtonsoft.Json" Version="12.0.3" />
+    <PackageReference Include="Xamarin.Essentials" Version="1.5.3.2" />
+    <PackageReference Include="Xamarin.Forms.Maps" Version="4.8.0.1269" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Compile Remove="Styles\MyPage.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Update="Views\AccountPages\ManageCreditCardsPage.xaml.cs">
+      <DependentUpon>ManageCreditCardsPage.xaml</DependentUpon>
+    </Compile>
+    <Compile Update="Views\AccountPages\ManageAddressesPage.xaml.cs">
+      <DependentUpon>ManageAddressesPage.xaml</DependentUpon>
+    </Compile>
+    <Compile Update="Views\AccountPages\ConfirmPasswordChangePage.xaml.cs">
+      <DependentUpon>ConfirmPasswordChangePage.xaml</DependentUpon>
+    </Compile>
+    <Compile Update="Views\AccountPages\CreditCardSavePage.xaml.cs">
+      <DependentUpon>CreditCardSavePage.xaml</DependentUpon>
+    </Compile>
+    <Compile Update="Views\MasterDetail\MenuPageUser.xaml.cs">
+      <DependentUpon>MenuPageUser.xaml</DependentUpon>
+    </Compile>
+    <Compile Update="Views\MasterDetail\MenuPageGuest.xaml.cs">
+      <DependentUpon>MenuPageGuest.xaml</DependentUpon>
+    </Compile>
+    <Compile Update="Views\AccountPages\SignUpAddressPage.xaml.cs">
+      <DependentUpon>SignUpAddressPage.xaml</DependentUpon>
+    </Compile>
+    <Compile Update="Views\AccountPages\UserInfoPage.xaml.cs">
+      <DependentUpon>UserInfoPage.xaml</DependentUpon>
+    </Compile>
+    <Compile Update="Views\Shared\MenuItemDetailPage.xaml.cs">
+      <DependentUpon>MenuItemDetailPage.xaml</DependentUpon>
+    </Compile>
+    <Compile Update="Views\GuestPages\GuestInfoPage.xaml.cs">
+      <DependentUpon>GuestInfoPage.xaml</DependentUpon>
+    </Compile>
+    <Compile Update="Views\Shared\SizeSelectionPage.xaml.cs">
+      <DependentUpon>SizeSelectionPage.xaml</DependentUpon>
+    </Compile>
+    <Compile Update="Views\Shared\OrdersPage.xaml.cs">
+      <DependentUpon>OrdersPage.xaml</DependentUpon>
+    </Compile>
+    <Compile Update="Views\Shared\WebViewPage.xaml.cs">
+      <DependentUpon>WebViewPage.xaml</DependentUpon>
+    </Compile>
+  </ItemGroup>
+
+  <ItemGroup>
+    <EmbeddedResource Update="Views\AccountPages\AccountPage.xaml">
+      <Generator>MSBuild:UpdateDesignTimeXaml</Generator>
+    </EmbeddedResource>
+    <EmbeddedResource Update="Views\AccountPages\AddressEditPage.xaml">
+      <Generator>MSBuild:UpdateDesignTimeXaml</Generator>
+    </EmbeddedResource>
+    <EmbeddedResource Update="Views\AccountPages\AddressListPage.xaml">
+      <Generator>MSBuild:UpdateDesignTimeXaml</Generator>
+    </EmbeddedResource>
+    <EmbeddedResource Update="Views\AccountPages\ConfirmAccountPage.xaml">
+      <Generator>MSBuild:UpdateDesignTimeXaml</Generator>
+    </EmbeddedResource>
+    <EmbeddedResource Update="Views\AccountPages\ConfirmPasswordChangePage.xaml">
+      <Generator>MSBuild:UpdateDesignTimeXaml</Generator>
+    </EmbeddedResource>
+    <EmbeddedResource Update="Views\AccountPages\ReviewOrderPage.xaml">
+      <Generator>MSBuild:UpdateDesignTimeXaml</Generator>
+    </EmbeddedResource>
+    <EmbeddedResource Update="Views\Shared\ContactPage.xaml">
+      <Generator>MSBuild:UpdateDesignTimeXaml</Generator>
+    </EmbeddedResource>
+    <EmbeddedResource Update="Views\AccountPages\CreditCardListPage.xaml">
+      <Generator>MSBuild:UpdateDesignTimeXaml</Generator>
+    </EmbeddedResource>
+    <EmbeddedResource Update="Views\Shared\DeliveryOrPickupPage.xaml">
+      <Generator>MSBuild:UpdateDesignTimeXaml</Generator>
+    </EmbeddedResource>
+    <EmbeddedResource Update="Views\AccountPages\ForgotPasswordPage.xaml">
+      <Generator>MSBuild:UpdateDesignTimeXaml</Generator>
+    </EmbeddedResource>
+    <EmbeddedResource Update="Views\Shared\MainMenuPage.xaml">
+      <Generator>MSBuild:UpdateDesignTimeXaml</Generator>
+    </EmbeddedResource>
+    <EmbeddedResource Update="Views\Shared\MenuItemsPage.xaml">
+      <Generator>MSBuild:UpdateDesignTimeXaml</Generator>
+    </EmbeddedResource>
+    <EmbeddedResource Update="Views\AccountPages\NewPasswordPage.xaml">
+      <Generator>MSBuild:UpdateDesignTimeXaml</Generator>
+    </EmbeddedResource>
+    <EmbeddedResource Update="Views\Shared\OrderFailedPage.xaml">
+      <Generator>MSBuild:UpdateDesignTimeXaml</Generator>
+    </EmbeddedResource>
+    <EmbeddedResource Update="Views\GuestPages\GuestInfoPage.xaml">
+      <Generator>MSBuild:UpdateDesignTimeXaml</Generator>
+    </EmbeddedResource>
+    <EmbeddedResource Update="Views\Shared\OrdersPage.xaml">
+      <Generator>MSBuild:UpdateDesignTimeXaml</Generator>
+    </EmbeddedResource>
+    <EmbeddedResource Update="Views\Shared\PrivacyPolicyPage.xaml">
+      <Generator>MSBuild:UpdateDesignTimeXaml</Generator>
+    </EmbeddedResource>
+    <EmbeddedResource Update="Views\AccountPages\CreditCardSavePage.xaml">
+      <Generator>MSBuild:UpdateDesignTimeXaml</Generator>
+    </EmbeddedResource>
+    <EmbeddedResource Update="Views\Shared\ShoppingCartPage.xaml">
+      <Generator>MSBuild:UpdateDesignTimeXaml</Generator>
+    </EmbeddedResource>
+    <EmbeddedResource Update="Views\AccountPages\SignInPage.xaml">
+      <Generator>MSBuild:UpdateDesignTimeXaml</Generator>
+    </EmbeddedResource>
+    <EmbeddedResource Update="Views\AccountPages\SignUpPage.xaml">
+      <Generator>MSBuild:UpdateDesignTimeXaml</Generator>
+    </EmbeddedResource>
+    <EmbeddedResource Update="Views\AccountPages\SignUpAddressPage.xaml">
+      <Generator>MSBuild:UpdateDesignTimeXaml</Generator>
+    </EmbeddedResource>
+    <EmbeddedResource Update="Views\Shared\WebViewPage.xaml">
+      <Generator>MSBuild:UpdateDesignTimeXaml</Generator>
+    </EmbeddedResource>
+  </ItemGroup>
+  <ItemGroup>
+    <None Remove="Resources\italiana-regular.otf" />
+    <None Remove="Resources\Italianno-Regular-OTF.otf" />
+    <None Remove="Styles\EmptyXmlFile.xml" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Resources\italiana-regular.otf" />
+    <EmbeddedResource Include="Resources\Italianno-Regular-OTF.otf" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\..\JessesPizza.App.Core\JessesPizza.MobileApp.Core.csproj" />
+    <ProjectReference Include="..\..\JessesPizza.Core\JessesPizza.Core.csproj" />
+    <ProjectReference Include="..\..\JessesPizza.Data\JessesPizza.Data.csproj" />
+  </ItemGroup>
+</Project>

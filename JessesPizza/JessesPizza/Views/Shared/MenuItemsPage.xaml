@@ -1,0 +1,66 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://xamarin.com/schemas/2014/forms"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="JessesPizza.Views.MenuItemsPage"
+                          xmlns:dataControls="clr-namespace:Telerik.XamarinForms.DataControls;assembly=Telerik.XamarinForms.DataControls"
+             xmlns:listView="clr-namespace:Telerik.XamarinForms.DataControls.ListView;assembly=Telerik.XamarinForms.DataControls"
+             xmlns:primitives="clr-namespace:Telerik.XamarinForms.Primitives;assembly=Telerik.XamarinForms.Primitives"
+             xmlns:input="clr-namespace:Telerik.XamarinForms.Input;assembly=Telerik.XamarinForms.Input"
+             xmlns:ios="clr-namespace:Xamarin.Forms.PlatformConfiguration.iOSSpecific;assembly=Xamarin.Forms.Core"
+             xmlns:ffimageloading="clr-namespace:FFImageLoading.Forms;assembly=FFImageLoading.Forms"
+             ios:Page.UseSafeArea="true"
+
+             Title="{Binding Title}">
+    <Grid VerticalOptions="FillAndExpand" HorizontalOptions="FillAndExpand" BackgroundColor="{DynamicResource backgroundColor}" >
+
+        <dataControls:RadListView AutomationId="MenuItemsListView" VerticalOptions="FillAndExpand" BackgroundColor="{DynamicResource backgroundColor}" ItemsSource="{Binding Items}"  x:Name="ItemsListView" SelectionMode="Single" ItemTapped="OnItemSelected">
+            <dataControls:RadListView.ItemTemplate>
+                <DataTemplate>
+                    <listView:ListViewTemplateCell>
+                        <listView:ListViewTemplateCell.View>
+                            <Frame AutomationId="MenuItemsFrame" CornerRadius="10" Padding="10" Margin="2" MinimumHeightRequest="100" BackgroundColor="{DynamicResource ListViewBackgroundColor}"    >
+                            <Grid >
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="*"/>
+                                    <ColumnDefinition Width ="100"/>
+                                </Grid.ColumnDefinitions>
+                                    <Grid Grid.Column="0">
+                                        <Grid.RowDefinitions>
+                                            <RowDefinition Height ="Auto"/>
+                                            <RowDefinition Height ="Auto" />
+                                            <RowDefinition Height ="Auto"/>
+                                        </Grid.RowDefinitions>
+                                        <Label Grid.Row="0" Text="{Binding Name}" 
+                                       LineBreakMode="WordWrap"  
+                                       FontSize="25"
+                                        HorizontalOptions="Start"
+                                       FontAttributes="Bold"
+                                       Margin="0"
+                                       TextColor="{DynamicResource TextPrimaryColor}"/>
+                                        <Label Grid.Row="1" Text="{Binding Description}" 
+                                       LineBreakMode="WordWrap"
+                                       FontSize="Medium"
+                                       TextColor="{DynamicResource TextPrimaryColor}" Margin="0,0,0,10"/>
+                                    </Grid>
+                                    <!--Padding="0,0,20,-10"-->
+
+                                    <Frame IsVisible="{Binding ImageHasValue}" Margin="0" Padding="0" IsClippedToBounds="True" VerticalOptions="FillAndExpand" HorizontalOptions="FillAndExpand" CornerRadius="10" Grid.Column="1" HeightRequest="100" WidthRequest="100" >
+                                    <ffimageloading:CachedImage Aspect="AspectFill" Grid.Column="1" HorizontalOptions="CenterAndExpand"  WidthRequest="100" HeightRequest="100" Source="{Binding ImageUrl}" CacheDuration="50" RetryCount="3" RetryDelay="600" DownsampleToViewSize="true" />
+                                </Frame>
+                            </Grid>
+                            </Frame>
+                        </listView:ListViewTemplateCell.View>
+                    </listView:ListViewTemplateCell>
+                </DataTemplate>
+            </dataControls:RadListView.ItemTemplate>
+            <dataControls:RadListView.ItemStyle>
+                <listView:ListViewItemStyle BackgroundColor="{DynamicResource backgroundColor}"
+                                        TextCellTextColor="{DynamicResource TextPrimaryColor}"
+                                        BorderColor="{DynamicResource TextPrimaryColor}"
+                                        BorderWidth="0"
+                                        BorderLocation="All" />
+            </dataControls:RadListView.ItemStyle>
+        </dataControls:RadListView>
+    </Grid>
+
+</ContentPage>

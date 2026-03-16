@@ -1,0 +1,164 @@
+﻿@page "/transactions"
+@using JessesPizza.Core.Models
+@using JessesPizza.Core.Models.Transactions
+@using JessesPizza.Data
+@using System.IO
+@using JessesPizza.Core.Helpers
+@using System.Runtime.InteropServices 
+
+@inject IPizzaRepo pizzaRepo
+@inject NavigationManager NavigationManager
+@inject NotificationService notificationService
+
+@code
+{
+
+    public List<MongoTransactionV1_1> MongoTransactions;
+    bool LoadingSignVisible { get; set; }
+    string NotificationText { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+        try
+        {
+            MongoTransactions = new List<MongoTransactionV1_1>();
+            LoadingSignVisible = true;
+            var enumerable = await pizzaRepo.GetAllTransactionsV1_1();
+            foreach (var transaction in enumerable)
+            {
+                if (transaction.Date.Year == 0001)
+                    await pizzaRepo.DeleteTransaction(transaction.TransactionGuid);
+                else
+                {
+                    TimeZoneInfo pdt;
+                    //Get Time zone info on windows, if not use linux convention
+                    if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
+                        pdt = TimeZoneInfo.FindSystemTimeZoneById("Pacific Standard Time");
+                    else
+                        pdt = TimeZoneInfo.FindSystemTimeZoneById("America/Los_Angeles");
+
+                    transaction.Date = TimeZoneInfo.ConvertTimeFromUtc(transaction.Date, pdt);
+                    MongoTransactions.Add(transaction);
+                }
+            }
+            var transactions = await pizzaRepo.GetAllTransactions();
+            foreach (var transaction in transactions)
+            {
+                if (transaction.Date.Year == 0001)
+                    await pizzaRepo.DeleteTransaction(transaction.TransactionGuid);
+                else {
+                    TimeZoneInfo pdt;
+                    //Get Time zone info on windows, if not use linux convention
+                    if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
+                        pdt = TimeZoneInfo.FindSystemTimeZoneById("Pacific Standard Time");
+                    else
+                        pdt = TimeZoneInfo.FindSystemTimeZoneById("America/Los_Angeles");
+
+                    transaction.Date = TimeZoneInfo.ConvertTimeFromUtc(transaction.Date, pdt);
+                    MongoTransactions.Add(new MongoTransactionV1_1(transaction));
+                }
+            }
+            MongoTransactions = MongoTransactions.OrderByDescending(x=>x.Date).ToList();
+            LoadingSignVisible = false;
+        }
+        catch(Exception e )
+        {
+            Serilog.Log.Logger.Error($"Unable to initialize Main Menu Items page because {e.Message}");
+        }
+    }
+
+
+    async void ShowNotification(NotificationMessage message)
+    {
+        notificationService.Notify(message);
+        await InvokeAsync(() => { StateHasChanged(); });
+    }
+}
+<AuthorizeView>
+    <Authorized>
+        <h1>Transactions</h1>
+        <div class="container col-md-12">
+            <RadzenNotification />
+            <RadzenDialog />
+                    <RadzenGrid AllowFiltering="true"  AllowSorting="true" AllowPaging="true" PageSize="10" Data="@MongoTransactions" TItem="MongoTransactionV1_1" ColumnWidth="50px">
+                        <Columns>
+                            <RadzenGridColumn TItem="MongoTransactionV1_1" Property="Date" Title="Date">
+                                <Template Context="Date">
+                                    @Date.Date.ToString("MM/dd/yyyy h:mm tt")
+                                </Template>
+                            </RadzenGridColumn>
+                            <RadzenGridColumn Width="100px" TItem="MongoTransactionV1_1" Property="ConvergeTransactionId" Title="Converge Id">
+                            </RadzenGridColumn>
+                            <RadzenGridColumn Width="30px" TItem="MongoTransactionV1_1" Property="Total" Title="Order Total">
+                                <Template Context="data">
+                                    @String.Format("{0:$.00}", data.Total)
+                                </Template>
+                            </RadzenGridColumn>
+                            <RadzenGridColumn TItem="MongoTransactionV1_1" Property="Name" Title="Name">
+                            </RadzenGridColumn>
+                            <RadzenGridColumn Width="40px" TItem="MongoTransactionV1_1" Property="PhoneNumber" Title="Phone Number">
+                            </RadzenGridColumn>
+                            <RadzenGridColumn TItem="MongoTransactionV1_1" Property="Address1" Title="Address">
+                            </RadzenGridColumn>
+                            <RadzenGridColumn Width="40px" TItem="MongoTransactionV1_1" Property="City" Title="City">
+                            </RadzenGridColumn>
+                            <RadzenGridColumn Width="30px" TItem="MongoTransactionV1_1" Property="ZipCode" Title="Zip Code">
+                            </RadzenGridColumn>
+                            <RadzenGridColumn Width="30px" TItem="MongoTransactionV1_1" Property="TransactionStateV1_1" Title="State">
+                            </RadzenGridColumn>
+
+                        </Columns>
+                    </RadzenGrid>
+
+        </div>
+    </Authorized>
+    <NotAuthorized>
+        <h1>Authentication Failure!</h1>
+        <p>You're not signed in.</p>
+    </NotAuthorized>
+</AuthorizeView>
+<style>
+    h2 .btn-group {
+        display: inline-block;
+    }
+
+    .selected {
+        background-color: #F4E9AA;
+    }
+
+    .notSelected {
+        background-color: #EDE8D7;
+    }
+
+    h2 {
+        margin-right: 20px;
+    }
+
+    div {
+        text-align: center;
+    }
+
+    #wrapper {
+        bottom: 50px;
+        position: fixed;
+        z-index: 5000;
+        right: 50px;
+    }
+
+    .container {
+        display: flex;
+    }
+
+    .fixed {
+        width: 450px;
+    }
+
+    .flex-item {
+        flex-grow: 1;
+    }
+
+    #radButton {
+        margin-right: -100px;
+        margin-left: -10px;
+    }
+</style>

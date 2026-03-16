@@ -1,0 +1,526 @@
+﻿@page "/mainmenuitems"
+@using JessesPizza.Core.Models
+@using JessesPizza.Data
+@using System.IO
+@using JessesPizza.Core.Helpers
+@using JessesPizza.WebApp.Models
+
+@inject IPizzaRepo PizzaRepo
+@inject NavigationManager NavigationManager
+@inject Radzen.DialogService dialogService
+@inject NotificationService notificationService
+@implements IDisposable
+
+@code
+{
+
+    public List<MainMenuItem> MainMenuItemsList;
+    public List<MainMenuItemWrapper> MainMenuItemsWrapperList { get; set; } = new List<MainMenuItemWrapper>();
+    bool LoadingSignVisible { get; set; }
+    string result;
+    public MainMenuItem SelectedMainMenuItem { get; set; }
+    public MainMenuItemWrapper SelectedMainMenuItemWrapper { get; set; }
+    public JessesMenuItem SelectedMenuItem { get; set; }
+    public RadzenDataList<JessesMenuItem> menuItemsDataList { get; set; }
+    public RadzenDataList<MainMenuItemWrapper> mainMenuItemsList { get; set; }
+    List<Group> AllGroups { get; set; } = new List<Group>();
+    List<GroupForm> SelectedGroups { get; set; } = new List<GroupForm>() { };
+    string NotificationText { get; set; }
+    bool IsItemsCardVisible { get; set; } = false;
+    bool menuItemsWindowIsVisible { get; set; } = false;
+    bool mainMenuItemsWindowIsVisible { get; set; } = false;
+
+    protected override async Task OnInitializedAsync()
+    {
+        try
+        {
+            LoadingSignVisible = true;
+            await RefreshLists();
+            if (MainMenuItemsList.Count != 0)
+                await OnMainMenuItemSelect(MainMenuItemsList.FirstOrDefault().Id);
+            dialogService.OnOpen += Open;
+            dialogService.OnClose += Close;
+            LoadingSignVisible = false;
+        }
+        catch
+        {
+            Serilog.Log.Logger.Error($"Unable to initialize Main Menu Items page");
+        }
+    }
+    public void Dispose()
+    {
+        dialogService.OnOpen -= Open;
+        dialogService.OnClose -= Close;
+    }
+    #region MenuItems
+    protected async Task OnMenuItemDuplicate(string id)
+    {
+        try
+        {
+            SelectedMenuItem = SelectedMainMenuItem.MenuItems.Where(x => x.Id == id).FirstOrDefault();
+            var duplicate = new JessesMenuItem(SelectedMenuItem);
+            duplicate.Id = IdHelper.GetUniqueId();
+            duplicate.Name = string.Concat("Copy of ", SelectedMenuItem.Name);
+            duplicate.ImageUrl = await ImageHelper.DuplicateImageFromUrl(id, duplicate.Id);
+            foreach (var size in duplicate.Sizes)
+            {
+                size.Id = IdHelper.GetUniqueId();
+            }
+            SelectedMainMenuItem.MenuItems.Add(duplicate);
+            await PizzaRepo.UpdateMainMenuItem(SelectedMainMenuItem);
+            var selected = SelectedMainMenuItem;
+            SelectedMainMenuItem = new MainMenuItem();
+            await RefreshLists();
+            OnMainMenuItemSelect(selected.Id);
+            var message = new NotificationMessage() { Severity = NotificationSeverity.Success, Summary = $"{SelectedMenuItem.Name} Successfully Duplicated", Duration = 4000 };
+            Serilog.Log.Logger.Information($"MenuItem {SelectedMenuItem.Name} successfully duplicated");
+            ShowNotification(message);
+        }
+        catch (Exception e)
+        {
+            var message = new NotificationMessage() { Severity = NotificationSeverity.Error, Summary = $"Unable to Duplicate Main Menu Item", Duration = 4000 };
+            ShowNotification(message);
+            await RefreshLists();
+            Serilog.Log.Logger.Error($"Unable to Duplicate Menu Item because {e.Message}");
+
+        }
+    }
+    private void HandleMenuItemDeleteCancel()
+    {
+        menuItemsWindowIsVisible = false;
+    }
+    private async void HandleMenuItemDeleteClick()
+    {
+        try
+        {
+            menuItemsWindowIsVisible = false;
+            SelectedMainMenuItem.MenuItems.Remove(SelectedMenuItem);
+            await PizzaRepo.UpdateMainMenuItem(SelectedMainMenuItem);
+            var assembly = Directory.GetCurrentDirectory();
+            var ext = string.Concat(assembly, "/wwwroot/JessesImages/", SelectedMenuItem.Id, ".jpg");
+            File.Delete(ext);
+            MainMenuItemsList = await PizzaRepo.GetAllMainMenuItems();
+            var message = new NotificationMessage() { Severity = NotificationSeverity.Info, Summary = $"{SelectedMenuItem.Name} Successfully Deleted", Duration = 4000 };
+            ShowNotification(message);
+            SelectedMenuItem = new JessesMenuItem();
+            StateHasChanged();
+            Serilog.Log.Logger.Information($"MenuItem {SelectedMenuItem.Name} successfully deleted");
+
+        }
+        catch (Exception e)
+        {
+            var message = new NotificationMessage() { Severity = NotificationSeverity.Error, Summary = $"Unable to Delete {SelectedMenuItem.Name} ", Duration = 4000 };
+            ShowNotification(message);
+            Serilog.Log.Logger.Error($"Unable to delete MenuItem because {e.Message}");
+
+        }
+    }
+
+    private void OnMenuItemDelete(string id)
+    {
+        SelectedMenuItem = SelectedMainMenuItem.MenuItems.Where(x => x.Id == id).FirstOrDefault();
+        menuItemsWindowIsVisible = true;
+
+    }
+    protected async Task OnItemSelect(string id)
+    {
+        SelectedMenuItem = SelectedMainMenuItem.MenuItems.Where(x => x.Id == id).FirstOrDefault();
+
+    }
+    #endregion
+    #region MainMenuItems
+    private void HandleMainMenuItemDeleteCancel()
+    {
+        mainMenuItemsWindowIsVisible = false;
+    }
+    private async void HandleMainMenuItemDeleteClick()
+    {
+        var menuItem = SelectedMainMenuItem;
+        try
+        {
+            mainMenuItemsWindowIsVisible = false;
+            await PizzaRepo.RemoveMainMenuItem(menuItem);
+            foreach (var item in menuItem.MenuItems)
+            {
+                var assembly = Directory.GetCurrentDirectory();
+                var ext = string.Concat(assembly, "/wwwroot/JessesImages/", item.Id, ".jpg");
+                File.Delete(ext);
+            }
+            var groupImageFilePath = string.Concat(Directory.GetCurrentDirectory(), "/wwwroot/JessesImages/", menuItem.Id, ".jpg");
+            File.Delete(groupImageFilePath);
+            MainMenuItemsList = await PizzaRepo.GetAllMainMenuItems();
+            MainMenuItemsWrapperList = new List<MainMenuItemWrapper>();
+            foreach (var mmItem in MainMenuItemsList)
+            {
+                var wrapper = new MainMenuItemWrapper(mmItem);
+                MainMenuItemsWrapperList.Add(wrapper);
+            }
+            var message = new NotificationMessage() { Severity = NotificationSeverity.Info, Summary = $"{menuItem.Name} Successfully Deleted", Duration = 4000 };
+            ShowNotification(message);
+            SelectedMenuItem = new JessesMenuItem();
+            IsItemsCardVisible = false;
+            Serilog.Log.Logger.Information($"MainMenuItem {menuItem.Name} successfully deleted");
+            StateHasChanged();
+        }
+        catch (Exception e)
+        {
+            var message = new NotificationMessage() { Severity = NotificationSeverity.Error, Summary = $"Unable to Delete {menuItem.Name} ", Duration = 4000 };
+            ShowNotification(message);
+            Serilog.Log.Logger.Error("Unable to delete MainMenuItem");
+        }
+    }
+    private void OnMainMenuItemDelete(string id)
+    {
+        SelectedMainMenuItem = MainMenuItemsList.Where(x => x.Id == id).FirstOrDefault();
+        mainMenuItemsWindowIsVisible = true;
+    }
+    protected async Task OnMainMenuItemDuplicate(string id)
+    {
+        try
+        {
+            SelectedMainMenuItem = MainMenuItemsList.Where(x => x.Id == id).FirstOrDefault();
+            SelectedMainMenuItemWrapper = MainMenuItemsWrapperList.Where(x => x.Id == id).FirstOrDefault();
+            var duplicate = new MainMenuItem(SelectedMainMenuItem);
+            duplicate.Id = IdHelper.GetUniqueId();
+            duplicate.Name = string.Concat("Copy of ", SelectedMainMenuItem.Name);
+            duplicate.ImageUrl = await ImageHelper.DuplicateImageFromUrl(id, duplicate.Id);
+            foreach (var item in SelectedMainMenuItem.MenuItems)
+            {
+                var duplicateItem = new JessesMenuItem(item);
+                duplicateItem.Id = IdHelper.GetUniqueId();
+                duplicateItem.ImageUrl = await ImageHelper.DuplicateImageFromUrl(item.Id, duplicateItem.Id);
+                foreach (var size in duplicateItem.Sizes)
+                {
+                    size.Id = IdHelper.GetUniqueId();
+                }
+                duplicate.MenuItems.Add(duplicateItem);
+            }
+            await PizzaRepo.AddMainMenuItem(duplicate);
+            await RefreshLists();
+            OnMainMenuItemSelect(SelectedMainMenuItem.Id);
+            var message = new NotificationMessage() { Severity = NotificationSeverity.Info, Summary = $"{SelectedMainMenuItem.Name} Successfully Duplicated", Duration = 4000 };
+            ShowNotification(message);
+            Serilog.Log.Logger.Information("MainMenuItem duplicated");
+
+        }
+        catch (Exception e)
+        {
+            var message = new NotificationMessage() { Severity = NotificationSeverity.Error, Summary = $"Unable to Duplicate Main Menu Item", Duration = 4000 };
+            ShowNotification(message);
+            Serilog.Log.Logger.Error($"Failed to duplicate MainMenuItem because {e.Message}");
+        }
+    }
+    protected async Task OnMainMenuItemSelect(string id)
+    {
+        if (SelectedMainMenuItem != null)
+            SelectedMainMenuItemWrapper.Selected = "notSelected";
+        SelectedMainMenuItemWrapper = MainMenuItemsWrapperList.Where(x => x.Id == id).FirstOrDefault();
+        SelectedMainMenuItemWrapper.Selected = "selected";
+        SelectedMainMenuItem = MainMenuItemsList.Where(x => x.Id == id).FirstOrDefault();
+        IsItemsCardVisible = true;
+        StateHasChanged();
+        Serilog.Log.Logger.Information("New MainMenuItem selected");
+    }
+    #endregion
+
+
+    async void ShowNotification(NotificationMessage message)
+    {
+        notificationService.Notify(message);
+        await InvokeAsync(() => { StateHasChanged(); });
+    }
+    async Task RefreshLists()
+    {
+        MainMenuItemsWrapperList = new List<MainMenuItemWrapper>();
+        SelectedGroups = new List<GroupForm>();
+        StateHasChanged();
+        MainMenuItemsList = await PizzaRepo.GetAllMainMenuItems();
+        AllGroups = await PizzaRepo.GetAllGroups();
+        foreach (var mmItem in MainMenuItemsList)
+        {
+            var wrapper = new MainMenuItemWrapper(mmItem);
+            MainMenuItemsWrapperList.Add(wrapper);
+            foreach (var item in mmItem.MenuItems)
+            {
+                foreach (var size in item.Sizes)
+                {
+                    foreach (var groupId in size.GroupIds)
+                    {
+                        var group = AllGroups.FirstOrDefault(x => x.Id == groupId);
+                        if (group != null)
+                        {
+                            var groupForm = new GroupForm(group);
+                            groupForm.MenuItemId = item.Id;
+                            groupForm.SizeId = size.Id;
+                            SelectedGroups.Add(groupForm);
+                        }
+                    }
+                }
+            }
+        }
+        MainMenuItemsWrapperList = MainMenuItemsWrapperList.OrderBy(x => x.Ordinal).ToList();
+        Serilog.Log.Logger.Information("MainMenuItems list refreshed");
+        StateHasChanged();
+    }
+    async void Open(string title, Type type, Dictionary<string, object> parameters, DialogOptions options)
+    {
+        var split = title.Split(' ');
+        string text = split[0].Insert(split[0].Length, "d");
+        string item = type.Name;
+        item = parameters["ItemName"] as string;
+        NotificationText = $"{item} Successfully {text}";
+        await InvokeAsync(() => { StateHasChanged(); });
+        Serilog.Log.Logger.Information("Dialog Opened from MainMenuItems Page");
+    }
+    async void Close(dynamic result)
+    {
+        try
+        {
+            if (string.IsNullOrEmpty(result) || result == "cancel")
+                return;
+            MainMenuItemsList = new List<MainMenuItem>();
+            MainMenuItemsWrapperList = new List<MainMenuItemWrapper>();
+            SelectedGroups = new List<GroupForm>();
+            await InvokeAsync(() => { StateHasChanged(); });
+            await RefreshLists();
+            await InvokeAsync(() => { StateHasChanged(); });
+            if (SelectedMainMenuItem != null & MainMenuItemsList != new List<MainMenuItem>())
+            {
+                OnMainMenuItemSelect(SelectedMainMenuItem.Id);
+            }
+            if (result == "MenuItemSuccess" || result == "MainItemSuccess") // & !itemCompare.All(SelectedGroup.Items.Contains)
+            {
+                var message = new NotificationMessage() { Severity = NotificationSeverity.Success, Summary = NotificationText, Duration = 4000 };
+                ShowNotification(message);
+            }
+            if (result == "MainItemFailure" || result == "MenuItemFailure") // & !itemCompare.All(SelectedGroup.Items.Contains)
+            {
+                var message = new NotificationMessage() { Severity = NotificationSeverity.Error, Summary = "Failed to complete action", Duration = 4000 };
+                ShowNotification(message);
+            }
+            Serilog.Log.Logger.Information("Dialog closed from MainMenuItems Page");
+        }
+        catch (Exception e)
+        {
+            Serilog.Log.Logger.Error($"Failed to close dialog because {e.Message}");
+        }
+    }
+}
+<AuthorizeView>
+    <Authorized>
+        <h1>Main Menu Items</h1>
+        <div class="container col-md-12">
+            <RadzenNotification />
+            <RadzenDialog />
+
+            <div class="fixed">
+                <div class="ui" style="text-align:center;">
+                    <h2>
+                        Main Menu Items List
+                        <small>
+                            <span class="btn-group">
+                                <RadzenButton Icon="add_circle" Style="font-size:large; background-color:#930304; margin-top:-50px;  display: inline-block; " Click="@(args =>  dialogService.Open<MainMenuItemDialog>($"Create New Main Menu Item",
+                        new Dictionary<string, object>() { { "ItemID", "1" },{ "ItemName", "New Main Menu Item"} },
+                        new DialogOptions() { Width = "600px", Height = "600px", Left = "calc(50% - 600px)", Top = "calc(50% -100px)"}))" />
+                            </span>
+                        </small>
+                    </h2>
+                </div>
+                <RadzenDataList @ref="@mainMenuItemsList" PageSize="5" WrapItems="true" AllowPaging="true" Data="@MainMenuItemsWrapperList" TItem="MainMenuItemWrapper">
+                    <Template Context="item">
+                        <RadzenCard Style="max-width:450px;" @onclick="@(e=>OnMainMenuItemSelect(item.Id))">
+                            <div id="@item.Id" class="row  @item.Selected" style="border-radius:3px; margin-top:-17px; margin-bottom:-17px; margin-right:-17px; margin-left:-17px;">
+
+
+                                <div class="col-md-12">
+                                    Item Name: <b>@item.Name</b>
+                                </div>
+                                <div class="col-md-6">
+                                    <RadzenImage Path="@item.ImageUrl" Style="width:100px; height:100px; " />
+                                </div>
+                                <div class="col-md-6" style="margin-right:0px">
+                                    <div>Menu Items: @item.MenuItems.Count()</div>
+                                </div>
+                                <div class="col-md-8">
+                                </div>
+                                <div class="col-md-4" style="margin-bottom:10px">
+                                    <div class="row" style="text-align:right;">
+                                        <RadzenIcon Style="cursor:pointer;" Icon="file_copy" @onclick="@(e => OnMainMenuItemDuplicate(item.Id))" />
+                                        <RadzenIcon Style="cursor:pointer;" Icon="edit" @onclick="@(args =>  dialogService.Open<MainMenuItemDialog>($"Update {item.Name}",
+                        new Dictionary<string, object>() { { "ItemID", item.Id },{ "ItemName", item.Name} },
+                        new DialogOptions() { Width = "600px", Height = "600px", Left = "calc(50% - 600px)", Top = "calc(50% -100px)" }))" />
+                                        <RadzenIcon Style="cursor:pointer;" Icon="close" @onclick="@(e => OnMainMenuItemDelete(item.Id))" />
+                                    </div>
+                                </div>
+                            </div>
+
+                        </RadzenCard>
+                    </Template>
+                </RadzenDataList>
+            </div>
+            @if (IsItemsCardVisible)
+            {
+                <div class="flex-item">
+                    <div>
+                        <h2>@SelectedMainMenuItem.Name Items</h2>
+                    </div>
+                    <RadzenCard Style="max-width:2000px;">
+                        <RadzenDataList PageSize="10" @ref="@menuItemsDataList" WrapItems="true" AllowPaging="true" Data="@SelectedMainMenuItem.MenuItems" TItem="JessesMenuItem">
+                            <Template Context="item">
+                                <RadzenCard Style="max-width:500px;  background-color:#EDE8D7; " @onclick="@(e=>OnItemSelect(item.Id))">
+                                    <div class="row ">
+                                        <div class="col-md-12">
+                                            <div>Item Name:   <b>@item.Name</b></div>
+                                        </div>
+                                        <div class="col-md-4">
+                                            <RadzenImage Path="@item.ImageUrl" Style="width:100px; height:100px" />
+                                        </div>
+                                        <div class=" col-md-8">
+                                            @{string periods; if (!string.IsNullOrEmpty(item.Description)) { if (item.Description.Length > 75) { periods = string.Concat(item.Description.Substring(0, 75), "..."); } else { periods = item.Description; } }
+                                                else
+                                                {
+                                                    periods = "";
+                                                }}
+
+                                            <div>Item Description: @periods  </div>
+
+                                        </div>
+
+                                        <div class="col-md-12">
+                                            @if (item.Sizes.Count() >= 1)
+                                            {
+                                                <label> <strong>Sizes </strong></label>
+                                                <br />
+                                                <RadzenGrid AllowPaging="true" PageSize="3" Data="@item.Sizes" TItem="JessesItemSize" ColumnWidth="50px">
+                                                    <Template Context="size">
+                                                        @if (SelectedGroups != null)
+                                                            @if (SelectedGroups.Where(x => x.MenuItemId == item.Name) != null)
+                                                            {
+                                                                <RadzenGrid AllowPaging="true" PageSize="3" Data="@SelectedGroups.Where(x=>x.MenuItemId == item.Id && x.SizeId == size.Id)" TItem="GroupForm" ColumnWidth="50px">
+                                                                    <Columns>
+                                                                        <RadzenGridColumn TItem="GroupForm" Property="Name" Title="Group Name">
+                                                                        </RadzenGridColumn>
+                                                                        <RadzenGridColumn Width="25px" TItem="GroupForm" Property="IsRequired" Title="Is Required">
+                                                                        </RadzenGridColumn>
+                                                                        <RadzenGridColumn Width="40px" TItem="GroupForm" Property="Type" Title="Group Type">
+                                                                        </RadzenGridColumn>
+                                                                        <RadzenGridColumn Width="15px" TItem="GroupForm" Property="Max" Title="Max">
+                                                                        </RadzenGridColumn>
+                                                                        <RadzenGridColumn Width="15px" TItem="GroupForm" Property="Min" Title="Min">
+                                                                        </RadzenGridColumn>
+
+                                                                    </Columns>
+                                                                </RadzenGrid>
+                                                            }
+                                                        </Template>
+
+                                                        <Columns>
+                                                            <RadzenGridColumn TItem="JessesItemSize" Property="Name" Title="Name" />
+                                                            <RadzenGridColumn TItem="JessesItemSize" Property="Price" Title="Price" />
+                                                            <RadzenGridColumn TItem="JessesItemSize" Property="IsDefault" Title="Is Default" />
+                                                        </Columns>
+                                                    </RadzenGrid>
+                                                    <br />
+                                                }
+                                        </div>
+                                        <div class="col-md-10">
+                                        </div>
+                                        <div class="col-md-2" style="margin-bottom:10px">
+                                            <div class="row" style="text-align:right;">
+                                                <RadzenIcon Style="cursor:pointer;" Icon="file_copy" @onclick="@(e => OnMenuItemDuplicate(item.Id))" />
+
+                                                <RadzenIcon Style="cursor:pointer;" Icon="edit" @onclick="@(args =>  dialogService.Open<MenuItemDialog>($"Update {item.Name}",
+                        new Dictionary<string, object>() { { "ItemID", item.Id },{ "MainMenuItemID", SelectedMainMenuItem.Id},{"ItemName",item.Name } },
+                        new DialogOptions() {Width = "1500px", Height = "700px", Left = "calc(50% - 1000px)", Top = "calc(50% -100px)" }))" />
+                                                <RadzenIcon Style="cursor:pointer;" Icon="close" @onclick="@(e => OnMenuItemDelete(item.Id))" />
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                </RadzenCard>
+                            </Template>
+                        </RadzenDataList>
+                    </RadzenCard>
+                </div>
+            }
+        </div>
+        <div id="wrapper">
+            <RadzenButton Style="background-color:#930304;" Icon="add_circle" Visible="@IsItemsCardVisible" Click="@(args =>  dialogService.Open<MenuItemDialog>($"Create New Menu Item for {SelectedMainMenuItem.Name}",
+                        new Dictionary<string, object>() { { "ItemID", "1"},{ "MainMenuItemID", SelectedMainMenuItem.Id},{ "ItemName", "New Menu Item"} },
+                        new DialogOptions() { Width = "1500px", Height = "700px", Left = "calc(50% - 1000px)", Top = "calc(50% -100px)" }))" />
+        </div>
+
+        <TelerikWindow Width="600px" Height="100" Visible="@mainMenuItemsWindowIsVisible">
+            <WindowContent>
+                Are you sure you want to delete <b>@SelectedMainMenuItem.Name </b>? The Menu Items it is
+                associated with will also be deleted.<br />
+                <TelerikButton OnClick="@HandleMainMenuItemDeleteClick">Delete</TelerikButton>
+                <TelerikButton OnClick="@HandleMainMenuItemDeleteCancel">Cancel</TelerikButton>
+            </WindowContent>
+        </TelerikWindow>
+        <TelerikWindow Width="600px" Height="100" Visible="@menuItemsWindowIsVisible">
+            <WindowContent>
+                Are you sure you want to delete <b>@SelectedMenuItem.Name </b>? <br />
+                <TelerikButton OnClick="@HandleMenuItemDeleteClick">Delete</TelerikButton>
+                <TelerikButton OnClick="@HandleMenuItemDeleteCancel">Cancel</TelerikButton>
+            </WindowContent>
+        </TelerikWindow>
+        <TelerikWindow @bind-Visible="@LoadingSignVisible" Modal="true">
+            <WindowTitle>
+                <strong>Please Wait</strong>
+            </WindowTitle>
+            <WindowContent>
+                Please wait...we are processing your request.
+            </WindowContent>
+        </TelerikWindow>
+    </Authorized>
+    <NotAuthorized>
+        <h1>Authentication Failure!</h1>
+        <p>You're not signed in.</p>
+    </NotAuthorized>
+</AuthorizeView>
+<style>
+    h2 .btn-group {
+        display: inline-block;
+    }
+
+    .selected {
+        background-color: #F4E9AA;
+    }
+
+    .notSelected {
+        background-color: #EDE8D7;
+    }
+
+    h2 {
+        margin-right: 20px;
+    }
+
+    div {
+        text-align: center;
+    }
+
+    #wrapper {
+        bottom: 50px;
+        position: fixed;
+        z-index: 5000;
+        right: 50px;
+    }
+
+    .container {
+        display: flex;
+    }
+
+    .fixed {
+        width: 450px;
+    }
+
+    .flex-item {
+        flex-grow: 1;
+    }
+
+    #radButton {
+        margin-right: -100px;
+        margin-left: -10px;
+    }
+</style>

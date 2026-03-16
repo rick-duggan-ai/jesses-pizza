@@ -1,0 +1,200 @@
+﻿@page "/MainMenuDialog/{ItemID}"
+
+@using JessesPizza.Core.Models
+@using JessesPizza.Data
+@using System.IO
+@using JessesPizza.Core
+@using Flurl.Http
+@using Flurl
+@using JessesPizza.Core.Helpers
+@inject Radzen.DialogService dialogService
+@inject IPizzaRepo PizzaRepo
+@code {
+    [Parameter] public string ItemID { get; set; }
+    [Parameter] public string ItemName { get; set; }
+
+    MainMenuItem item = new MainMenuItem() { };
+    MainMenuItem originalItem { get; set; } = new MainMenuItem();
+    public bool IsEdit { get; set; } = false;
+    public string FilePath { get; set; }
+    public bool WindowIsVisible { get; set; } = false;
+    public bool DeleteWindowVisible { get; set; } = false;
+    public string Message { get; set; }
+    private byte[] ImageArray { get; set; }
+    private string ImageExtension { get; set; }
+    private bool ImageUploaded = false;
+    private bool CheckBoxValue = false;
+
+    protected override async Task OnInitializedAsync()
+    {
+
+        await InvokeAsync(async () =>
+        {
+            try
+            {
+                if (ItemID == "1")
+                    item = new MainMenuItem() { Id = IdHelper.GetUniqueId(), MenuItems = new List<JessesMenuItem>() { },Ordinal = 0 };
+                else
+                {
+                    item = await PizzaRepo.GetMainMenuItem(ItemID);
+                    originalItem = item;
+                    IsEdit = true;
+                    ImageUploaded = true;
+                    FilePath = item.ImageUrl;
+
+                }
+                StateHasChanged();
+            }
+            catch (Exception e)
+            {
+                Serilog.Log.Logger.Error($"Failed to initialize MainMenuItemDialogbecause {e.Message}");
+            }
+        });
+
+    }
+    private async void Submit()
+    {
+        var mmItem = item;
+        if (string.IsNullOrEmpty(mmItem.Name))
+        {
+            Message = "Group Name is required";
+            WindowIsVisible = true;
+            return;
+        }
+
+        try
+        {
+            await CleanupImage(mmItem.Id);
+            var timestamp = DateTime.Now.TimeOfDay.ToString();
+            if (CheckBoxValue)
+                mmItem.ImageUrl = null;
+            else
+                mmItem.ImageUrl =  string.Concat(ImageHelper.GetImageBasePath(), item.Id.ToString(), ".jpg?",timestamp);
+
+            if (IsEdit)
+            {
+                await PizzaRepo.UpdateMainMenuItem(mmItem);
+            }
+            else
+                await PizzaRepo.AddMainMenuItem(mmItem);
+            Serilog.Log.Logger.Information("MainMenuItemDialog successfully submitted");
+            dialogService.Close("MainItemSuccess");
+
+        }
+        catch (Exception e)
+        {
+            dialogService.Close("MainItemFailure");
+            Serilog.Log.Logger.Error($"Exception thrown trying to submit MainMenuItemDialog because {e.Message}");
+
+        }
+    }
+    void Cancel()
+    {
+        dialogService.Close("cancel");
+    }
+    private void HandleCancel()
+    {
+        WindowIsVisible = false;
+        DeleteWindowVisible = false;
+
+    }
+    public async Task CleanupImage(string id)
+    {
+        var assembly = Directory.GetCurrentDirectory();
+        var ext = string.Concat("/wwwroot/JessesImages/", id, "new.jpg");
+        var newFilePath = string.Concat(assembly, ext);
+        if (System.IO.File.Exists(newFilePath))
+        {
+            ext = string.Concat("/wwwroot/JessesImages/", id, ".jpg");
+            var filePath = string.Concat(assembly, ext);
+            if(File.Exists(filePath))
+                File.Delete(filePath);
+            File.Move(newFilePath, filePath);
+            return;
+
+        }
+        else
+            return;
+    }
+    int progress;
+    string info;
+
+    void OnProgress(UploadProgressArgs args, string name)
+    {
+        this.info = $"% '{name}' / {args.Loaded} of {args.Total} bytes.";
+        this.progress = args.Progress;
+        var assembly = Directory.GetCurrentDirectory();
+        var ext = string.Concat("/wwwroot/JessesImages/", item.Id.ToString(), ".jpg");
+        FilePath = string.Concat(assembly, ext);
+        if (!ImageUploaded)
+        {
+            item.ImageUrl =  string.Concat(ImageHelper.GetImageBasePath(), item.Id.ToString(), ".jpg");
+            ImageUploaded = true;
+        }
+        else
+        {
+            var timestamp = DateTime.Now.TimeOfDay.ToString();
+            item.ImageUrl =  string.Concat(ImageHelper.GetImageBasePath(), item.Id.ToString(), "new.jpg?",timestamp);
+        }
+    }
+
+}
+
+
+<EditForm OnValidSubmit="Submit" Model="@item">
+    <DataAnnotationsValidator />
+    <ValidationSummary />
+    <div class="row">
+        <div class="col-md-12">
+            <RadzenFieldset Text="Main Menu Item Info">
+                <div class="row">
+                    <div class="col-md-4 align-items-center d-flex">
+                        <RadzenLabel Text="Item Name" />
+                    </div>
+                    <div class="col-md-8">
+                        <RadzenTextBox style="width: 100%;" @bind-Value="item.Name" Name="MMIName" />
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-md-4 align-items-center d-flex">
+                        <RadzenLabel Text="Priority" />
+                    </div>
+                    <div class="col-md-8">
+                        <RadzenNumeric style="width: 100%;" Min="0" Max="25" @bind-Value="item.Ordinal" Name="MMIOrdinal" />
+                    </div>
+                </div>
+                <div class="row" style="margin-top:15px;">
+                    <div class="col-md-4 align-items-center d-flex">
+                        <label for="body">Upload Image: </label>
+                    </div>
+                    <div class="col-md-8">
+                        @*<RadzenFileInput @bind-Value="item.ImageUrl" Style="width:400px;" TValue="string" Change="@(args => Change(args, "FileInput"))" />*@
+                        <RadzenImage Style="height: 100px; width:100px;" Path="@item.ImageUrl"></RadzenImage>
+
+                        <Radzen.Blazor.RadzenUpload Accept="image/*" Url=@($"upload/single/{item.Id}") Progress="@((args) => OnProgress(args, "Images only upload"))" />
+                        <span ml-5>No Image</span>
+                        <Radzen.Blazor.RadzenCheckBox TValue="bool" @bind-Value="CheckBoxValue"></Radzen.Blazor.RadzenCheckBox>
+                    </div>
+                </div>
+            </RadzenFieldset>
+        </div>
+    </div>
+    <div class="row justify-content-center">
+        <div class="col-md-12 d-flex align-items-end justify-content-center" style="margin-top: 16px;">
+            <RadzenButton ButtonType="Radzen.ButtonType.Submit" Icon="save" Text="Save" />
+            <RadzenButton ButtonStyle="ButtonStyle.Light" Icon="cancel" style="display: inline-block; margin-left: 10px;" Text="Cancel" Click="@Cancel" />
+        </div>
+    </div>
+</EditForm>
+<TelerikWindow Width="600px" Height="100" Visible="@WindowIsVisible">
+    <WindowContent>
+        Maximum must be greater than or equal to Minimum<br />
+        <TelerikButton OnClick="@HandleCancel">Ok</TelerikButton>
+    </WindowContent>
+</TelerikWindow>
+<TelerikWindow Width="600px" Height="100" Visible="@WindowIsVisible">
+    <WindowContent>
+        @Message<br />
+        <TelerikButton OnClick="@HandleCancel">Ok</TelerikButton>
+    </WindowContent>
+</TelerikWindow>

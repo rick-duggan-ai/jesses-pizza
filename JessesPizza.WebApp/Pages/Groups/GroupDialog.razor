@@ -1,0 +1,256 @@
+﻿@page "/GroupDialog/{GroupID}"
+
+@using JessesPizza.Core.Models
+@using JessesPizza.Data
+@using System.IO
+@using JessesPizza.Core.Helpers
+@inject Radzen.DialogService dialogService
+@inject IPizzaRepo PizzaRepo
+
+
+@code {
+    [Parameter] public string GroupID { get; set; }
+    [Parameter] public string ItemName { get; set; }
+    List<GroupTypeSelector> groupTypes = new List<GroupTypeSelector>() { new GroupTypeSelector() { Name = "Single", Id = 1 }, new GroupTypeSelector() { Name = "Multiple", Id = 2 }, new GroupTypeSelector() { Name = "MinMax", Id = 3 } };
+    Group group { get; set; } = new Group();
+    Group originalGroup { get; set; } = new Group();
+
+    public bool IsEdit { get; set; } = false;
+    public string FilePath { get; set; }
+    public string OriginalImagePath { get; set; }
+    public string Message { get; set; }
+    public bool WindowIsVisible { get; set; } = false;
+    public bool DeleteWindowVisible { get; set; } = false;
+    private bool ImageUploaded = false;
+    private bool CheckBoxValue = false;
+
+    protected override async Task OnInitializedAsync()
+    {
+        try
+        {
+            await InvokeAsync(async () =>
+            {
+                if (GroupID == "1")
+                    group = new Group() { Id = IdHelper.GetUniqueId(), GroupType = 1 };
+                else
+                {
+                    IsEdit = true;
+                    ImageUploaded = true;
+                    group = await PizzaRepo.GetGroup(GroupID);
+                    FilePath = group.ImageUrl;
+                }
+                StateHasChanged();
+            });
+            StateHasChanged();
+        }
+        catch(Exception e)
+        {
+            Serilog.Log.Logger.Error( $"Unable to initialize GroupDialog because: {e.Message}");
+        }
+    }
+    private async void Submit()
+    {
+        try
+        {
+        var selectedGroup = group;
+        var timestamp = DateTime.Now.TimeOfDay.ToString();
+        if (string.IsNullOrEmpty(selectedGroup.Name))
+        {
+            Message = "Group Name is required";
+            WindowIsVisible = true;
+            return;
+        }
+        await CleanupImage(selectedGroup.Id);
+        if (CheckBoxValue)
+            selectedGroup.ImageUrl = null;
+        else
+            selectedGroup.ImageUrl = string.Concat(ImageHelper.GetImageBasePath(), selectedGroup.Id.ToString(), ".jpg?", timestamp);
+        selectedGroup.Type = (GroupType)(selectedGroup.GroupType - 1);
+        if (selectedGroup.Type != GroupType.MinMax)
+        {
+            selectedGroup.Min = 0;
+            selectedGroup.Max = 0;
+        }
+        else
+        {
+            if (selectedGroup.Min > selectedGroup.Max)
+            {
+                Message = "Maximum must be greater than or equal to Minimum";
+                WindowIsVisible = true;
+                return;
+            }
+        }
+
+            if (IsEdit)
+                await PizzaRepo.UpdateGroup(selectedGroup);
+            else
+            {
+                selectedGroup.Items = new List<GroupItem>();
+                await PizzaRepo.AddGroup(selectedGroup);
+            }
+            dialogService.Close("GroupSuccess");
+        }
+        catch (Exception e)
+        {
+            dialogService.Close("GroupFailure");
+            Serilog.Log.Logger.Error( $"Unable to submit GroupDialog because: {e.Message}");
+        }
+    }
+    void Cancel()
+    {
+        dialogService.Close("cancel");
+    }
+    private void HandleCancel()
+    {
+        WindowIsVisible = false;
+        DeleteWindowVisible = false;
+    }
+    private async void DeleteIconClick()
+    {
+        DeleteWindowVisible = true;
+    }
+    private async void HandleDeleteClick()
+    {
+        try
+        {
+            WindowIsVisible = false;
+            await PizzaRepo.RemoveGroup(group);
+            StateHasChanged();
+        }
+        catch (Exception e)
+        {
+            Console.WriteLine(e.ToString());
+            Serilog.Log.Logger.Error( $"Unable to Delete GroupDialog because: {e.Message}");
+        }
+    }
+    private async void ValidatorChange()
+    {
+        await InvokeAsync(async () =>
+        {
+            StateHasChanged();
+        });
+    }
+    public async Task CleanupImage(string id)
+    {
+        var assembly = Directory.GetCurrentDirectory();
+        var ext = string.Concat("/wwwroot/JessesImages/", id, "new.jpg");
+        var newFilePath = string.Concat(assembly, ext);
+        if (System.IO.File.Exists(newFilePath))
+        {
+            ext = string.Concat("/wwwroot/JessesImages/", id, ".jpg");
+            var filePath = string.Concat(assembly, ext);
+            if(File.Exists(filePath))
+                File.Delete(filePath);
+            File.Move(newFilePath, filePath);
+            return;
+
+        }
+        else
+            return;
+    }
+    int progress;
+    string info;
+
+    void OnProgress(UploadProgressArgs args, string name)
+    {
+        this.info = $"% '{name}' / {args.Loaded} of {args.Total} bytes.";
+        this.progress = args.Progress;
+        var assembly = Directory.GetCurrentDirectory();
+        var ext = string.Concat("/wwwroot/JessesImages/", group.Id.ToString(), ".jpg");
+        FilePath = string.Concat(assembly, ext);
+        if (!ImageUploaded)
+        {
+            group.ImageUrl =  string.Concat(ImageHelper.GetImageBasePath(), group.Id.ToString(), ".jpg");
+            ImageUploaded = true;
+        }
+        else
+        {
+            var timestamp = DateTime.Now.TimeOfDay.ToString();
+            group.ImageUrl =  string.Concat(ImageHelper.GetImageBasePath(), group.Id.ToString(), "new.jpg?",timestamp);
+        }
+    }
+
+}
+
+<EditForm Model="@group" OnValidSubmit="Submit">
+    <DataAnnotationsValidator />
+    <ValidationSummary />
+    <div class="row">
+        <div class="col-md-12">
+            <RadzenFieldset Text="Group Info">
+                <div class="row">
+                    <div class="col-md-4 align-items-center d-flex">
+                        <RadzenLabel Text="Group Name" />
+                    </div>
+                    <div class="col-md-8">
+                        <RadzenTextBox style="width: 100%;" @bind-Value="@group.Name" Name="GroupName" />
+                    </div>
+                </div>
+                <div class="row" style="margin-top:15px;">
+                    <div class="col-md-4 align-items-center d-flex">
+                        <RadzenLabel Text="Is Required" />
+                    </div>
+                    <div class="col-md-8">
+                        <RadzenCheckBox @bind-Value="@group.IsRequired"></RadzenCheckBox>
+                    </div>
+                </div>
+                <div class="row" style="margin-top:15px;">
+                    <div class="col-md-4 align-items-center d-flex">
+                        <RadzenLabel Text="Group Type" />
+                    </div>
+                    <div class="col-md-8">
+                        <RadzenDropDown @bind-Value="group.GroupType" Data="@groupTypes" style="width: 100%;" TextProperty="Name" ValueProperty="Id" Name="GroupType">
+                        </RadzenDropDown>
+                    </div>
+                </div>
+                @if (group.GroupType == (int)GroupType.MinMax + 1)
+                    {
+                <div class="row">
+                    <div class="col-md-4 align-items-center d-flex">
+                        <RadzenLabel Text="Max: " />
+                    </div>
+                    <div class="col-md-8">
+                        <RadzenNumeric style="width: 100%;" Min="0" @bind-Value="group.Max" />
+
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-md-4 align-items-center d-flex">
+                        <RadzenLabel Text="Min: " />
+                    </div>
+                    <div class="col-md-8">
+                        <RadzenNumeric style="width: 100%;" Min="0" @bind-Value="group.Min" />
+
+                    </div>
+                </div>
+                    }
+
+
+            </RadzenFieldset>
+            <div class="row" style="margin-top:15px;margin-bottom:25px;">
+                <div class="col-md-4 align-items-center d-flex">
+                    <label for="body">Upload Image: </label>
+                </div>
+                <div class="col-md-8 ">
+                    <RadzenImage Style="height: 100px; width:100px;" Path="@group.ImageUrl"></RadzenImage>
+                    <Radzen.Blazor.RadzenUpload Accept="image/*" Url=@($"upload/single/{group.Id}") Progress="@((args) => OnProgress(args, "Images only upload"))" />
+                    <span ml-5>No Image</span>
+                    <Radzen.Blazor.RadzenCheckBox TValue="bool" @bind-Value="CheckBoxValue"></Radzen.Blazor.RadzenCheckBox>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="row justify-content-center">
+        <div class="col-md-12 d-flex align-items-end justify-content-center" style="margin-top: 16px;">
+            <RadzenButton ButtonType="Radzen.ButtonType.Submit" Icon="save" Text="Save" />
+            <RadzenButton ButtonStyle="ButtonStyle.Light" Icon="cancel" style="display: inline-block; margin-left: 10px;" Text="Cancel" Click="@Cancel" />
+        </div>
+    </div>
+</EditForm>
+<TelerikWindow Width="600px" Height="100" Visible="@WindowIsVisible">
+    <WindowContent>
+        @Message<br />
+        <TelerikButton OnClick="@HandleCancel">Ok</TelerikButton>
+    </WindowContent>
+</TelerikWindow>
+

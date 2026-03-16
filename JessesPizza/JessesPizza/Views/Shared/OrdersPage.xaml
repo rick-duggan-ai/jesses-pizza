@@ -1,0 +1,90 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://xamarin.com/schemas/2014/forms"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:dataControls="clr-namespace:Telerik.XamarinForms.DataControls;assembly=Telerik.XamarinForms.DataControls"
+             xmlns:listView="clr-namespace:Telerik.XamarinForms.DataControls.ListView;assembly=Telerik.XamarinForms.DataControls"
+             xmlns:primitives="clr-namespace:Telerik.XamarinForms.Primitives;assembly=Telerik.XamarinForms.Primitives"
+             xmlns:input="clr-namespace:Telerik.XamarinForms.Input;assembly=Telerik.XamarinForms.Input"
+             xmlns:viewModels="clr-namespace:JessesPizza.ViewModels"
+             x:Class="JessesPizza.Views.OrdersPage"
+             Title="Order History">
+
+    <ContentPage.Content>
+
+            <Grid BackgroundColor="{DynamicResource backgroundColor}" >
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto"></RowDefinition>
+                <RowDefinition Height="Auto"></RowDefinition>
+                <RowDefinition Height="*"></RowDefinition>
+            </Grid.RowDefinitions>
+            <Label Grid.Row="0" Text ="My Orders" FontSize="30" FontAttributes="Bold" TextColor="{DynamicResource TextPrimaryColor}" HorizontalOptions="Center"  ></Label>
+            <ActivityIndicator Grid.Row="1" IsVisible="{Binding IsLoading}" IsEnabled="{Binding IsLoading}" IsRunning="{Binding IsLoading}" HorizontalOptions="Center"></ActivityIndicator>
+            <Label Margin="5" Grid.Row="1" IsVisible="{Binding IsEmpty}"  Text ="You have not placed any orders yet" FontSize="20" FontAttributes="Bold" TextColor="{DynamicResource TextPrimaryColor}" HorizontalOptions="Center"  ></Label>
+            <dataControls:RadListView   Grid.Row="2" BackgroundColor="{DynamicResource backgroundColor}"   ItemsSource="{Binding OpenTransactions}" x:Name="shoppingListView" SelectionMode="None">
+                <dataControls:RadListView.ItemTemplate>
+                    <DataTemplate>
+                        <listView:ListViewTemplateCell>
+                            <listView:ListViewTemplateCell.View>
+                                <Frame CornerRadius="10" Padding="10" Margin="2" BackgroundColor="{DynamicResource ListViewBackgroundColor}" >
+                                    <Grid>
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="*"/>
+                                            <ColumnDefinition Width ="*"/>
+                                            <ColumnDefinition Width ="*"/>
+                                        </Grid.ColumnDefinitions>
+                                        <Grid.RowDefinitions>
+                                            <RowDefinition Height ="Auto"/>
+                                            <RowDefinition Height ="Auto" />
+                                            <RowDefinition Height ="Auto" />
+                                            <RowDefinition Height ="Auto" />
+                                        </Grid.RowDefinitions>
+                                        <Label  Grid.Row="0" Grid.Column="0" Text="{Binding Total, StringFormat='Total: {0:C}'}" FontSize="Medium" FontAttributes="Bold" TextColor="{DynamicResource TextPrimaryColor}" VerticalOptions="Center" />
+                                        <Label  Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="3" Text="{Binding Date, StringFormat='Order Date: {0:MM/dd/yyyy hh:mm tt}'}" FontSize="Medium" FontAttributes="Bold" TextColor="{DynamicResource TextPrimaryColor}" VerticalOptions="Center" />
+                                        <primitives:RadExpander Grid.Row="2" Grid.Column="0" Grid.ColumnSpan="3" x:Name="expander" >
+                                            <primitives:RadExpander.Header>
+                                                <primitives:ExpanderHeader
+                                                        IndicatorText="&#x203A;"                   
+                                                        IndicatorColor="{DynamicResource TextPrimaryColor}"
+                                                        IndicatorFontFamily="Arial"
+                                                        IndicatorFontSize="30"
+                                                        IndicatorLocation="End"
+                                                        IndicatorAnimationDuration="1000"
+                                                        BorderColor="{DynamicResource TextSecondaryColor}"
+                                                        BorderThickness="1"
+                                                        BackgroundColor="{DynamicResource ListViewBackgroundColor}" >
+                                                    <Label Text="Items" VerticalOptions="Center" Style="{DynamicResource LabelStyle}" />
+                                                </primitives:ExpanderHeader>
+                                            </primitives:RadExpander.Header>
+                                        <primitives:RadExpander.Content>
+                                            <StackLayout>
+                                                    <Label Margin="5" FontSize="Large" TextColor="{DynamicResource TextPrimaryColor}" Text="{Binding ItemsListString, StringFormat='{0}'}" />
+                                                </StackLayout>
+                                        </primitives:RadExpander.Content>
+                                    </primitives:RadExpander>
+                                    </Grid>
+                                </Frame>
+                            </listView:ListViewTemplateCell.View>
+                        </listView:ListViewTemplateCell>
+                    </DataTemplate>
+                </dataControls:RadListView.ItemTemplate>
+                                            <dataControls:RadListView.ItemStyle>
+        <listView:ListViewItemStyle BackgroundColor="{DynamicResource backgroundColor}"
+                                        BorderColor="{DynamicResource TextPrimaryColor}"
+                                        BorderWidth="1"
+                                        BorderLocation="All"
+                                    />
+    </dataControls:RadListView.ItemStyle>
+            </dataControls:RadListView>
+        </Grid>
+            <!--<StackLayout IsVisible="{Binding IsBusy}" Padding="12"
+                 AbsoluteLayout.LayoutFlags="PositionProportional"
+                 AbsoluteLayout.LayoutBounds="0.5,0.5,-1,-1">
+
+                <ActivityIndicator IsVisible="{Binding IsBusy}"  IsRunning="{Binding IsBusy}" HorizontalOptions="Center"></ActivityIndicator>
+
+                <Label Text="Loading..." HorizontalOptions="Center" TextColor="White"/>
+
+            </StackLayout>-->
+
+    </ContentPage.Content>
+</ContentPage>

@@ -1,0 +1,69 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8" />
+    <title>time picker test</title>
+    <link rel="stylesheet" href="css/orders.css" />
+    <script src="js/orders.js" ></script>
+    <script>
+        function showpicker() {
+            document.getElementById("pickTime").style.display = "block";
+            let now = new Date();
+            let hour = now.getHours(); 
+            let minute = now.getMinutes() + 20;
+            if (minute > 60) {
+                hour++;
+                if (hour == 24) {
+                    hour = 0;
+                }
+                minute -= 60;
+            }
+            if (hour > 12) {
+                document.getElementById("am").checked = false;
+                document.getElementById("pm").checked = true;
+                hour -= 12;
+            }
+            document.getElementById("hour").value = hour;
+            document.getElementById("minute").value = minute;
+        }
+        function sendText() {
+            let d = (document.getElementById("delivery").checked) ? "delivered" : "ready for pickup";
+            let h = document.getElementById("hour").value;
+            let m = document.getElementById("minute").value;
+            if (m.length < 2) m = "0" + m;
+            let a = (document.getElementById("am").checked) ? "AM" : "PM";
+            let t = `${h}:${m} ${a}`
+            let msg = `Your order from Jesse's Pizza will be ${d} at approximately ${t}`;
+            document.getElementById("textMessage").text = msg;
+            if (confirm(msg)) {
+                $.ajax("")
+            }
+        }
+    </script>
+</head>
+<body>
+    <button onclick="showpicker()">show picker</button>
+    <!-- this part will be copied into the page -->
+    <div id="pickTime" style="display:none">
+        <input type="text" pattern="\d*" id="hour" value="1" />
+        <input type="text" pattern="\d*" id="minute" value="2" />
+        <div>
+            <input type="radio" name="am_pm" id="am" checked="checked" />
+            <label for="am">AM</label>
+            <input type="radio" name="am_pm" id="pm" />
+            <label for="pm">PM</label>
+
+        </div>
+        <div>
+            <input type="radio" name="pickup" id="pickup" />
+            <label for="pickup">Pickup</label>
+            <input type="radio" name="pickup" id="delivery" checked="checked" />
+            <label for="delivery">delivery</label>
+        </div>
+        <button id="sendText" onclick="sendText()">send text</button>
+    </div>
+    <div id="textMessage">
+
+    </div>
+</body>
+</html>

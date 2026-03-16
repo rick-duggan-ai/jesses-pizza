@@ -1,0 +1,569 @@
+﻿@page "/groupspage"
+@using JessesPizza.Core.Models
+@using JessesPizza.Data
+@using System.IO
+@using JessesPizza.Core.Helpers
+@using JessesPizza.WebApp.Models
+
+@inject IPizzaRepo PizzaRepo
+@inject NavigationManager NavigationManager
+@inject DialogService dialogService
+@inject NotificationService notificationService
+@inject IJSRuntime JSRuntime;
+@implements IDisposable
+@code
+{
+    public List<Group> GroupsList;
+    public List<GroupWrapper> GroupWrapperList { get; set; } = new List<GroupWrapper>();
+    bool LoadingSignVisible { get; set; }
+    string result;
+    public string SelectedStyle { get; set; } = "selected";
+    public Group SelectedGroup { get; set; } = new Group() { Id = "", Items = new List<GroupItem>() };
+    public GroupWrapper SelectedGroupWrapper { get; set; } = new GroupWrapper();
+
+    public GroupItem SelectedItem { get; set; } = new GroupItem();
+    public RadzenDataList<GroupWrapper> groupDataList { get; set; }
+    public RadzenDataList<GroupItem> itemDataList { get; set; }
+    public RadzenCard itemsCard { get; set; }
+    bool GroupWindowIsVisible { get; set; } = false;
+    bool ItemWindowIsVisible { get; set; } = false;
+    string NotificationText { get; set; }
+    int SelectedGroupType = 1;
+    string groupID = "1";
+    bool IsItemsCardVisible { get; set; } = false;
+
+    public void Dispose()
+    {
+        dialogService.OnOpen -= Open;
+        dialogService.OnClose -= Close;
+        Serilog.Log.Logger.Information("Disposed Groups page");
+    }
+
+    protected override async Task OnInitializedAsync()
+    {
+        try
+        {
+            LoadingSignVisible = true;
+            dialogService.OnOpen += Open;
+            dialogService.OnClose += Close;
+            GroupsList = await PizzaRepo.GetAllGroups();
+            foreach (var group in GroupsList)
+            {
+                var wrapper = new GroupWrapper(group);
+                GroupWrapperList.Add(wrapper);
+            }
+            LoadingSignVisible = false;
+            Serilog.Log.Logger.Information("Successfully initialized Groups page");
+        }
+        catch
+        {
+            Serilog.Log.Logger.Error("Exception thrown trying to initialize GroupsPage");
+        }
+    }
+    #region Groups
+    private void HandleGroupDeleteCancel()
+    {
+        GroupWindowIsVisible = false;
+    }
+    private async void HandleGroupDeleteClick()
+    {
+        var group = SelectedGroup;
+        try
+        {
+            GroupWindowIsVisible = false;
+            await PizzaRepo.RemoveGroup(group);
+            if (group.Items != null)
+                foreach (var item in group.Items)
+                {
+                    var itemImageFilePath = string.Concat(Directory.GetCurrentDirectory(), "/wwwroot/JessesImages/", item.Id, ".jpg");
+                    File.Delete(itemImageFilePath);
+                }
+            var groupImageFilePath = string.Concat(Directory.GetCurrentDirectory(), "/wwwroot/JessesImages/", group.Id, ".jpg");
+            File.Delete(groupImageFilePath);
+            GroupsList = await PizzaRepo.GetAllGroups();
+            GroupWrapperList = new List<GroupWrapper>();
+            foreach (var group1 in GroupsList)
+            {
+                var wrapper = new GroupWrapper(group1);
+                GroupWrapperList.Add(wrapper);
+            }
+            SelectedGroup = new Group();
+            IsItemsCardVisible = false;
+            var mainMenuItems = await PizzaRepo.GetAllMainMenuItems();
+            foreach (var mmItem in mainMenuItems)
+            {
+                foreach (var item in mmItem.MenuItems)
+                {
+                    foreach (var size in item.Sizes)
+                    {
+                        foreach (var groupId in size.GroupIds)
+                        {
+                            if (groupId == group.Id)
+                            {
+                                var list = size.GroupIds.ToList();
+                                list.Remove(groupId);
+                                size.GroupIds = list;
+                                await PizzaRepo.UpdateMainMenuItem(mmItem);
+                            }
+                        }
+                    }
+                }
+            }
+            var message = new NotificationMessage() { Severity = NotificationSeverity.Info, Summary = $"{group.Name} Successfully Deleted", Duration = 4000 };
+            ShowNotification(message);
+            Serilog.Log.Logger.Information($"Successfully Deleted group: {group.Name}");
+            StateHasChanged();
+        }
+        catch (Exception e)
+        {
+            var message = new NotificationMessage() { Severity = NotificationSeverity.Error, Summary = $"Unable to Delete {group.Name}", Duration = 4000 };
+            ShowNotification(message);
+            Serilog.Log.Logger.Error($"Unable to Delete {group.Name}");
+        }
+    }
+    private void OnGroupDelete(string id)
+    {
+        SelectedGroup = GroupsList.Where(x => x.Id == id).FirstOrDefault();
+        GroupWindowIsVisible = true;
+    }
+    protected async Task OnGroupDuplicate(string id)
+    {
+        try
+        {
+            SelectedGroup = GroupsList.Where(x => x.Id == id).FirstOrDefault();
+            var duplicate = new Group(SelectedGroup);
+            duplicate.Name = string.Concat("Copy of ", SelectedGroup.Name);
+            duplicate.Id = IdHelper.GetUniqueId();
+            duplicate.ImageUrl = await ImageHelper.DuplicateImageFromUrl(id, duplicate.Id);
+            foreach (var item in SelectedGroup.Items)
+            {
+                var duplicateItem = new GroupItem(item);
+                duplicateItem.Id = IdHelper.GetUniqueId();
+                duplicateItem.ImageUrl = await ImageHelper.DuplicateImageFromUrl(item.Id, duplicateItem.Id);
+                duplicateItem.GroupId = duplicate.Id;
+                duplicate.Items.Add(duplicateItem);
+            }
+            await PizzaRepo.AddGroup(duplicate);
+            GroupsList = await PizzaRepo.GetAllGroups();
+            GroupWrapperList = new List<GroupWrapper>();
+            foreach (var group1 in GroupsList)
+            {
+                var wrapper = new GroupWrapper(group1);
+                GroupWrapperList.Add(wrapper);
+            }
+            await OnGroupSelect(SelectedGroup.Id);
+            NotificationText = $"{SelectedGroup.Name} Successfully Duplicated";
+            var message = new NotificationMessage() { Severity = NotificationSeverity.Success, Summary = NotificationText, Duration = 4000 };
+            ShowNotification(message);
+            Serilog.Log.Logger.Information($"Successfully Duplicated group: {SelectedGroup.Name}");
+        }
+        catch (Exception e)
+        {
+            NotificationText = $"Unable to Duplicate Group";
+            var message = new NotificationMessage() { Severity = NotificationSeverity.Error, Summary = NotificationText, Duration = 4000 };
+            ShowNotification(message);
+            Serilog.Log.Logger.Error($"Unable to Duplicate {SelectedGroup.Name} because {e.Message}");
+        }
+    }
+    protected async Task OnGroupSelect(string id)
+    {
+        if (SelectedGroup != null)
+            SelectedGroupWrapper.Selected = "notSelected";
+        SelectedGroupWrapper = GroupWrapperList.Where(x => x.Id == id).FirstOrDefault();
+        SelectedGroupWrapper.Selected = "selected";
+
+        SelectedGroup = GroupsList.Where(x => x.Id == id).FirstOrDefault();
+        IsItemsCardVisible = true;
+        StateHasChanged();
+    }
+    #endregion
+    #region GroupItems
+    private void HandleItemDeleteCancel()
+    {
+        ItemWindowIsVisible = false;
+    }
+    private async void HandleItemDeleteClick()
+    {
+        try
+        {
+            ItemWindowIsVisible = false;
+            SelectedGroup.Items.Remove(SelectedGroup.Items.Where(x => x.Id == SelectedItem.Id).FirstOrDefault());
+            var assembly = Directory.GetCurrentDirectory();
+            var ext = string.Concat(assembly, "/wwwroot/JessesImages/", SelectedItem.Id, ".jpg");
+            File.Delete(ext);
+            await PizzaRepo.UpdateGroup(SelectedGroup);
+            GroupsList = await PizzaRepo.GetAllGroups();
+            GroupWrapperList = new List<GroupWrapper>();
+            foreach (var group1 in GroupsList)
+            {
+                var wrapper = new GroupWrapper(group1);
+                GroupWrapperList.Add(wrapper);
+            }
+            await OnGroupSelect(SelectedGroup.Id);
+            var message = new NotificationMessage() { Severity = NotificationSeverity.Success, Summary = $"{SelectedItem.Name} Successfully Deleted", Duration = 4000 };
+            ShowNotification(message);
+            SelectedItem = new GroupItem();
+            Serilog.Log.Logger.Information($"Successfully Deleted group: {SelectedItem.Name}");
+            StateHasChanged();
+        }
+        catch (Exception e)
+        {
+            var message = new NotificationMessage() { Severity = NotificationSeverity.Error, Summary = $"Unable to Delete {SelectedItem.Name} ", Duration = 4000 };
+            ShowNotification(message);
+            Serilog.Log.Logger.Error($"Unable to Delete {SelectedItem.Name} because {e.Message}");
+
+        }
+    }
+    protected async Task OnItemDuplicate(string id)
+    {
+        try
+        {
+            SelectedItem = SelectedGroup.Items.Where(x => x.Id == id).FirstOrDefault();
+            var duplicate = new GroupItem(SelectedItem);
+            duplicate.Name = string.Concat("Copy of ", SelectedItem.Name);
+            duplicate.Id = IdHelper.GetUniqueId();
+            duplicate.ImageUrl = await ImageHelper.DuplicateImageFromUrl(id, duplicate.Id);
+            SelectedGroup.Items.Add(duplicate);
+            await PizzaRepo.UpdateGroup(SelectedGroup);
+            GroupsList = await PizzaRepo.GetAllGroups();
+            GroupWrapperList = new List<GroupWrapper>();
+            foreach (var group1 in GroupsList)
+            {
+                var wrapper = new GroupWrapper(group1);
+                GroupWrapperList.Add(wrapper);
+            }
+            await OnGroupSelect(SelectedGroup.Id);
+            StateHasChanged();
+            NotificationText = $"{SelectedItem.Name} Successfully Duplicated";
+            var message = new NotificationMessage() { Severity = NotificationSeverity.Success, Summary = NotificationText, Duration = 4000 };
+            ShowNotification(message);
+            Serilog.Log.Logger.Information($"Successfully Duplicated group: {duplicate.Name}");
+        }
+        catch (Exception e)
+        {
+            NotificationText = $"Unable to Duplicate Item";
+            var message = new NotificationMessage() { Severity = NotificationSeverity.Error, Summary = NotificationText, Duration = 4000 };
+            ShowNotification(message);
+            Serilog.Log.Logger.Error($"Unable to Duplicate item: {SelectedItem.Name}, because: {e.Message}");
+
+        }
+    }
+
+    private void OnItemDelete(string id)
+    {
+        SelectedItem = SelectedGroup.Items.Where(x => x.Id == id).FirstOrDefault();
+        ItemWindowIsVisible = true;
+    }
+    protected async Task OnItemSelect(string id)
+    {
+        SelectedItem = SelectedGroup.Items.Where(x => x.Id == id).FirstOrDefault();
+    }
+    #endregion
+
+    async void Open(string title, Type type, Dictionary<string, object> parameters, DialogOptions options)
+    {
+        try
+        {
+            var split = title.Split(' ');
+            string text = split[0].Insert(split[0].Length, "d");
+            string item = parameters["ItemName"] as string;
+
+            NotificationText = $"{item} Successfully {text}";
+
+            await InvokeAsync(() => { StateHasChanged(); });
+        }
+        catch (Exception e)
+        {
+            Serilog.Log.Logger.Error($"Unable to open dialog, because: {e.Message}");
+        }
+    }
+    async void Close(dynamic result)
+    {
+        try
+        {
+            if (!string.IsNullOrEmpty(result) & result != "cancel" & result != "MainItemSuccess" & result != "MainItemFailure" & result != "MenuItemSuccess" & result != "MenuItemFailure")
+            {
+                var selected = SelectedGroup; ;
+                var groupCompare = GroupsList;
+                var itemCompare = SelectedGroup.Items;
+
+                GroupsList = null;
+                GroupWrapperList = new List<GroupWrapper>();
+                GroupsList = await PizzaRepo.GetAllGroups();
+                foreach (var group1 in GroupsList)
+                {
+                    var wrapper = new GroupWrapper(group1);
+                    GroupWrapperList.Add(wrapper);
+                }
+                SelectedGroup = GroupsList.Where(x => x.Id == selected.Id).FirstOrDefault();
+                SelectedGroupWrapper = GroupWrapperList.Where(x => x.Id == selected.Id).FirstOrDefault();
+                if (SelectedGroup != null & GroupsList != new List<Group>())
+                {
+                    SelectedGroupWrapper.Selected = "selected";
+                    OnGroupSelect(SelectedGroup.Id);
+                }
+
+                if (result == "GroupSuccess" || result == "ItemSuccess") // & !itemCompare.All(SelectedGroup.Items.Contains)
+                {
+                    var message = new NotificationMessage() { Severity = NotificationSeverity.Success, Summary = NotificationText, Duration = 4000 };
+                    ShowNotification(message);
+                }
+                if (result == "GroupFailure" || result == "ItemFailure") // & !itemCompare.All(SelectedGroup.Items.Contains)
+                {
+                    var message = new NotificationMessage() { Severity = NotificationSeverity.Error, Summary = "Failed to complete action", Duration = 4000 };
+                    ShowNotification(message);
+                }
+
+                //await InvokeAsync(() => { StateHasChanged(); });
+                StateHasChanged();
+
+            }
+        }
+        catch (Exception e)
+        {
+            Serilog.Log.Logger.Error($"Unable to close dialog, because: {e.Message}");
+        }
+    }
+
+    async void ShowNotification(NotificationMessage message)
+    {
+        try
+        {
+            notificationService.Notify(message);
+            await InvokeAsync(() => { StateHasChanged(); });
+        }
+        catch (Exception e)
+        {
+            Serilog.Log.Logger.Error($"Unable to show notification because: {e.Message}");
+        }
+    }
+
+}
+<AuthorizeView>
+    <Authorized>
+        <h1>Groups</h1>
+        <div class="container col-md-12" style="background-color:#F8F7EF;">
+            <RadzenNotification />
+            <RadzenDialog />
+            <div class="fixed">
+                <div>
+                    <div class="ui" style="text-align:center;">
+                        <h2>
+                            Groups List
+                            <small>
+                                <span class="btn-group">
+                                    <RadzenButton Icon="add_circle" Style="font-size:large; background-color:#930304; margin-top:-50px;  display: inline-block; " Click="@(args =>  dialogService.Open<JessesPizza.WebApp.Pages.Groups.GroupDialog>($"Create New Group",
+                        new Dictionary<string, object>() { { "GroupID", groupID },{ "ItemName", "New Group"} },
+                        new DialogOptions() { Width = "600px", Height = "600px", Left = "calc(50% - 600px)", Top = "calc(50% -100px)" }))" />
+                                </span>
+                            </small>
+                        </h2>
+
+
+                    </div>
+                    <RadzenDataList @ref="@groupDataList" PageSize="5" WrapItems="true" AllowPaging="true" Data="@GroupWrapperList" TItem="GroupWrapper" Style="background-color:transparent;">
+                        <Template Context="group">
+                            @*<div id="@group.Selected" style="width: 100%; height: 100%;min-width:100%; min-height: 100%; border-color:transparent;border-right-width:80px; border-width:-50px;">*@
+
+                            <RadzenCard Style=" max-width:450px; max-height:500px; height:100%; border-bottom:15px;border-bottom-color:red;  "
+                                        @onclick="@(e=>OnGroupSelect(group.Id))">
+                                <div id="@group.Id" class="row  @group.Selected" style="border-radius:3px; margin-top:-17px; margin-bottom:-17px; margin-right:-17px; margin-left:-17px;">
+
+                                    <div class="col-md-12">
+                                        Group Name: <b>@group.Name</b>
+                                    </div>
+                                    <div class="col-md-4">
+                                        <br />
+                                        <RadzenImage Path="@group.ImageUrl" Style="width:100px; height:100px; margin-right:10px" />
+                                    </div>
+                                    <div class="col-md-5" style="margin-right:0px; cursor:pointer;">
+                                        <RadzenRadioButtonList Style="cursor:default;" Disabled="true" @bind-Value="@group.GroupType" TValue="int" Orientation="Orientation.Vertical">
+                                            <Items>
+                                                <RadzenRadioButtonListItem Text="Single" Value="1" />
+                                                <RadzenRadioButtonListItem Text="Multiple" Value="2" />
+                                                <RadzenRadioButtonListItem Text="MinMax" Value="3" />
+                                            </Items>
+                                        </RadzenRadioButtonList>
+                                    </div>
+                                    <div class="col-md-3" style="margin-top:10px">
+                                        <label> Max: @group.Max</label>
+                                        <label> Min: @group.Min</label>
+                                        <label> Is Required: <RadzenCheckBox @bind-Value="@group.IsRequired" Disabled="true"></RadzenCheckBox></label>
+                                    </div>
+                                    <div class="col-md-9">
+                                    </div>
+                                    <div class="col-md-3" style="margin-bottom:10px">
+                                        <div class="row" style="text-align:right;">
+                                            <RadzenIcon Style="cursor:pointer;" Icon="file_copy" @onclick="@(e => OnGroupDuplicate(group.Id))" />
+                                            <RadzenIcon Style="cursor:pointer;" Icon="edit" @onclick="@(args =>  dialogService.Open<GroupDialog>($"Update {group.Name}",
+                        new Dictionary<string, object>() { { "GroupID", group.Id },{ "ItemName", group.Name} },
+                        new DialogOptions() { Width = "600px", Height = "600px", Left = "calc(50% - 600px)", Top = "calc(50% -100px)" }))" />
+                                            <RadzenIcon Style="cursor:pointer;" Icon="close" @onclick="@(e => OnGroupDelete(group.Id))" />
+                                        </div>
+                                    </div>
+                                </div>
+                            </RadzenCard>
+                        </Template>
+                    </RadzenDataList>
+                </div>
+
+            </div>
+            @if (IsItemsCardVisible)
+            {
+                <div class="flex-item">
+                    <div>
+                        <h2>@SelectedGroup.Name Items</h2>
+                    </div>
+                    <RadzenCard Visible="@IsItemsCardVisible" Style="background-color:#F8F7EF; max-width:2000px;">
+                        <div class="row">
+                            <RadzenDataList @ref="@itemDataList" WrapItems="true" AllowPaging="true" Data="@SelectedGroup.Items" TItem="GroupItem">
+                                <Template Context="item">
+                                    <RadzenCard Style="max-width:500px; margin-bottom:20px; background-color:#F8F7EF; " @onclick="@(e=>OnItemSelect(item.Id))">
+                                        <div class="row" style=" background-color:#EDE8D7; border-radius:3px; margin-top:-17px; margin-bottom:-17px; margin-right:-17px; margin-left:-17px;">
+                                            <div class="col-md-12">
+                                                <div>Item Name:   <b>@item.Name</b></div>
+                                            </div>
+                                            <div class="col-md-4">
+                                                <RadzenImage Path="@item.ImageUrl" Style="width:100px; height:100px" />
+                                            </div>
+                                            <div class="col-md-8">
+                                                @if (item.Sizes.Count() >= 1)
+                                                {
+                                                    <label> <strong>Sizes </strong></label>
+                                                    <br />
+                                                    <RadzenGrid AllowPaging="true" PageSize="5" Data="@item.Sizes" TItem="ItemSize" ColumnWidth="50px">
+                                                        <Columns>
+                                                            <RadzenGridColumn TItem="ItemSize" Property="Name" Title="Name" />
+                                                            <RadzenGridColumn TItem="ItemSize" Property="Price" Title="Price" />
+                                                            <RadzenGridColumn TItem="ItemSize" Property="Default" Title="Is Default" />
+
+                                                        </Columns>
+                                                    </RadzenGrid>
+                                                    <br />
+                                                }
+                                                @if (item.Sides.Count() >= 1)
+                                                {
+                                                    <label> <strong>Sides </strong></label>
+                                                    <br />
+                                                    <RadzenGrid AllowPaging="true" PageSize="5" Data="@item.Sides" TItem="ItemSide" ColumnWidth="50px">
+                                                        <Columns>
+                                                            <RadzenGridColumn TItem="ItemSide" Property="Name" Title="Name" />
+                                                            <RadzenGridColumn TItem="ItemSide" Property="Price" Title="Price" />
+                                                            <RadzenGridColumn TItem="ItemSide" Property="IsDefault" Title="Is Default" />
+
+                                                        </Columns>
+                                                    </RadzenGrid>
+                                                }
+                                            </div>
+                                            <div class="col-md-10">
+                                            </div>
+                                            <div class="col-md-2" style="margin-bottom:10px">
+                                                <div class="row" style="text-align:right;">
+                                                    <RadzenIcon Style="cursor:pointer;" Icon="file_copy" @onclick="@(e => OnItemDuplicate(item.Id))" />
+
+                                                    <RadzenIcon Style="cursor:pointer;" Icon="edit" @onclick="@(args =>  dialogService.Open<GroupItemDialog>($"Update {item.Name}",
+                        new Dictionary<string, object>() { { "ItemID", item.Id },{ "GroupID", SelectedGroup.Id},{ "ItemName", item.Name} },
+                        new DialogOptions() { Width = "700px", Height = "700px", Left = "calc(50% - 600px)", Top = "calc(50% -100px)" }))" />
+                                                    <RadzenIcon Style="cursor:pointer;" Icon="close" @onclick="@(e => OnItemDelete(item.Id))" />
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                    </RadzenCard>
+                                </Template>
+                            </RadzenDataList>
+                        </div>
+
+                    </RadzenCard>
+                </div>
+
+            }
+
+        </div>
+        <div id="wrapper">
+            <RadzenButton Style="background-color:#930304;" Icon="add_circle" Visible="@IsItemsCardVisible" Click="@(args =>  dialogService.Open<GroupItemDialog>($"Create New Item for {SelectedGroup.Name}",
+                        new Dictionary<string, object>() { { "ItemID", "1"},{ "GroupID", SelectedGroup.Id},{ "ItemName", "New Group Item"} },
+                        new DialogOptions() { Width = "800px", Height = "700px", Left = "calc(50% - 600px)", Top = "calc(50% -100px)" }))" />
+        </div>
+        <TelerikWindow Width="600px" Height="100" Visible="@GroupWindowIsVisible">
+            <WindowContent>
+                Are you sure you want to delete @*<b>@SelectedGroup?.Name?</b>*@ The Group Items it is
+                associated with will also be deleted.<br />
+                <TelerikButton OnClick="@HandleGroupDeleteClick">Delete</TelerikButton>
+                <TelerikButton OnClick="@HandleGroupDeleteCancel">Cancel</TelerikButton>
+            </WindowContent>
+        </TelerikWindow>
+
+        <TelerikWindow Width="600px" Height="100" Visible="@ItemWindowIsVisible">
+            <WindowContent>
+                Are you sure you want to delete <b>@SelectedItem?.Name? </b>? <br />
+                <TelerikButton OnClick="@HandleItemDeleteClick">Delete</TelerikButton>
+                <TelerikButton OnClick="@HandleItemDeleteCancel">Cancel</TelerikButton>
+            </WindowContent>
+        </TelerikWindow>
+
+        <TelerikWindow @bind-Visible="@LoadingSignVisible" Modal="true">
+            <WindowTitle>
+                <strong>Please Wait</strong>
+            </WindowTitle>
+            <WindowContent>
+                @*Add animated gif and styling to taste*@
+                Please wait...we are processing your request.
+            </WindowContent>
+        </TelerikWindow>
+    </Authorized>
+    <NotAuthorized>
+        <h1>Authentication Failure!</h1>
+        <p>You're not signed in.</p>
+    </NotAuthorized>
+</AuthorizeView>
+
+
+
+<style type="text/css">
+    h2 .btn-group {
+        display: inline-block;
+    }
+
+    .selected {
+        background-color: #F4E9AA;
+    }
+
+    .notSelected {
+        background-color: #EDE8D7;
+    }
+
+    #wrapper {
+        bottom: 50px;
+        position: fixed;
+        z-index: 5000;
+        right: 50px;
+    }
+
+    h2 {
+        margin-right: 20px;
+    }
+
+    div {
+        text-align: center;
+    }
+
+    .container {
+        display: flex;
+    }
+
+    .fixed {
+        width: 550px;
+        max-width: 550px;
+    }
+
+    .flex-item {
+        flex-grow: 1;
+    }
+
+    #radButton {
+        margin-right: -100px;
+        margin-left: -10px;
+    }
+</style>
+

@@ -1,0 +1,29 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://xamarin.com/schemas/2014/forms"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:d="http://xamarin.com/schemas/2014/forms/design"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" xmlns:telerikDataForm="clr-namespace:Telerik.XamarinForms.Input.DataForm;assembly=Telerik.XamarinForms.Input" xmlns:telerikInput="clr-namespace:Telerik.XamarinForms.Input;assembly=Telerik.XamarinForms.Input" xmlns:telerikCommon="clr-namespace:Telerik.XamarinForms.Common;assembly=Telerik.XamarinForms.Common"
+             mc:Ignorable="d"
+             x:Class="JessesPizza.Views.SignUpAddressPage"
+             >
+    <ContentPage.Content>
+        <StackLayout BackgroundColor="{DynamicResource backgroundColor}">
+            <telerikInput:RadDataForm CommitMode="Immediate"  FormValidationCompleted="DataFormValidationCompleted"  x:Name="DataForm" BackgroundColor="{DynamicResource backgroundColor}"  >
+                <telerikInput:RadDataForm.GroupHeaderStyle>
+                    <telerikDataForm:DataFormGroupHeaderStyle IsCollapsible="False" TextAlignment="Center"/>
+                </telerikInput:RadDataForm.GroupHeaderStyle>
+                <telerikInput:RadDataForm.EditorStyle>
+
+                    <telerikDataForm:DataFormEditorStyle >
+                        <telerikDataForm:DataFormEditorStyle.Background>
+                            <telerikCommon:Background Fill="Transparent"/>
+                        </telerikDataForm:DataFormEditorStyle.Background>
+                    </telerikDataForm:DataFormEditorStyle>
+                </telerikInput:RadDataForm.EditorStyle>
+
+
+            </telerikInput:RadDataForm>
+            <telerikInput:RadButton VerticalOptions="EndAndExpand" x:Name="SubmitButton" Text="CONTINUE" Style="{DynamicResource ButtonStyle}" Clicked="SubmitButton_Clicked" Margin="10,0,10,25" />
+        </StackLayout>
+    </ContentPage.Content>
+</ContentPage>

@@ -1,0 +1,40 @@
+﻿
+@*@page "/privacy"
+@using JessesPizza.Core.Models
+@using JessesPizza.Core.Models.Transactions
+@using JessesPizza.Data
+@using System.IO
+@using JessesPizza.Core.Helpers
+
+
+@inject IPizzaRepo pizzaRepo
+
+@code
+{
+
+    string PrivacyString { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+        try
+        {
+            var str = await pizzaRepo.GetPrivacyPolicy();
+            PrivacyString = str;
+
+        }
+        catch (Exception e)
+        {
+            Serilog.Log.Logger.Error($"Unable to display privacy page because {e.Message}");
+        }
+    }
+
+}
+<div class="container">
+    <pre class="text-wrap">"@PrivacyString"</pre>
+</div>
+
+<style>
+    div {
+        text-align: center;
+    }
+</style>*@

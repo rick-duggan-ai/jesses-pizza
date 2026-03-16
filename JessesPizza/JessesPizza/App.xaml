@@ -1,0 +1,118 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<Application xmlns="http://xamarin.com/schemas/2014/forms"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+                          xmlns:input="clr-namespace:Telerik.XamarinForms.Input;assembly=Telerik.XamarinForms.Input" xmlns:converters="clr-namespace:JessesPizza.Converters"
+             x:Class="JessesPizza.App">
+    <Application.Resources>
+        <ResourceDictionary>
+            <!--Global Styles-->
+                                    <Style x:Key="baseStyle" TargetType="input:RadDataForm">
+                    <Setter Property="BackgroundColor" Value="Black" />
+
+            </Style>
+            <!--<Color x:Key="NavigationPrimary">#2196F3</Color>
+            <Style TargetType="NavigationPage">
+                <Setter Property="BarBackgroundColor" Value="{StaticResource NavigationPrimary}" />
+                <Setter Property="BarTextColor" Value="White" />
+            </Style>-->
+
+            <OnPlatform x:Key="MaterialFontFamily" x:TypeArguments="x:String">
+                <On Platform="iOS" Value="Material Design Icons" />
+                <On Platform="Android" Value="materialdesignicons-webfont.ttf#Material Design Icons" />
+            </OnPlatform>
+            <OnPlatform x:Key="PizzaFont" x:TypeArguments="x:String">
+                <On Platform="iOS" Value="italiana-regular" />
+                <On Platform="Android" Value="materialdesignicons-webfont.ttf#Material Design Icons" />
+            </OnPlatform>
+            <Color x:Key="backgroundColor">#FFFFFFFF</Color>
+            <Color x:Key="TextPrimaryColor">#FF000000</Color>
+            <Color x:Key="TextSecondaryColor">#80000000</Color>
+            <Color x:Key="TextTernaryColor">#C8C8C8</Color>
+            <Color x:Key="ListViewSelectedColor">Orange</Color>
+            <Color x:Key="ListViewBackgroundColor">#FFFFFFFF</Color>
+
+            <Color x:Key="HeaderColor">#FFFFFFFF</Color>
+            <Color x:Key="NavigationPrimary">#930304</Color>
+
+            <Color x:Key="FormBackgroundColor">#242726</Color>
+
+            <Style TargetType="NavigationPage">
+                <Setter Property="BarBackgroundColor" Value="{StaticResource NavigationPrimary}" />
+                <Setter Property="BarTextColor" Value="White" />
+            </Style>
+
+            <Style x:Key="ButtonStyle" TargetType="Button">
+                <Setter Property="FontSize" Value="Medium" />
+                <Setter Property="FontAttributes" Value="Bold" />
+                <Setter Property="Padding" Value="10" />
+                <Setter Property="FontSize">
+                    <Setter.Value>
+                        <OnPlatform
+                            x:TypeArguments="x:Double"
+                            Android="15"
+                            iOS="16"
+                            WinPhone="16" />
+                    </Setter.Value>
+                </Setter>
+                <Setter Property="CornerRadius" Value="10" />
+                <Setter Property="BorderWidth" Value="2" />
+                <Setter Property="BackgroundColor" Value="{StaticResource NavigationPrimary}"/>
+                <Setter Property="TextColor" Value="{StaticResource backgroundColor}" />
+                <Setter Property="BorderColor" Value="{StaticResource TextPrimaryColor}"/>
+
+            </Style>
+            <Style x:Key="LabelStyle" TargetType="Label">
+                <Setter Property="FontAttributes" Value="Bold" />
+                <Setter Property="FontSize">
+                    <Setter.Value>
+                        <OnPlatform
+                            x:TypeArguments="x:Double"
+                            Android="15"
+                            iOS="16"
+                            WinPhone="16" />
+                    </Setter.Value>
+                </Setter>
+                <Setter Property="TextColor" Value="{StaticResource TextPrimaryColor}" />
+            </Style>
+            <Style x:Key="TitleStyle" TargetType="Label">
+                <Setter Property="FontAttributes" Value="Bold" />
+                <Setter Property="FontSize">
+                    <Setter.Value>
+                        <OnPlatform
+                            x:TypeArguments="x:Double"
+                            Android="24"
+                            iOS="30"
+                            WinPhone="20" />
+                    </Setter.Value>
+                </Setter>
+                <Setter Property="TextColor" Value="{StaticResource TextPrimaryColor}" />
+            </Style>
+            
+            
+            <x:String x:Key="Home">&#xf2dc;</x:String>
+            <x:String x:Key="About">&#xf2fc;</x:String>
+            <x:String x:Key="Orders">&#xf116;</x:String>
+            <x:String x:Key="Cart">&#xf110;</x:String>
+            <x:String x:Key="Phone">&#xf3f2;</x:String>
+            <x:String x:Key="Hours">&#xf953;</x:String>
+            <x:String x:Key="Facebook">&#xf20d;</x:String>
+            <x:String x:Key="PlusSign">&#xf415;</x:String>
+            
+            
+            <converters:CardDescriptionToImageConverter x:Key="CardConverter"
+                                                    Amex="ic_amex"
+                                                    Discover="ic_discover" 
+                                                    MasterCard="ic_mastercard" 
+                                                    Visa="ic_visa"
+                                                    NotRecognized="nocards"/>
+            <converters:CardDescriptionToColorConverter x:Key="CardColorConverter"
+                                                    Amex="#3177CB"
+                                                    Discover="#E9752F" 
+                                                    MasterCard="#394854" 
+                                                    Visa="#2867BA"
+                                                    NotRecognized="#75849D"/>
+            <converters:BooleanToColorConverter x:Key="BoolToColorConverter" />
+        </ResourceDictionary>
+
+    </Application.Resources>
+</Application>

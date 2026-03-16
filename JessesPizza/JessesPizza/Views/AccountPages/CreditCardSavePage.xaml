@@ -1,0 +1,21 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://xamarin.com/schemas/2014/forms"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:d="http://xamarin.com/schemas/2014/forms/design"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" xmlns:local="clr-namespace:JessesPizza.Views"
+             mc:Ignorable="d"
+             x:Class="JessesPizza.Views.CreditCardSavePage" BackgroundColor="{DynamicResource backgroundColor}" >
+    <ContentPage.Content>
+        <StackLayout >
+            <Label Margin="20,50,20,20" Text="Order successfully completed! Would you like to save this card for future orders?"
+              
+                   HorizontalTextAlignment ="Center"/>
+            <local:CreditCardDisplayView x:Name="CardView">
+            </local:CreditCardDisplayView>
+            <StackLayout Margin="20" Orientation="Horizontal">
+                <Button x:Name="YesButton" WidthRequest="100" HorizontalOptions="CenterAndExpand" Clicked="YesButton_Clicked" Style="{DynamicResource ButtonStyle}" Text="YES"></Button>
+                <Button x:Name="NoButton" WidthRequest="100" HorizontalOptions="CenterAndExpand" Clicked="NoButton_Clicked" Style="{DynamicResource ButtonStyle}" Text="NO"></Button>
+            </StackLayout>
+        </StackLayout>
+    </ContentPage.Content>
+</ContentPage>

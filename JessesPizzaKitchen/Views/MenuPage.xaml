@@ -1,0 +1,36 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://xamarin.com/schemas/2014/forms"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="JessesPizzaKitchen.Views.MenuPage"
+             Title="Menu">
+    <StackLayout VerticalOptions="FillAndExpand">
+        <ListView x:Name="ListViewMenu"
+                    HasUnevenRows="True"
+                  SeparatorVisibility="None">
+            <ListView.ItemTemplate>
+                <DataTemplate>
+                    <ViewCell>
+                        <Grid Padding="10">
+                            <Label Text="{Binding Title}" FontSize="20"/>
+                        </Grid>
+                    </ViewCell>
+                </DataTemplate>
+            </ListView.ItemTemplate>
+        </ListView>
+        <Frame  CornerRadius="10" HorizontalOptions="FillAndExpand" Margin="5,0,5,10" BackgroundColor="{StaticResource NavigationPrimary}"
+                  IsVisible="{Binding IsLoggedIn}">
+            <StackLayout Orientation="Horizontal" HorizontalOptions="CenterAndExpand">
+                <Label Text="{StaticResource Login}"
+                           FontSize="Title"
+                        TextColor="White"
+                           VerticalOptions="Center"
+                           FontFamily="{StaticResource MaterialFontFamily}"></Label>
+                <Label TextColor="White" Text="Logout" VerticalOptions="Center"></Label>
+            </StackLayout>
+            <Frame.GestureRecognizers>
+                <TapGestureRecognizer Tapped="TapGestureRecognizer_TappedAsync">
+                </TapGestureRecognizer>
+            </Frame.GestureRecognizers>
+        </Frame>
+    </StackLayout>
+</ContentPage>

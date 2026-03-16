@@ -1,0 +1,75 @@
+﻿
+@page "/privacy"
+@using JessesPizza.Core.Models
+@using JessesPizza.Core.Models.Transactions
+@using JessesPizza.Data
+@using System.IO
+@using JessesPizza.Core.Helpers
+@using JessesPizza.WebApp.Helpers
+@using Flurl;
+@using Flurl.Http;
+@{
+    Layout = null;
+}
+@model JessesPizza.WebApp.Pages.Privacy.PrivacyModel
+
+@inject IPizzaRepo pizzaRepo
+@{
+    try
+    {
+        await CheckTokenAsync();
+        await GetJWT();
+        var privacy = await Constants.JessesApiBaseUrl.AppendPathSegment("api/Mongo/Privacy").WithOAuthBearerToken(Model.AppUser.Token).GetStringAsync();
+        Model.PrivacyString = privacy;
+    }
+    catch (Exception e)
+    {
+        Serilog.Log.Logger.Error($"Unable to display privacy page because {e.Message}");
+    }
+    async Task GetJWT()
+    {
+        try
+        {
+            var secret = new AppSecret() { Secret = "JessesPizzaAppSecret" };
+            var user = await Constants.JessesApiBaseUrl
+                .AppendPathSegment("api/Auth/Login")
+                .WithHeader("accept", "application/json")
+                .PostJsonAsync(secret).ReceiveJson<AppUser>();
+            if (user != null)
+            {
+                Model.AppUser = user;
+            }
+        }
+        catch (Exception e)
+        {
+
+        }
+    }
+    async Task CheckTokenAsync()
+    {
+        if (Model.AppUser == null)
+            await GetJWT();
+        if (string.IsNullOrEmpty(Model.AppUser.Token))
+            await GetJWT();
+        if (Model.AppUser.TokenExpires < DateTime.Now)
+            await GetJWT();
+    }
+
+}
+<body>
+    <pre class="">@Model.PrivacyString</pre>
+</body>
+
+<style>
+    pre {
+        white-space: pre-wrap;
+        text-align: center;
+        word-wrap: break-word;
+        word-break: break-word;
+        max-width: 100%;
+    }
+
+    div {
+        text-align: center;
+    }
+</style>

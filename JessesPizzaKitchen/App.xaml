@@ -1,0 +1,49 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<Application xmlns="http://xamarin.com/schemas/2014/forms"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml" xmlns:converters="clr-namespace:JessesPizzaKitchen.Converters"
+             x:Class="JessesPizzaKitchen.App">
+    <Application.Resources>
+        <ResourceDictionary>
+            <!--Global Styles-->
+
+            <Color x:Key="backgroundColor">#FFFFFFFF</Color>
+            <Color x:Key="TextPrimaryColor">#FF000000</Color>
+            <Color x:Key="TextSecondaryColor">#80000000</Color>
+            <Color x:Key="TextTernaryColor">#C8C8C8</Color>
+            <Color x:Key="ListViewSelectedColor">#70808080</Color>
+            <Color x:Key="HeaderColor">#FFFFFFFF</Color>
+            <Color x:Key="NavigationPrimary">#931303</Color>
+            <x:String x:Key="Login">&#xf004;</x:String>
+
+            <Style TargetType="NavigationPage">
+                <Setter Property="BarBackgroundColor" Value="{StaticResource NavigationPrimary}" />
+                <Setter Property="BarTextColor" Value="White" />
+            </Style>
+
+            <Style x:Key="ButtonStyle" TargetType="Button">
+                <Setter Property="FontSize" Value="Medium" />
+                <Setter Property="FontAttributes" Value="Bold" />
+                <Setter Property="Padding" Value="10" />
+
+                <Setter Property="CornerRadius" Value="10" />
+                <Setter Property="BorderWidth" Value="2" />
+                <Setter Property="BackgroundColor" Value="{StaticResource NavigationPrimary}"/>
+                <Setter Property="TextColor" Value="{StaticResource backgroundColor}" />
+                <Setter Property="BorderColor" Value="{StaticResource TextPrimaryColor}"/>
+
+            </Style>
+            <!--  Material Icons-->
+            <OnPlatform x:Key="MaterialFontFamily" x:TypeArguments="x:String">
+                <On Platform="iOS" Value="Material Design Icons" />
+                <On Platform="Android" Value="materialdesignicons-webfont.ttf#Material Design Icons" />
+            </OnPlatform>
+            <Style x:Key="ConnectedIconStyle" TargetType="Label">
+                <Setter Property="Text" Value="{Binding ConnectedIcon}"></Setter>
+                <Setter Property="FontSize" Value="20"></Setter>
+                <Setter Property="TextColor" Value="{Binding IconColor}"></Setter>
+
+            </Style>
+            <converters:BoolToButtonTextConverter x:Key="BoolToTextConverter" />
+        </ResourceDictionary>
+    </Application.Resources>
+</Application>

@@ -1,0 +1,129 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://xamarin.com/schemas/2014/forms"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:d="http://xamarin.com/schemas/2014/forms/design"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:maps="clr-namespace:Xamarin.Forms.Maps;assembly=Xamarin.Forms.Maps"
+             mc:Ignorable="d"
+             x:Class="JessesPizza.Views.ContactPage"
+             Title="Contact Us"
+            >
+    <ContentPage.Content>
+        <ScrollView>
+            <StackLayout>
+                <Frame   CornerRadius="10" Padding="10" Margin="2"  BackgroundColor="{DynamicResource backgroundColor}"   >
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="Auto"></ColumnDefinition>
+                            <ColumnDefinition Width="Auto"></ColumnDefinition>
+                            <ColumnDefinition Width="*"></ColumnDefinition>
+                        </Grid.ColumnDefinitions>
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="50"></RowDefinition>
+                            <RowDefinition Height="Auto"></RowDefinition>
+                            <RowDefinition Height="50"></RowDefinition>
+                        </Grid.RowDefinitions>
+                        <Image  Grid.Row="0"
+                                Grid.Column="0"
+                                HeightRequest="44"
+                                HorizontalOptions="Center"
+                                VerticalOptions="Center"
+                                WidthRequest="44">
+                            <Image.Source>
+                                <FontImageSource
+                                    FontFamily="{DynamicResource MaterialFontFamily}"
+                                    Glyph="{StaticResource Phone}"
+                                    Size="44"
+                                    Color="{StaticResource TextPrimaryColor}" />
+                            </Image.Source>
+                            <Image.GestureRecognizers>
+                                <TapGestureRecognizer NumberOfTapsRequired="1" Tapped="TapGestureRecognizer_Tapped"></TapGestureRecognizer>
+                            </Image.GestureRecognizers>
+                        </Image>
+                        <Label Style="{StaticResource LabelStyle}" VerticalOptions="Center" HorizontalOptions="End" Grid.Column="1" Grid.Row="0" Text="Call us: ">
+                            <Label.GestureRecognizers>
+                                <TapGestureRecognizer NumberOfTapsRequired="1" Tapped="TapGestureRecognizer_Tapped"></TapGestureRecognizer>
+                            </Label.GestureRecognizers>
+                        </Label>
+                        <Label Style="{StaticResource LabelStyle}" VerticalOptions="Center" HorizontalOptions="Center" Grid.Column="2" Grid.Row="0" Text="(702)898-5635">
+                            <Label.GestureRecognizers>
+                                <TapGestureRecognizer NumberOfTapsRequired="1" Tapped="TapGestureRecognizer_Tapped"></TapGestureRecognizer>
+                            </Label.GestureRecognizers>
+                        </Label>
+
+                        <Image  Grid.Row="1"
+                                Grid.Column="0"
+                                HeightRequest="44"
+                                HorizontalOptions="Center"
+                                VerticalOptions="Start"
+                                WidthRequest="44">
+                            <Image.Source>
+                                <FontImageSource
+                                    FontFamily="{DynamicResource MaterialFontFamily}"
+                                    Glyph="{StaticResource Hours}"
+                                    Size="44"
+                                    Color="{StaticResource TextPrimaryColor}" />
+                            </Image.Source>
+                        </Image>
+                        <Label Style="{StaticResource LabelStyle}" Margin="0,15,0,0" VerticalOptions="Start" HorizontalOptions="End" Grid.Column="1" Grid.Row="1" Text="Hours:"></Label>
+                        <Label LineHeight="1.5" Text="{Binding HoursString}" Style="{StaticResource LabelStyle}" VerticalOptions="Start" HorizontalOptions="Center" Grid.Column="2" Grid.Row="1"></Label>
+
+                        <Image  Grid.Row="2"
+                                Grid.Column="0"
+                                HeightRequest="44"
+                                HorizontalOptions="Center"
+                                VerticalOptions="Center"
+                                WidthRequest="44"
+                                >
+                            <Image.Source>
+                                <FontImageSource
+                                    FontFamily="{DynamicResource MaterialFontFamily}"
+                                    Glyph="{StaticResource Facebook}"
+                                    Size="44"
+                                    Color="{StaticResource TextPrimaryColor}" />
+                            </Image.Source>
+                            <Image.GestureRecognizers>
+                                <TapGestureRecognizer Tapped="Button_Clicked" NumberOfTapsRequired="1"></TapGestureRecognizer>
+                            </Image.GestureRecognizers>
+                        </Image>
+                        <Label  Style="{StaticResource LabelStyle}" VerticalOptions="Center" Grid.Column="1" Grid.Row="2" Grid.ColumnSpan="2" Text="Check us out on Facebook">
+                            <Label.GestureRecognizers>
+                                <TapGestureRecognizer Tapped="Button_Clicked" NumberOfTapsRequired="1"></TapGestureRecognizer>
+                            </Label.GestureRecognizers>
+                        </Label>
+                    </Grid>
+
+                </Frame>
+                <maps:Map HeightRequest="300" Margin="10" x:Name="map"                IsShowingUser="True"
+               MoveToLastRegionOnLayoutChange="False">
+                    <x:Arguments>
+                        <maps:MapSpan>
+                            <x:Arguments>
+                                <maps:Position>
+                                    <x:Arguments>
+                                        <x:Double>36.023155</x:Double>
+                                        <x:Double>-115.048875</x:Double>
+                                    </x:Arguments>
+                                </maps:Position>
+                                <x:Double>0.01</x:Double>
+                                <x:Double>0.01</x:Double>
+                            </x:Arguments>
+                        </maps:MapSpan>
+                    </x:Arguments>
+                    <maps:Map.Pins >
+                        <maps:Pin x:Name="JessesPin" Label="Jesse's Pizza" Address="1450 W Horizon Ridge Pkwy, Henderson, NV 89012" >
+                            <maps:Pin.Position>
+                                <maps:Position>
+                                    <x:Arguments>
+                                        <x:Double>36.023155</x:Double>
+                                        <x:Double>-115.048875</x:Double>
+                                    </x:Arguments>
+                                </maps:Position>
+                            </maps:Pin.Position>
+                        </maps:Pin>
+                    </maps:Map.Pins>
+                </maps:Map>
+            </StackLayout>
+        </ScrollView>
+    </ContentPage.Content>
+</ContentPage>

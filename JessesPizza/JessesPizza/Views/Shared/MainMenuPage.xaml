@@ -1,0 +1,66 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://xamarin.com/schemas/2014/forms"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:input="clr-namespace:Telerik.XamarinForms.Input;assembly=Telerik.XamarinForms.Input"
+             xmlns:listView="clr-namespace:Telerik.XamarinForms.DataControls.ListView;assembly=Telerik.XamarinForms.DataControls"
+             xmlns:dataControls="clr-namespace:Telerik.XamarinForms.DataControls;assembly=Telerik.XamarinForms.DataControls"
+             xmlns:ffimageloading="clr-namespace:FFImageLoading.Forms;assembly=FFImageLoading.Forms" 
+             x:Class="JessesPizza.Views.MainMenuPage"
+             Title="{Binding Title}">
+    <StackLayout  VerticalOptions="FillAndExpand" HorizontalOptions="FillAndExpand" BackgroundColor="{DynamicResource backgroundColor}" >
+        <ActivityIndicator HeightRequest="50" IsVisible="{Binding IsBusy}" IsRunning="{Binding IsBusy}"></ActivityIndicator>
+        <dataControls:RadListView   VerticalOptions="FillAndExpand"  BackgroundColor="{DynamicResource backgroundColor}"  IsPullToRefreshActive="True" x:Name="ItemsListView" SelectionMode="Single" ItemTapped="OnItemSelected">
+            <dataControls:RadListView.ItemTemplate>
+                <DataTemplate>
+                    <listView:ListViewTemplateCell>
+                        <listView:ListViewTemplateCell.View >
+                            <Frame  CornerRadius="10" Padding="10,10,10,10" Margin="2,2,2,2" BackgroundColor="{DynamicResource ListViewBackgroundColor}"  >
+                                <Grid Margin="5" >
+                                    <Grid.RowDefinitions>
+                                        <RowDefinition Height ="Auto"/>
+                                    </Grid.RowDefinitions>
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="*"/>
+                                        <ColumnDefinition Width ="100"/>
+                                    </Grid.ColumnDefinitions>
+                                    <Grid Grid.Column="0">
+                                        <Grid.RowDefinitions>
+                                            <RowDefinition Height ="Auto"/>
+                                        </Grid.RowDefinitions>
+
+                                        <Label Grid.Row="0" Text="{Binding Name}" 
+                                       LineBreakMode="WordWrap" 
+                                        Style="{DynamicResource TitleStyle}" 
+                                          FontSize="30"     />
+                                    </Grid>
+                                    
+                                    <Frame IsVisible="{Binding ImageHasValue}" Margin="0" Padding="0" IsClippedToBounds="True" VerticalOptions="FillAndExpand" HorizontalOptions="FillAndExpand" CornerRadius="10" Grid.Column="1" HeightRequest="100" WidthRequest="100" >
+                                        <ffimageloading:CachedImage Aspect="AspectFill" MinimumHeightRequest="100"  Grid.Column="1" HorizontalOptions="CenterAndExpand"  WidthRequest="100" HeightRequest="100" Source="{Binding ImageUrl}" FadeAnimationEnabled="True"  LoadingDelay="0" CacheDuration="50" RetryCount="10" RetryDelay="100" DownsampleToViewSize="true" />
+                                    </Frame>
+
+                                </Grid>
+                            </Frame>
+                        </listView:ListViewTemplateCell.View>
+                    </listView:ListViewTemplateCell>
+                </DataTemplate>
+            </dataControls:RadListView.ItemTemplate>
+            <dataControls:RadListView.FooterTemplate>
+                <DataTemplate >
+                    <StackLayout HeightRequest="50">
+                        
+                    </StackLayout>
+                </DataTemplate>
+            </dataControls:RadListView.FooterTemplate>
+            <dataControls:RadListView.ItemStyle>
+                <listView:ListViewItemStyle BackgroundColor="{DynamicResource backgroundColor}"
+                                        TextCellTextColor="{DynamicResource TextPrimaryColor}"
+                                        BorderColor="{DynamicResource TextPrimaryColor}"
+                                          
+                                        BorderWidth="0"
+                                        BorderLocation="All" />
+            </dataControls:RadListView.ItemStyle>
+
+        </dataControls:RadListView>
+        
+    </StackLayout>
+</ContentPage>

@@ -1,0 +1,144 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://xamarin.com/schemas/2014/forms"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:d="http://xamarin.com/schemas/2014/forms/design"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             mc:Ignorable="d"
+             x:Class="JessesPizza.Views.AccountPages.ReviewOrderPage"
+             Title="Review Order Page">
+    <ContentPage.Content>
+            <StackLayout>
+                <Label Style="{DynamicResource TitleStyle}" Text="Review your order" HorizontalTextAlignment="Center"></Label>
+                <Frame CornerRadius="10" Padding="10" Margin="2"  BackgroundColor="{DynamicResource backgroundColor}">
+                    <StackLayout>
+                    <Grid>
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="40"></RowDefinition>
+                            <RowDefinition Height="*"></RowDefinition>
+                        </Grid.RowDefinitions>
+                        <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width=".6*"></ColumnDefinition>
+                            <ColumnDefinition Width=".2*"></ColumnDefinition>
+                            <ColumnDefinition Width=".2*"></ColumnDefinition>
+                        </Grid.ColumnDefinitions>
+                            <Label Grid.Row="0" Grid.Column="0" Text="Item Name" Style="{DynamicResource HeaderStyle}"></Label>
+                            <Label Grid.Row="0" Grid.Column="1" Text="Quantity" Style="{DynamicResource HeaderStyle}"></Label>
+                            <Label Grid.Row="0" Grid.Column="2" Text="Price" Style="{DynamicResource HeaderStyle}"></Label>
+                            <ListView SeparatorVisibility="None"  Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="3" ItemsSource="{Binding ShoppingCartItems}">
+                                <ListView.ItemTemplate>
+                                    <DataTemplate>
+                                        <ViewCell>
+                                            <Grid>
+                                                <Grid.RowDefinitions>
+                                                    <RowDefinition Height="Auto"></RowDefinition>
+                                                </Grid.RowDefinitions>
+                                                <Grid.ColumnDefinitions>
+                                                    <ColumnDefinition Width=".6*"></ColumnDefinition>
+                                                    <ColumnDefinition Width=".2*"></ColumnDefinition>
+                                                    <ColumnDefinition Width=".2*"></ColumnDefinition>
+                                                </Grid.ColumnDefinitions>
+                                                <Label Grid.Column="0" Style="{StaticResource HeaderStyle}" Text="{Binding Name}" ></Label>
+                                                <Label Grid.Column="1" HorizontalTextAlignment="Center" Style="{StaticResource HeaderStyle}" Text="{Binding Quantity}" ></Label>
+                                                <Label Grid.Column="2" Style="{StaticResource HeaderStyle}" Text="{Binding Price}" ></Label>
+                                            </Grid>
+                                        </ViewCell>
+                                    </DataTemplate>
+                                </ListView.ItemTemplate>
+                            <ListView.Footer>
+                                <StackLayout>
+                                    <Grid Margin="5,15,5,5">
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="50"/>
+                                            <ColumnDefinition Width ="*"/>
+                                            <ColumnDefinition Width ="*"/>
+                                            <ColumnDefinition Width ="50"/>
+                                        </Grid.ColumnDefinitions>
+                                        <Grid.RowDefinitions>
+                                            <RowDefinition Height ="Auto"/>
+                                            <RowDefinition Height ="Auto"/>
+                                            <RowDefinition Height ="Auto" />
+                                            <RowDefinition Height ="Auto" />
+                                            <RowDefinition Height ="Auto" />
+                                        </Grid.RowDefinitions>
+                                        <Label Grid.Row ="0" Grid.Column="1"  HorizontalOptions="StartAndExpand" FontSize="Small" FontAttributes="Bold" TextColor="{DynamicResource TextPrimaryColor}" Text ="SubTotal:"/>
+                                        <Label Grid.Row ="0" Grid.Column="2"  HorizontalOptions="EndAndExpand" FontSize="Medium" FontAttributes="Bold" TextColor="{DynamicResource TextPrimaryColor}" Text ="{Binding Totals.SubTotal, StringFormat='{0:C}'}"></Label>
+
+                                        <Label IsVisible="{Binding LocalTransaction.IsDelivery}" Grid.Row ="1" Grid.Column="1" HorizontalOptions="StartAndExpand" FontSize="Small" FontAttributes="Bold" TextColor="{DynamicResource TextPrimaryColor}" Text ="Delivery Fee:"></Label>
+                                        <Label IsVisible="{Binding LocalTransaction.IsDelivery}" Grid.Row ="1" Grid.Column="2" HorizontalOptions="EndAndExpand" FontSize="Medium" FontAttributes="Bold" TextColor="{DynamicResource TextPrimaryColor}"  Text ="{Binding Totals.DeliveryCharge, StringFormat='{0:C}'}"></Label>
+
+                                        <Label Grid.Row ="2" Grid.Column="1" HorizontalOptions="StartAndExpand" FontSize="Small" FontAttributes="Bold" TextColor="{DynamicResource TextPrimaryColor}" Text ="Tip:"></Label>
+                                        <Label Grid.Row ="2" Grid.Column="2" HorizontalOptions="EndAndExpand" FontSize="Medium" FontAttributes="Bold" TextColor="{DynamicResource TextPrimaryColor}" Text ="{Binding Totals.Tip, StringFormat='{0:C}'}"></Label>
+
+                                        <Label Grid.Row ="3" Grid.Column="1" HorizontalOptions="StartAndExpand" FontSize="Small" FontAttributes="Bold" TextColor="{DynamicResource TextPrimaryColor}"  Text ="Sales Tax:"></Label>
+                                        <Label Grid.Row ="3" Grid.Column="2" HorizontalOptions="EndAndExpand" FontSize="Medium" FontAttributes="Bold" TextColor="{DynamicResource TextPrimaryColor}"  Text ="{Binding Totals.TaxTotal, StringFormat='{0:C}'}"></Label>
+
+                                        <Label Grid.Row ="4" Grid.Column="1" HorizontalOptions="StartAndExpand" FontSize="Small" FontAttributes="Bold" TextColor="{DynamicResource TextPrimaryColor}"  Text ="Order Total:"></Label>
+                                        <Label Grid.Row ="4" Grid.Column="2" HorizontalOptions="EndAndExpand" FontSize="Medium" FontAttributes="Bold" TextColor="{DynamicResource TextPrimaryColor}"  Text ="{Binding Totals.Total, StringFormat='{0:C}'}"></Label>
+                                    </Grid>
+                                    <Frame CornerRadius="10" Padding="10" Margin="2"  BackgroundColor="{DynamicResource backgroundColor}" IsVisible="{Binding SpecialInstructionsVisible}">
+                                        <StackLayout>
+                                            <Label HorizontalOptions="CenterAndExpand" Text="Special Instructions" HorizontalTextAlignment="Center" Style="{DynamicResource LabelStyle}"></Label>
+                                            <Label FontSize="Small" FontAttributes="None" HorizontalOptions="CenterAndExpand" Text ="{Binding SpecialInstructions}"  HorizontalTextAlignment="Start" Style="{DynamicResource LabelStyle}"></Label>
+                                        </StackLayout>
+                                    </Frame>
+                                    <Frame CornerRadius="10" Padding="10" Margin="2"  BackgroundColor="{DynamicResource backgroundColor}">
+                                        <Grid>
+                                            <Grid.RowDefinitions>
+                                                <RowDefinition Height="Auto" ></RowDefinition>
+                                                <RowDefinition ></RowDefinition>
+                                                <RowDefinition ></RowDefinition>
+                                            </Grid.RowDefinitions>
+                                            <Grid.ColumnDefinitions>
+                                                <ColumnDefinition Width="*"></ColumnDefinition>
+                                                <ColumnDefinition Width="*"></ColumnDefinition>
+                                                <ColumnDefinition Width="*"></ColumnDefinition>
+
+                                            </Grid.ColumnDefinitions>
+                                            <Label Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="3" HorizontalOptions="CenterAndExpand" Text="{Binding AddressLabelText}" HorizontalTextAlignment="Center" Style="{DynamicResource LabelStyle}"></Label>
+                                            <Label FontSize="Small" FontAttributes="None" Grid.Row="1" Grid.Column="1" Grid.ColumnSpan="2" HorizontalOptions="Start" Text="{Binding Info.AddressLine1}" HorizontalTextAlignment="Start" Style="{DynamicResource LabelStyle}"></Label>
+                                            <StackLayout Orientation="Horizontal" Grid.Row="2" Grid.Column="1" Grid.ColumnSpan="2" HorizontalOptions="Start"  >
+                                                <Label FontSize="Small" FontAttributes="None"  HorizontalTextAlignment="Start" Text="{Binding Info.City}" Style="{DynamicResource LabelStyle}"></Label>
+                                                <Label FontSize="Small" FontAttributes="None" HorizontalTextAlignment="Start" Text="{Binding Info.ZipCode}" Style="{DynamicResource LabelStyle}"></Label>
+                                            </StackLayout>
+
+
+                                        </Grid>
+                                    </Frame>
+                                    <Frame CornerRadius="10" Padding="10" Margin="2"  BackgroundColor="{DynamicResource backgroundColor}">
+                                        <StackLayout>
+
+                                            <Label HorizontalOptions="CenterAndExpand" Text="Credit Card Info" HorizontalTextAlignment="Center" Style="{DynamicResource LabelStyle}"></Label>
+                                            <Label FontSize="Small" FontAttributes="None" Grid.Row="1" Grid.Column="1" Grid.ColumnSpan="2" HorizontalOptions="CenterAndExpand" Text ="{Binding CardDescription, StringFormat='Type: {0:F}'}"  HorizontalTextAlignment="Start" Style="{DynamicResource LabelStyle}"></Label>
+                                            <Label FontSize="Small" FontAttributes="None" Grid.Row="1" Grid.Column="1" Grid.ColumnSpan="2" HorizontalOptions="CenterAndExpand" Text ="{Binding CardExpirationDate, StringFormat='Expiration Date: {0:F}'}" HorizontalTextAlignment="Start" Style="{DynamicResource LabelStyle}"></Label>
+                                            <Label FontSize="Small" FontAttributes="None" Grid.Row="1" Grid.Column="1" Grid.ColumnSpan="2" HorizontalOptions="CenterAndExpand" Text ="{Binding CardNumber, StringFormat='Credit Card Number: {0:F}'}"  HorizontalTextAlignment="Start" Style="{DynamicResource LabelStyle}"></Label>
+                                        </StackLayout>
+                                    </Frame>
+                                    <Button Style="{DynamicResource ButtonStyle}" Text="PLACE ORDER" Clicked="Button_Clicked"></Button>
+                                </StackLayout>
+                            </ListView.Footer>
+                            </ListView>
+                        </Grid>
+
+                    </StackLayout>
+                </Frame>
+               
+            </StackLayout>
+                </ContentPage.Content>
+    <ContentPage.Resources>
+        <ResourceDictionary>
+            <Style x:Key="HeaderStyle" TargetType="Label">
+                <Setter Property="FontAttributes" Value="Bold" />
+                <Setter Property="FontSize">
+                    <Setter.Value>
+                        <OnPlatform
+                            x:TypeArguments="x:Double"
+                            Android="16"
+                            iOS="16"
+                            WinPhone="16" />
+                    </Setter.Value>
+                </Setter>
+                <Setter Property="TextColor" Value="{StaticResource TextPrimaryColor}" />
+            </Style>
+        </ResourceDictionary>
+</ContentPage.Resources>
+</ContentPage>

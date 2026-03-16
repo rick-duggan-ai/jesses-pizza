@@ -1,0 +1,146 @@
+﻿@model JessesApi.Views.OrderCompleteEmailModel
+@{
+    Layout = "EmailLayout";
+}
+@{
+    <div class="container-flex">
+        <h1 style="text-align:center; font-size: 48px;line-height:125%; color: black; font-weight: 400; ">Jesse's Pizza has a new order!</h1>
+        <h2 style="color:black;" align="center">Order Summary</h2>
+        @{
+            string GetDaySuffix(int day)
+            {
+                switch (day)
+                {
+                    case 1:
+                    case 21:
+                    case 31:
+                        return "st";
+                    case 2:
+                    case 22:
+                        return "nd";
+                    case 3:
+                    case 23:
+                        return "rd";
+                    default:
+                        return "th";
+                }
+            }
+            var suffix = GetDaySuffix(Model.Transaction.Date.Day);
+            <p style="color:black;text-align:center;">@Model.Transaction.Date.Subtract(TimeSpan.FromHours(8)).ToString("dddd, MMMM d")@suffix @Model.Transaction.Date.Subtract(TimeSpan.FromHours(8)).ToString("yyyy") at  @Model.Transaction.Date.Subtract(TimeSpan.FromHours(8)).ToString("h:mm tt")</p>
+        }
+        <hr>
+        <table align="center" style=" width: 100%;height: 100%;  padding: 15px;">
+            @{
+                foreach (var cartItem in Model.ShoppingCartItems)
+                {
+                    <tr style="border-bottom: 1px solid dimgray; padding: 0px;">
+                        <th style=" line-height: 0.80em; white-space:pre; color:dimgray;text-align: left; padding: 0px; margin:0;">
+                            <ul style="float:left; list-style-type:none;  padding-left: 0; list-style:none; margin: 0px 0px 0px 0px; margin-top: 0px;">
+                                <li style="font-size: large; float: left; text-align: left; margin-bottom:0em; margin: 0 0 0 0; color: dimgray;">@cartItem.Item.Name (@cartItem.Item.SizeName) x @cartItem.Item.Quantity</li>
+                                @if (cartItem.Item.RequiredChoicesEnabled)
+                                {
+                                    <li style="line-height: 75%; list-style-type: none; color:dimgray; white-space: pre; text-align: left;font-size: small; margin: 10px
+0 0 10px;" class="group">@cartItem.RequiredText</li>
+}
+                                @if (cartItem.Item.OptionalChoicesEnabled)
+                                {
+                                    <li style=" list-style-type: none; white-space: pre; text-align: left;font-size: medium; margin: 0; margin-top: -2em;" class="group"> @cartItem.OptionalText</li>
+                                }
+                            </ul>
+                        </th>
+                        <td style="color: dimgray; text-align: right; padding: 0px;">@cartItem.Item.Price.ToString("$0.00")</td>
+                    </tr>
+                }
+            }
+        </table>
+        <table align="center" style=" width: 100%;height: 100%;  padding: 15px;">
+            <tr style="border-bottom: 1px solid dimgray;">
+                <th style="        color: dimgray;
+        text-align: left;
+        padding: 15px;
+">Delivery Charge</th>
+                <td style="        color: dimgray;
+        text-align: right;
+        padding: 15px;">
+                    @Model.Transaction.DeliveryCharge.ToString("$0.00")
+                </td>
+            </tr>
+            <tr style="border-bottom: 1px solid dimgray;">
+                <th style="        color: dimgray;
+        text-align: left;
+        padding: 15px;
+">Subtotal</th>
+                <td style="color:dimgray;text-align: right; padding: 15px;">@Model.Transaction.SubTotal.ToString("$0.00")</td>
+            </tr>
+            <tr style="        border-bottom: 1px solid dimgray;
+">
+                <th style="        color: dimgray;
+        text-align: left;
+        padding: 15px;">Tax</th>
+                <td style="color:dimgray;text-align: right; padding: 15px;">@Model.Transaction.TaxTotal.ToString("$0.00")</td>
+            </tr>
+            <tr style="border-bottom: 1px solid dimgray;">
+                <th style="color:dimgray;text-align: left; padding: 15px;">Tip</th>
+                <td style="color:dimgray;text-align: right; padding: 15px;">@Model.Transaction.Tip.ToString("$0.00")</td>
+            </tr>
+        </table>
+        <table align="center" style=" width: 100%;height: 100%;  padding: 15px;">
+            <tr style="line-height:10px; border-bottom: 4px solid black;border-top: 2px solid black;">
+                <th style="color:black; font-size:x-large;text-align: left; padding: 15px;"><b>Total</b></th>
+                <td style="color:black; font-size:x-large;text-align: right;padding: 15px;"><b>@Model.Transaction.Total.ToString("$0.00")</b></td>
+            </tr>
+        </table>
+
+
+        @if (!string.IsNullOrEmpty(Model.SpecialInstructions))
+        {
+            <h2 style="margin-top:50px; color:black;" align="center">Special Instructions</h2>
+
+            <table align="center" style=" width: 100%;height: 100%;  padding: 15px;">
+                <tr style="border-bottom: 1px solid gray;">
+                    <th style="color:black; font-size:large;text-align: left; padding: 15px;"><b>Instructions: </b></th>
+                    <td style="line-height:75%; color:black; font-size:medium;text-align: right;padding: 15px;">
+                        <p>@Model.SpecialInstructions</p>
+                    </td>
+            </table>
+        }
+
+        <h2 style="margin-top:50px; color:black;" align="center">Customer Details</h2>
+
+        <table align="center" style=" width: 100%;height: 100%;  padding: 15px;">
+            <tr style="border-bottom: 1px solid gray;">
+                <th style="color:black; font-size:large;text-align: left; padding: 15px;"><b>@Model.AddressLabel</b></th>
+                <td style="line-height:75%; color:black; font-size:medium;text-align: right;padding: 15px;">
+                    <p>@Model.Transaction.Name</p>
+                    <p>@Model.Transaction.Address1</p>
+                    <p>@Model.Transaction.City</p>
+                    <p>NV @Model.Transaction.ZipCode</p>
+                </td>
+            </tr>
+            <tr style="border-bottom: 1px solid gray;">
+                <th style="color:black; font-size:large;text-align: left; padding: 15px;"><b>Billed to</b></th>
+                <td style="line-height:75%; color:black; font-size:medium;text-align: right;padding: 15px;">
+                    <p>@Model.Transaction.CardShortDescription</p>
+                    <p>@Model.Transaction.CardPreview</p>
+                    <p>@Model.Transaction.ExpDate</p>
+                </td>
+            </tr>
+            <tr>
+                <th style="color:black; font-size:large;text-align: left; padding: 15px;"><b>Contact info</b></th>
+                <td style="line-height:75%; color:black; font-size:medium;text-align: right;padding: 15px;">
+                    <p>@Model.Transaction.PhoneNumber</p>
+                    <p>@Model.Transaction.Email</p>
+                </td>
+            </tr>
+        </table>
+    </div>
+}
+<style>
+    .group {
+        line-height: 50%;
+        white-space: pre;
+        text-align: left;
+        font-size: medium;
+        margin-top: -3em;
+    }
+</style>

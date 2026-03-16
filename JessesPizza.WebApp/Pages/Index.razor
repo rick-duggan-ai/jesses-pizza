@@ -1,0 +1,387 @@
+﻿
+@page "/"
+@using JessesPizza.Core.Models
+@using JessesPizza.Data
+@inject IPizzaRepo PizzaRepo
+@inject NotificationService notificationService
+
+@code
+{
+    RadzenGrid<ZipCode> zipCodesGrid;
+    JessesPizzaSettings Settings { get; set; } = new JessesPizzaSettings();
+    bool IsEdit { get; set; } = true;
+    protected override async Task OnInitializedAsync()
+    {
+        try
+        {
+            await InvokeAsync(async () =>
+            {
+                Settings = await PizzaRepo.GetSettings();
+                if (Settings == null)
+                {
+                    Settings = new JessesPizzaSettings()
+                    {
+                        StoreHours = new List<StoreHours>(){ new StoreHours() {Day = DayOfTheWeek.Monday },
+                    new StoreHours() {Day = DayOfTheWeek.Tuesday },
+                    new StoreHours() {Day = DayOfTheWeek.Wednesday },
+                    new StoreHours() {Day = DayOfTheWeek.Thursday },
+                    new StoreHours() {Day = DayOfTheWeek.Friday },
+                    new StoreHours() {Day = DayOfTheWeek.Saturday },
+                    new StoreHours() {Day = DayOfTheWeek.Sunday}}
+                    };
+                    IsEdit = false;
+                }
+            });
+        }
+        catch (Exception e)
+        {
+            Serilog.Log.Logger.Error($"Exception thrown trying to initialize MenuItemDialog because {e.Message}");
+        }
+
+    }
+    void Change(DateTime? value, string name, string format)
+    {
+        StateHasChanged();
+    }
+    private async void Submit(JessesPizzaSettings settings)
+    {
+        try
+        {
+
+            if (IsEdit)
+            {
+                var result = await PizzaRepo.UpdateSettings(settings);
+                if (result == null)
+                {
+                    var error = new NotificationMessage() { Severity = NotificationSeverity.Error, Summary = "Failed to save settings", Duration = 4000 };
+                    ShowNotification(error);
+                    return;
+                }
+            }
+            else
+                await PizzaRepo.AddSettings(settings);
+
+            var message = new NotificationMessage() { Severity = NotificationSeverity.Success, Summary = "Successfully saved settings", Duration = 4000 };
+            ShowNotification(message);
+        }
+        catch (Exception e)
+        {
+            var message = new NotificationMessage() { Severity = NotificationSeverity.Error, Summary = "Failed to save settings", Duration = 4000 };
+            ShowNotification(message);
+
+            Serilog.Log.Logger.Error($"Exception thrown trying to submit MenuItemDialog because {e.Message}");
+        }
+    }
+
+    async void ShowNotification(NotificationMessage message)
+    {
+        try
+        {
+            notificationService.Notify(message);
+            await InvokeAsync(() => { StateHasChanged(); });
+        }
+        catch (Exception e)
+        {
+            Serilog.Log.Logger.Error($"Unable to show notification because: {e.Message}");
+        }
+    }
+    #region ZipCodes
+    private void AddZipCode()
+    {
+        try
+        {
+            ZipCode newZipCode = new ZipCode() { ZipCodeValue = "" };
+            if (Settings.ZipCodes == null)
+                Settings.ZipCodes = new List<ZipCode>();
+            Settings.ZipCodes.Add(newZipCode);
+            zipCodesGrid.Reload();
+            EditRow(newZipCode);
+            int page = Settings.ZipCodes.Count() / 8;
+            zipCodesGrid.GoToPage(page);
+
+        }
+        catch (Exception e)
+        {
+            Serilog.Log.Logger.Error($"Exception thrown trying to add size in MenuItemDialog because {e.Message}");
+        }
+    }
+    void EditRow(ZipCode zipCode)
+    {
+        zipCodesGrid.EditRow(zipCode);
+    }
+
+    void OnUpdateRow(ZipCode zipCode)
+    {
+    }
+
+    void SaveRow(ZipCode zipCode)
+    {
+        zipCodesGrid.UpdateRow(zipCode);
+    }
+
+    void CancelEdit(ZipCode zipCode)
+    {
+        zipCodesGrid.CancelEditRow(zipCode);
+    }
+
+    void DeleteRow(ZipCode zipCode)
+    {
+        Settings.ZipCodes.Remove(zipCode);
+        zipCodesGrid.Reload();
+    }
+
+    #endregion
+}
+
+<AuthorizeView Context="blah">
+    <Authorized>
+        <h1>Configure Settings</h1>
+        <RadzenTemplateForm Data="@Settings" Submit="@((JessesPizzaSettings args) => { Submit(args); })">
+            <RadzenNotification />
+            <div class="row">
+                <div class="col-md-2"></div>
+                <div class="col-md-8">
+                <RadzenFieldset Text="Application Settings">
+                <div class="row">
+                    <div class="col-md-1"></div>
+                    <div class="col-md-2 align-items-center d-flex">
+                        <RadzenLabel Text="Use demo endpoints" />
+                    </div>
+                    <div class="col-md-5">
+                        <input type="checkbox" @bind="Settings.UseDemoEndpoints">
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-md-1"></div>
+                    <div class="col-md-2 align-items-center d-flex">
+                        <RadzenLabel Text="Elavon Merchant Id"/>
+                    </div>
+                    <div class="col-md-4">
+                        <RadzenTextBox style="width: 100%;" @bind-Value="Settings.MerchantId" Name="MerchantId"/>
+                    </div>
+                    <div class="col-md-1"></div>
+                </div>
+                <div class="row">
+                    <div class="col-md-1"></div>
+                    <div class="col-md-2 align-items-center d-flex">
+                        <RadzenLabel Text="Elavon User Id"/>
+                    </div>
+                    <div class="col-md-4">
+                        <RadzenTextBox style="width: 100%;" @bind-Value="Settings.UserId" Name="UserId"/>
+                    </div>
+                    <div class="col-md-1"></div>
+                </div>
+                <div class="row">
+                    <div class="col-md-1"></div>
+                    <div class="col-md-2 align-items-center d-flex">
+                        <RadzenLabel Text="Elavon Pin"/>
+                    </div>
+                    <div class="col-md-4">
+                        <RadzenTextBox style="width: 100%;" @bind-Value="Settings.Pin" Name="Pin"/>
+                    </div>
+                    <div class="col-md-1"></div>
+                </div>
+                <div class="row">
+                    <div class="col-md-1"></div>
+                    <div class="col-md-2 align-items-center d-flex">
+                        <RadzenLabel Text="SendGrid API Key"/>
+                    </div>
+                    <div class="col-md-4">
+                        <RadzenTextBox style="width: 100%;" @bind-Value="Settings.SendGridKey" Name="Pin"/>
+                    </div>
+                    <div class="col-md-1"></div>
+                </div>
+                <div class="row">
+                    <div class="col-md-1"></div>
+                    <div class="col-md-2 align-items-center d-flex">
+                        <RadzenLabel Text="SendGrid Email Address"/>
+                    </div>
+                    <div class="col-md-4">
+                        <RadzenTextBox style="width: 100%;" @bind-Value="Settings.SendGridEmail" Name="Pin"/>
+                    </div>
+                    <div class="col-md-1"></div>
+                </div>
+                <div class="row">
+                    <div class="col-md-1"></div>
+                    <div class="col-md-2 align-items-center d-flex">
+                        <RadzenLabel Text="Admin Email Address"/>
+                    </div>
+                    <div class="col-md-4">
+                        <RadzenTextBox style="width: 100%;" @bind-Value="Settings.AdminEmail" Name="Pin"/>
+                    </div>
+                    <div class="col-md-1"></div>
+                </div>
+                <div class="row">
+                    <div class="col-md-1"></div>
+                    <div class="col-md-2 align-items-center d-flex">
+                        <RadzenLabel Text="Twilio Account Id"/>
+                    </div>
+                    <div class="col-md-4">
+                        <RadzenTextBox style="width: 100%;" @bind-Value="Settings.TwilioAccountSid" Name="Pin"/>
+                    </div>
+                    <div class="col-md-1"></div>
+                </div>
+
+                <div class="row">
+                    <div class="col-md-1"></div>
+                    <div class="col-md-2 align-items-center d-flex">
+                        <RadzenLabel Text="Twilio Auth Token"/>
+                    </div>
+                    <div class="col-md-4">
+                        <RadzenTextBox style="width: 100%;" @bind-Value="Settings.TwilioAuthToken" Name="Pin"/>
+                    </div>
+                    <div class="col-md-1"></div>
+                </div>
+
+                <div class="row">
+                    <div class="col-md-1"></div>
+                    <div class="col-md-2 align-items-center d-flex">
+                        <RadzenLabel Text="Twilio Phone Number"/>
+                    </div>
+                    <div class="col-md-4">
+                        <RadzenTextBox style="width: 100%;" @bind-Value="Settings.TwilioPhoneNumber" Name="Pin"/>
+                    </div>
+                    <div class="col-md-1"></div>
+                </div>
+
+
+                <div class="row">
+                    <div class="col-md-1"></div>
+                    <div class="col-md-2 align-items-center d-flex">
+                        <RadzenLabel Style="font-weight: bold;" Text="Delivery Charge"/>
+                    </div>
+                    <div class="col-md-4">
+                        <RadzenNumeric TValue="decimal" Placeholder="0.00" @bind-Value="Settings.DeliveryCharge" Min="0" Style="width: 100%; display: block" Name="DeliveryCharge"/>
+                    </div>
+                    <div class="col-md-1"></div>
+                </div>
+                <div class="row">
+                    <div class="col-md-1"></div>
+                    <div class="col-md-2 align-items-center d-flex">
+                        <RadzenLabel Text="Tax Rate"/>
+                    </div>
+                    <div class="col-md-4">
+                        <RadzenNumeric TValue="decimal" Placeholder="0.00" @bind-Value="Settings.TaxRate" Min="0" Style="width: 100%; display: block" Name="DeliveryCharge"/>
+                    </div>
+                    <div class="col-md-1"></div>
+                </div>
+                <div class="row">
+                    <div class="col-md-1"></div>
+                    <div class="col-md-2 align-items-center d-flex">
+                        <RadzenLabel Text="Minimum Order Amount"/>
+                    </div>
+                    <div class="col-md-4">
+                        <RadzenNumeric TValue="decimal" Placeholder="0.00" @bind-Value="Settings.MinimumOrderAmount" Min="0" Style="width: 100%; display: block" Name="DeliveryCharge"/>
+                    </div>
+                    <div class="col-md-1"></div>
+                </div>
+
+                <div class="row">
+                    <div class="col-md-1"></div>
+                    <div class="col-md-2 align-items-center d-flex">
+                        <RadzenLabel Text="About Jesse's Pizza"/>
+                    </div>
+                    <div class="col-md-5">
+                        <Radzen.Blazor.RadzenTextArea Rows="5" style="width: 100%;" @bind-Value="Settings.AboutText" Name="About"/>
+                    </div>
+                </div>
+                @{
+                    if (Settings.StoreHours != null)
+                        foreach (StoreHours hours in Settings.StoreHours)
+                        {
+                            <div class="row">
+                                <div class="col-md-1"></div>
+                                <div class="col-md-2 align-items-center d-flex">
+                                    <RadzenLabel Text="@String.Concat(hours.Day.ToString(), ":")"/>
+                                </div>
+                                <div class="col-md-8">
+                                    <RadzenLabel Text="Opening Time:"/>
+                                    <RadzenDatePicker HourFormat="12" TValue="DateTime?" @bind-Value="@hours.OpeningTime" ShowTime="true" TimeOnly="true" DateFormat="hh:mm tt" Style="margin-right: 10px;"/>
+                                    <RadzenLabel Text="Closing Time:"/>
+                                    <RadzenDatePicker HourFormat="12" TValue="DateTime?" @bind-Value="@hours.ClosingTime" ShowTime="true" TimeOnly="true" DateFormat="h:mm tt"/>
+                                </div>
+                                <div class="col-md-1"></div>
+                            </div>
+                        }
+                }
+                <div class="row" style="margin-top: 15px; margin-bottom: 15px;">
+                    <div class="col-md-12" style="text-align: center">
+                        <label for="body">
+                            <b>Valid Zip Codes</b>
+                            <RadzenButton Style="background-color: #930304;" Size="ButtonSize.Small" Icon="add_circle" Click="(e => AddZipCode())"/>
+                        </label>
+                    </div>
+                </div>
+                <div class="row" style="margin-top: 15px; margin-bottom: 15px;">
+                    <div class="col-md-1"></div>
+                    <div class="col-md-10">
+                        <RadzenGrid @ref="zipCodesGrid" AllowPaging="true" PageSize="8" Data="@Settings.ZipCodes" TItem="ZipCode" Style="text-align: center;">
+                            <Columns>
+
+                                <RadzenGridColumn TItem="ZipCode" Property="ZipCodeValue" Title="Zip Codes" TextAlign="TextAlign.Center">
+                                    <EditTemplate Context="zipCode">
+                                        <RadzenTextBox @bind-Value="zipCode.ZipCodeValue" Style="width: 100%; display: block" Name="SizeName"/>
+                                    </EditTemplate>
+                                </RadzenGridColumn>
+                                <RadzenGridColumn TItem="ZipCode" Bubble="false" Filterable="false" Sortable="false" TextAlign="TextAlign.Center" Width="100px">
+                                    <Template Context="zipCode">
+                                        <RadzenButton Icon="edit" Size="ButtonSize.Small" Click="@(args => EditRow(zipCode))">
+                                        </RadzenButton>
+                                    </Template>
+                                    <EditTemplate Context="zipCode">
+                                        <RadzenButton Icon="save" Size="ButtonSize.Small" Click="@((args) => SaveRow(zipCode))">
+                                        </RadzenButton>
+                                        <RadzenButton Icon="cancel" Size="ButtonSize.Small" ButtonStyle="ButtonStyle.Secondary" Click="@((args) => CancelEdit(zipCode))">
+                                        </RadzenButton>
+                                    </EditTemplate>
+                                </RadzenGridColumn>
+                                <RadzenGridColumn TItem="ZipCode" Context="zipCodes" Bubble="false" Filterable="false" Sortable="false" TextAlign="TextAlign.Center" Width="70px">
+                                    <Template Context="zipCode">
+                                        <RadzenButton ButtonStyle="ButtonStyle.Danger" Icon="close" Size="ButtonSize.Small" Click="@((args) => DeleteRow(zipCode))">
+                                        </RadzenButton>
+                                    </Template>
+                                    <EditTemplate Context="zipCode">
+                                        <RadzenButton ButtonStyle="ButtonStyle.Danger" Icon="close" Size="ButtonSize.Small" Click="@((args) => DeleteRow(zipCode))">
+                                        </RadzenButton>
+                                    </EditTemplate>
+                                </RadzenGridColumn>
+                            </Columns>
+                        </RadzenGrid>
+                    </div>
+                    <div class="col-md-1"></div>
+
+                </div>
+
+                </RadzenFieldset>
+
+                </div>
+
+            </div>
+            <div class="row justify-content-center">
+                <div class="col-md-12 d-flex align-items-end justify-content-center" style="margin-top: 16px;">
+                    <RadzenButton ButtonType="Radzen.ButtonType.Submit" Icon="save" Text="Save" />
+                </div>
+            </div>
+
+
+        </RadzenTemplateForm>
+    </Authorized>
+    <NotAuthorized>
+        <div class="row col-lg-12 justify-content-center">
+            <h1>Authentication Failure!</h1>
+        </div>
+        <div class="row col-lg-12 justify-content-center">
+            <p>You're not signed in.</p>
+        </div>
+    </NotAuthorized>
+</AuthorizeView>
+<style type="text/css">
+    label {
+        font-weight: bold;
+    }
+
+    div {
+        margin-bottom: 12px;
+    }
+</style>
+

@@ -1,0 +1,19 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://xamarin.com/schemas/2014/forms"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:d="http://xamarin.com/schemas/2014/forms/design"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             mc:Ignorable="d"
+             x:Class="JessesPizza.Views.DeliveryOrPickupPage"
+             Title="Delivery or Pickup?">
+    <ContentPage.Content>
+        <StackLayout>
+            <Button Style="{DynamicResource ButtonStyle}" Text="DELIVERY" Margin="10,80,10,0" Clicked="DeliveryButton_Clicked" x:Name="DeliveryButton">
+            </Button>
+            <Button Style="{DynamicResource ButtonStyle}" Text="NO CONTACT DELIVERY" Margin="10,40,10,0" Clicked="NoContactDeliveryButton_Clicked" x:Name="NoContactButton">
+            </Button>
+            <Button Style="{DynamicResource ButtonStyle}" Text="PICKUP" Margin="10,40,10,0" Clicked="PickUpButton_Clicked" x:Name="PickUpButton">
+            </Button>
+        </StackLayout>
+    </ContentPage.Content>
+</ContentPage>

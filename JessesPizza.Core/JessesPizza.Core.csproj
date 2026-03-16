@@ -1,0 +1,19 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>netstandard2.0</TargetFramework>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Destructurama.Attributed" Version="2.0.0" />
+    <PackageReference Include="MongoDB.Bson" Version="2.10.3" />
+    <PackageReference Include="sqlite" Version="3.13.0" />
+    <PackageReference Include="sqlite-net-pcl" Version="1.7.335" />
+    <PackageReference Include="System.ComponentModel.Annotations" Version="4.7.0" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\JessesPizza.App.Core\JessesPizza.MobileApp.Core.csproj" />
+  </ItemGroup>
+
+</Project>

@@ -1,0 +1,496 @@
+﻿@page "/MenuItemDialog/{ItemID}"
+
+@using JessesPizza.Core.Models
+@using JessesPizza.Data
+@using System.IO
+@using JessesPizza.Core.Helpers
+@using JessesPizza.WebApp.Models
+@inject Radzen.DialogService dialogService
+@inject IPizzaRepo PizzaRepo
+
+
+@code {
+    [Parameter] public string ItemID { get; set; }
+    [Parameter] public string MainMenuItemID { get; set; }
+    [Parameter] public string ItemName { get; set; }
+
+    MainMenuItem mainMenuItem = new MainMenuItem();
+    JessesItemSize SizeRow { get; set; }
+    Group GroupRow { get; set; }
+    JessesMenuItem item { get; set; } = new JessesMenuItem() { Id = IdHelper.GetUniqueId(), Sizes = new List<JessesItemSize>() { new JessesItemSize() { Name = "Default", GroupIds = new List<string>() { } } } };
+    JessesMenuItem originalItem { get; set; } = new JessesMenuItem();
+    List<Group> AllGroups { get; set; } = new List<Group>();
+    List<GroupForm> SelectedGroups { get; set; } = new List<GroupForm>() { };
+    RadzenGrid<JessesItemSize> sizeGrid;
+    RadzenGrid<GroupForm> groupsGrid;
+    public JessesItemSize SelectedSize { get; set; } = new JessesItemSize();
+    public bool IsEdit { get; set; } = false;
+    public string FilePath { get; set; }
+    public bool WindowIsVisible { get; set; } = false;
+    public bool DeleteWindowVisible { get; set; } = false;
+    public string Message { get; set; }
+    private bool ImageUploaded = false;
+    private bool CheckBoxValue = false;
+
+
+    protected override async Task OnInitializedAsync()
+    {
+        try
+        {
+            await InvokeAsync(async () =>
+            {
+                AllGroups = await PizzaRepo.GetAllGroups();
+                if (ItemID == "1")
+                {
+                    mainMenuItem = await PizzaRepo.GetMainMenuItem(MainMenuItemID);
+                    if (mainMenuItem.MenuItems == null)
+                        mainMenuItem.MenuItems = new List<JessesMenuItem>();
+                    item = new JessesMenuItem() { Id = IdHelper.GetUniqueId(), Sizes = new List<JessesItemSize>() { new JessesItemSize() { Id = IdHelper.GetUniqueId(), Name = "Default", GroupIds = new List<string>() { } } } };
+                    StateHasChanged();
+                    EditRow(item.Sizes.First());
+                    StateHasChanged();
+                }
+                else
+                {
+                    mainMenuItem = await PizzaRepo.GetMainMenuItem(MainMenuItemID);
+                    item = mainMenuItem.MenuItems.Where(x => x.Id == ItemID).FirstOrDefault();
+                    if (item != null)
+                        foreach (var size in item.Sizes)
+                        {
+                            foreach (var groupId in size.GroupIds)
+                            {
+                                var group = AllGroups.FirstOrDefault(x => x.Id == groupId);
+                                var groupForm = new GroupForm(group);
+                                groupForm.Id = IdHelper.GetUniqueId();
+                                groupForm.SizeId = size.Id;
+                                SelectedGroups.Add(groupForm);
+                            }
+                        }
+                    SelectedSize = item.Sizes.FirstOrDefault();
+                    originalItem = item;
+                    IsEdit = true;
+                    ImageUploaded = true;
+                    FilePath = item.ImageUrl;
+                }
+                StateHasChanged();
+                Serilog.Log.Logger.Information("Successfully initialized MenuItemDialog");
+            });
+        }
+        catch (Exception e)
+        {
+            Serilog.Log.Logger.Error($"Exception thrown trying to initialize MenuItemDialog because {e.Message}");
+        }
+
+    }
+    private async void Submit()
+    {
+        if (item.Sizes.Count() == 0)
+        {
+            Message = "Item must have at least 1 size";
+            WindowIsVisible = true;
+            return;
+        }
+        try
+        {
+            await CleanupImage(item.Id);
+            var timestamp = DateTime.Now.TimeOfDay.ToString();
+            if (CheckBoxValue)
+                item.ImageUrl = null;
+            else
+                item.ImageUrl = string.Concat(ImageHelper.GetImageBasePath(), item.Id.ToString(), ".jpg?", timestamp);
+            if (SelectedGroups != null)
+            {
+                if (SelectedGroups.Count() != 0)
+                {
+                    foreach (var size in item.Sizes)
+                    {
+                        if (string.IsNullOrEmpty(size.Name))
+                        {
+                            Message = $"Please enter a name for size";
+                            WindowIsVisible = true;
+                            return;
+                        }
+
+                        size.GroupIds = new List<string>();
+                    }
+                    foreach (var groupForm in SelectedGroups)
+                    {
+                        var group = AllGroups.Where(x => x.Id == groupForm.GroupId).FirstOrDefault();
+
+                        var size = item.Sizes.Where(x => x.Id == groupForm.SizeId).FirstOrDefault();
+                        if (group == null)
+                        {
+                            Message = $"Please select a group for {size.Name} or delete the Group record";
+                            WindowIsVisible = true;
+                            return;
+                        }
+                        if (size != null)
+                        {
+                            if (size.GroupIds == null)
+                                size.GroupIds = new List<string>();
+                            var groupsList = size.GroupIds.ToList();
+                            groupsList.Add(group.Id);
+                            size.GroupIds = groupsList;
+                        }
+                    }
+                }
+                else
+                {
+                    foreach (var size in item.Sizes)
+                    {
+                        size.GroupIds = new List<string>();
+                    }
+                }
+            }
+            if (IsEdit)
+            {
+                mainMenuItem.MenuItems.Remove(mainMenuItem.MenuItems.Where(x => x.Id == item.Id).FirstOrDefault());
+            }
+            mainMenuItem.MenuItems.Add(item);
+            await PizzaRepo.UpdateMainMenuItem(mainMenuItem);
+            await InvokeAsync(() => { StateHasChanged(); });
+
+            dialogService.Close("MenuItemSuccess");
+            Serilog.Log.Logger.Information("Successfully submitted MenuItemDialog");
+        }
+        catch (Exception e)
+        {
+            Serilog.Log.Logger.Error($"Exception thrown trying to submit MenuItemDialog because {e.Message}");
+            dialogService.Close("MenuItemFailure");
+        }
+    }
+    void Cancel()
+    {
+        dialogService.Close("cancel");
+    }
+    private void HandleCancel()
+    {
+        WindowIsVisible = false;
+        DeleteWindowVisible = false;
+    }
+    public async Task CleanupImage(string id)
+    {
+        var assembly = Directory.GetCurrentDirectory();
+        var ext = string.Concat("/wwwroot/JessesImages/", id, "new.jpg");
+        var newFilePath = string.Concat(assembly, ext);
+        if (System.IO.File.Exists(newFilePath))
+        {
+            ext = string.Concat("/wwwroot/JessesImages/", id, ".jpg");
+            var filePath = string.Concat(assembly, ext);
+            if (File.Exists(filePath))
+                File.Delete(filePath);
+            File.Move(newFilePath, filePath);
+            return;
+
+        }
+        else
+            return;
+    }
+    int progress;
+    string info;
+
+    void OnProgress(UploadProgressArgs args, string name)
+    {
+        this.info = $"% '{name}' / {args.Loaded} of {args.Total} bytes.";
+        this.progress = args.Progress;
+        var assembly = Directory.GetCurrentDirectory();
+        var ext = string.Concat("/wwwroot/JessesImages/", item.Id.ToString(), ".jpg");
+        FilePath = string.Concat(assembly, ext);
+        if (!ImageUploaded)
+        {
+            item.ImageUrl = string.Concat(ImageHelper.GetImageBasePath(), item.Id.ToString(), ".jpg");
+            ImageUploaded = true;
+        }
+        else
+        {
+            var timestamp = DateTime.Now.TimeOfDay.ToString();
+            item.ImageUrl = string.Concat(ImageHelper.GetImageBasePath(), item.Id.ToString(), "new.jpg?", timestamp);
+        }
+    }
+    #region Sizes
+    private void AddSize()
+    {
+        try
+        {
+            var newSize = new JessesItemSize() { Id = IdHelper.GetUniqueId(), GroupIds = new List<string>() { } };
+            item.Sizes.Add(newSize);
+            sizeGrid.Reload();
+            EditRow(newSize);
+            int page = item.Sizes.Count() / 3;
+            sizeGrid.GoToPage(page);
+        }
+        catch (Exception e)
+        {
+            Serilog.Log.Logger.Error($"Exception thrown trying to add size in MenuItemDialog because {e.Message}");
+        }
+    }
+    void EditRow(JessesItemSize size)
+    {
+        sizeGrid.EditRow(size);
+    }
+
+    void OnUpdateRow(JessesItemSize size)
+    {
+    }
+
+    void SaveRow(JessesItemSize size)
+    {
+        sizeGrid.UpdateRow(size);
+    }
+
+    void CancelEdit(JessesItemSize size)
+    {
+        sizeGrid.CancelEditRow(size);
+    }
+
+    void DeleteRow(JessesItemSize size)
+    {
+        item.Sizes.Remove(size);
+
+        var groupsToRemove = new List<GroupForm>();
+        foreach (var group in SelectedGroups)
+        {
+            if (group.SizeId == size.Name)
+                groupsToRemove.Add(group);
+        }
+        if (groupsToRemove.Count() != 0)
+        {
+            foreach (var group in groupsToRemove)
+            {
+                SelectedGroups.Remove(group);
+            }
+        }
+        sizeGrid.Reload();
+    }
+
+    #endregion
+    #region Groups
+    private async void AddGroup(JessesItemSize size)
+    {
+        SelectedSize = size;
+        try
+        {
+            if (SelectedSize != null)
+            {
+                if (SelectedSize.Name != null)
+                {
+                    var group = new GroupForm() { Id = IdHelper.GetUniqueId(), SizeId = SelectedSize.Id };
+                    var list = SelectedSize.GroupIds.ToList();
+                    list.Add(group.Id);
+                    size.GroupIds = list;
+                    SelectedGroups.Add(group);
+                    StateHasChanged();
+                    EditRow(group);
+                    int page = SelectedSize.GroupIds.Count() / 3;
+                    groupsGrid.GoToPage(page);
+                    groupsGrid.Reload();
+                }
+            }
+        }
+        catch (Exception e)
+        {
+            Serilog.Log.Logger.Error($"Exception thrown trying to add group in MenuItemDialog because {e.Message}");
+        }
+
+    }
+    void EditRow(GroupForm group)
+    {
+        groupsGrid.EditRow(group);
+    }
+
+    void OnUpdateRow(GroupForm group)
+    {
+    }
+
+    void SaveRow(GroupForm group)
+    {
+        groupsGrid.UpdateRow(group);
+    }
+
+    void CancelEdit(GroupForm group)
+    {
+        groupsGrid.CancelEditRow(group);
+    }
+
+    void DeleteRow(GroupForm group)
+    {
+        SelectedGroups.Remove(group);
+        groupsGrid.Reload();
+    }
+    void SizeNameDDChange(GroupForm groupForm)
+    {
+        var group = AllGroups.Where(x => x.Id == groupForm.GroupId).FirstOrDefault();
+        var selectedGroupForm = SelectedGroups.Where(x => x.Id == groupForm.Id).FirstOrDefault();
+        selectedGroupForm.Name = group.Name;
+        selectedGroupForm.Min = group.Min;
+        selectedGroupForm.Max = group.Max;
+        selectedGroupForm.Type = group.Type;
+        selectedGroupForm.IsRequired = group.IsRequired;
+        groupsGrid.Reload();
+
+    }
+    #endregion
+
+
+}
+
+<EditForm OnValidSubmit="Submit" Model="@item">
+    <DataAnnotationsValidator />
+    <ValidationSummary />
+    <div class="row">
+        <div class="col-md-12">
+            <RadzenFieldset Text="Main Menu Item Info">
+                <div class="row">
+                    <div class="col-md-4 align-items-center d-flex">
+                        <RadzenLabel Text="Item Name" />
+                    </div>
+                    <div class="col-md-8">
+                        <RadzenTextBox style="width: 100%;" @bind-Value="item.Name" Name="MMIName" />
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-md-4 align-items-center d-flex">
+                        <RadzenLabel Text="Item Description" />
+                    </div>
+                    <div class="col-md-8">
+                        <RadzenTextArea Placeholder="Enter Description here..." @bind-Value="item.Description" Style="width: 100%; margin-top:15px" />
+                    </div>
+                </div>
+                <div class="row" style="margin-top:15px;">
+                    <div class="col-md-4 align-items-center d-flex">
+                        <label for="body">Upload Image: </label>
+                    </div>
+                    <div class="col-md-8">
+                        <RadzenImage Style="height: 100px; width:100px;" Path="@item.ImageUrl"></RadzenImage>
+                        <Radzen.Blazor.RadzenUpload Accept="image/*" Url=@($"upload/single/{item.Id}") Progress="@((args) => OnProgress(args, "Images only upload"))" />
+                        <span ml-5>No Image</span>
+                        <Radzen.Blazor.RadzenCheckBox TValue="bool" @bind-Value="CheckBoxValue"></Radzen.Blazor.RadzenCheckBox>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="row" style="margin-top:15px;margin-bottom:15px;">
+                            <div class="col-md-12" style="text-align:center">
+                                <label for="body"><b>Sizes </b><RadzenButton Style="background-color:#930304;" Size="ButtonSize.Small" Icon="add_circle" Click="(e => AddSize())" /></label>
+                            </div>
+                        </div>
+                        <RadzenGrid @ref="sizeGrid" AllowPaging="true" PageSize="3" RowSelect="@(args => SelectedSize = args)" Data="@item.Sizes" TItem="JessesItemSize" @bind-Value="SizeRow">
+                            <Columns>
+                                <RadzenGridColumn TItem="JessesItemSize" Property="Name" Title="Size Name">
+                                    <EditTemplate Context="side">
+                                        <RadzenTextBox @bind-Value="side.Name" Style="width:100%; display: block" Name="SizeName" />
+                                    </EditTemplate>
+                                </RadzenGridColumn>
+                                <RadzenGridColumn TItem="JessesItemSize" Property="Price" Title="Size Price">
+                                    <EditTemplate Context="size">
+                                        <RadzenNumeric @bind-Value="size.Price" Min="0" Style="width:100%; display: block" Name="SizePrice" />
+                                        <RadzenRequiredValidator Text="SizePrice is required" Component="SizePrice" Popup="true" />
+                                    </EditTemplate>
+                                </RadzenGridColumn>
+                                <RadzenGridColumn TItem="JessesItemSize" Property="IsDefault" Title="Is Default">
+                                    <EditTemplate Context="size">
+                                        <RadzenCheckBox @bind-Value="size.IsDefault" Style="width:100%; display: block" Name="SizeDefault" />
+                                    </EditTemplate>
+                                </RadzenGridColumn>
+                                <RadzenGridColumn TItem="JessesItemSize" Bubble="false" Filterable="false" Sortable="false" TextAlign="TextAlign.Center" Width="100px">
+                                    <Template Context="size">
+                                        <RadzenButton Icon="edit" Size="ButtonSize.Small" Click="@(args => EditRow(size))">
+                                        </RadzenButton>
+                                    </Template>
+                                    <EditTemplate Context="size">
+                                        <RadzenButton Icon="save" Size="ButtonSize.Small" Click="@((args) => SaveRow(size))">
+                                        </RadzenButton>
+                                        <RadzenButton Icon="cancel" Size="ButtonSize.Small" ButtonStyle="ButtonStyle.Secondary" Click="@((args) => CancelEdit(size))">
+                                        </RadzenButton>
+                                    </EditTemplate>
+                                </RadzenGridColumn>
+
+                                <RadzenGridColumn TItem="JessesItemSize" Context="size" Bubble="false" Filterable="false" Sortable="false" TextAlign="TextAlign.Center" Width="70px">
+                                    <Template Context="size">
+                                        <RadzenButton ButtonStyle="ButtonStyle.Danger" Icon="close" Size="ButtonSize.Small " Click="@((args) => DeleteRow(size))">
+                                        </RadzenButton>
+                                    </Template>
+                                    <EditTemplate Context="size">
+                                        <RadzenButton ButtonStyle="ButtonStyle.Danger" Icon="close" Size="ButtonSize.Small" Click="@((args) => DeleteRow(size))">
+                                        </RadzenButton>
+                                    </EditTemplate>
+                                </RadzenGridColumn>
+                            </Columns>
+                        </RadzenGrid>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="row" style="margin-top:15px; margin-bottom:15px;">
+                            <div class="col-md-12" style="text-align:center">
+                                <label for="body">
+                                    <b>Groups for @SelectedSize.Name  </b>
+                                    <RadzenButton Style="background-color:#930304;" Size="ButtonSize.Small" Icon="add_circle" Click="(e => AddGroup(SelectedSize))" />
+                                </label>
+                            </div>
+                        </div>
+                        <RadzenGrid @ref="groupsGrid" AllowPaging="true" PageSize="3" Data="@SelectedGroups.Where(x => x.SizeId == SelectedSize.Id)" TItem="GroupForm">
+                            <Columns>
+                                <RadzenGridColumn Width="200px" TItem="GroupForm" Property="Name" Title="Group Name">
+                                    <EditTemplate Context="group">
+                                        <RadzenDropDown @bind-Value="group.GroupId" TValue="string" Placeholder="Select Group..." Data="@AllGroups" TextProperty="Name" ValueProperty="Id" Style=" vertical-align:middle;" Change="@((args) => SizeNameDDChange(group))" />
+                                    </EditTemplate>
+                                </RadzenGridColumn>
+                                <RadzenGridColumn TItem="GroupForm" Property="IsRequired" Title="Is Required">
+                                </RadzenGridColumn>
+                                <RadzenGridColumn TItem="GroupForm" Property="Type" Title="Group Type">
+                                </RadzenGridColumn>
+                                <RadzenGridColumn TItem="GroupForm" Property="Min" Title="Min">
+                                </RadzenGridColumn>
+                                <RadzenGridColumn TItem="GroupForm" Property="Max" Title="Max">
+                                </RadzenGridColumn>
+
+                                <RadzenGridColumn TItem="GroupForm" Bubble="false" Filterable="false" Sortable="false" TextAlign="TextAlign.Center" Width="100px">
+                                    <Template Context="group">
+                                        <RadzenButton Icon="edit" Size="ButtonSize.Small" Click="@(args => EditRow(group))">
+                                        </RadzenButton>
+                                    </Template>
+                                    <EditTemplate Context="group">
+                                        <RadzenButton Icon="save" Size="ButtonSize.Small" Click="@((args) => SaveRow(group))">
+                                        </RadzenButton>
+                                        <RadzenButton Icon="cancel" Size="ButtonSize.Small" ButtonStyle="ButtonStyle.Secondary" Click="@((args) => CancelEdit(group))">
+                                        </RadzenButton>
+                                    </EditTemplate>
+                                </RadzenGridColumn>
+
+                                <RadzenGridColumn TItem="GroupForm" Context="group" Bubble="false" Filterable="false" Sortable="false" TextAlign="TextAlign.Center" Width="70px">
+                                    <Template Context="group">
+                                        <RadzenButton ButtonStyle="ButtonStyle.Danger" Icon="close" Size="ButtonSize.Small " Click="@((args) => DeleteRow(group))">
+                                        </RadzenButton>
+                                    </Template>
+                                    <EditTemplate Context="group">
+                                        <RadzenButton ButtonStyle="ButtonStyle.Danger" Icon="close" Size="ButtonSize.Small" Click="@((args) => DeleteRow(group))">
+                                        </RadzenButton>
+                                    </EditTemplate>
+                                </RadzenGridColumn>
+                            </Columns>
+                        </RadzenGrid>
+                    </div>
+                </div>
+            </RadzenFieldset>
+
+        </div>
+    </div>
+
+    <div class="row justify-content-center">
+        <div class="col-md-12 d-flex align-items-end justify-content-center" style="margin-top: 16px;">
+            <RadzenButton ButtonType="Radzen.ButtonType.Submit" Icon="save" Text="Save" />
+            <RadzenButton ButtonStyle="ButtonStyle.Light" Icon="cancel" style="display: inline-block; margin-left: 10px;" Text="Cancel" Click="@Cancel" />
+        </div>
+    </div>
+</EditForm>
+<TelerikWindow Width="600px" Height="100" Visible="@WindowIsVisible">
+    <WindowContent>
+        Maximum must be greater than or equal to Minimum<br />
+        <TelerikButton OnClick="@HandleCancel">Ok</TelerikButton>
+    </WindowContent>
+</TelerikWindow>
+<TelerikWindow Width="600px" Height="100" Visible="@WindowIsVisible">
+    <WindowContent>
+        @Message<br />
+        <TelerikButton OnClick="@HandleCancel">Ok</TelerikButton>
+    </WindowContent>
+</TelerikWindow>

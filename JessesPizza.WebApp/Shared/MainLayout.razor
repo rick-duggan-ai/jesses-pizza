@@ -1,0 +1,16 @@
+﻿@inherits LayoutComponentBase
+    <TelerikRootComponent>
+        <div  class="sidebar" style="background-color:#930304!important; background-image:none;"  >
+            <NavMenu/>
+        </div>
+
+        <div class="main" style="background-color:#F8F7EF;">
+            <div class="top-row px-4 auth">
+                <LoginDisplay />
+            </div>
+
+            <div class="content px-4">
+                @Body
+            </div>
+        </div>
+    </TelerikRootComponent>

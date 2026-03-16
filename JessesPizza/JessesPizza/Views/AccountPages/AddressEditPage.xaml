@@ -1,0 +1,30 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://xamarin.com/schemas/2014/forms"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:d="http://xamarin.com/schemas/2014/forms/design"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" xmlns:telerikCommon="clr-namespace:Telerik.XamarinForms.Common;assembly=Telerik.XamarinForms.Common" xmlns:telerikInput="clr-namespace:Telerik.XamarinForms.Input;assembly=Telerik.XamarinForms.Input" xmlns:telerikDataForm="clr-namespace:Telerik.XamarinForms.Input.DataForm;assembly=Telerik.XamarinForms.Input"
+             mc:Ignorable="d"
+             x:Class="JessesPizza.Views.AddressEditPage" BackgroundColor="{DynamicResource backgroundColor}" >
+
+    <ContentPage.Content>
+
+        <ScrollView BackgroundColor="{DynamicResource backgroundColor}" >
+            <StackLayout x:Name="StackLayout"  >
+                <telerikInput:RadDataForm  FormValidationCompleted="DataForm_FormValidationCompleted"  CommitMode="Immediate"  x:Name="DataForm" BackgroundColor="{DynamicResource backgroundColor}" Source="{Binding }"  >
+                    <telerikInput:RadDataForm.GroupHeaderStyle>
+                        <telerikDataForm:DataFormGroupHeaderStyle IsCollapsible="False" TextAlignment="Center"/>
+                    </telerikInput:RadDataForm.GroupHeaderStyle>
+                    <telerikInput:RadDataForm.EditorStyle>
+                        <telerikDataForm:DataFormEditorStyle >
+                            <telerikDataForm:DataFormEditorStyle.Background>
+                                <telerikCommon:Background Fill="Transparent"/>
+                            </telerikDataForm:DataFormEditorStyle.Background>
+                        </telerikDataForm:DataFormEditorStyle>
+                    </telerikInput:RadDataForm.EditorStyle>
+                </telerikInput:RadDataForm>
+                <telerikInput:RadButton VerticalOptions="EndAndExpand" x:Name="SaveButton" Text="SAVE" Style="{DynamicResource ButtonStyle}" Clicked="SaveButton_Clicked" Margin="10,0,10,25" />
+            </StackLayout>
+        </ScrollView>
+    </ContentPage.Content>
+
+</ContentPage>

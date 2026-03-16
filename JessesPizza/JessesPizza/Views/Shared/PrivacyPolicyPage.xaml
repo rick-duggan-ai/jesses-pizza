@@ -1,0 +1,29 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://xamarin.com/schemas/2014/forms"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:d="http://xamarin.com/schemas/2014/forms/design"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             mc:Ignorable="d"
+             x:Class="JessesPizza.Views.PrivacyPolicyPage"
+            Title="{Binding Title}">
+
+    <ContentPage.Content>
+        <ScrollView>
+            <StackLayout>
+            <Label Margin="5" Text="{Binding PrivacyString}"
+                VerticalOptions="CenterAndExpand" 
+                HorizontalOptions="CenterAndExpand" HorizontalTextAlignment="Center" Style="{DynamicResource LabelStyle}" />
+                <StackLayout HorizontalOptions="End" Margin="10" Orientation="Horizontal">
+                    <Label  FontAttributes="Bold" FontSize="Large" Text="Tap the check box to confirm that you have read and agree to the privacy policy" Style="{DynamicResource LabelStyle}">
+                        <Label.TextColor>
+                            <OnPlatform x:TypeArguments="Color" Android="#e93976" iOS="#0b80ff">
+                            </OnPlatform>
+                        </Label.TextColor>
+                    </Label>
+                    <CheckBox  Margin="0,0,0,5"  IsChecked="{Binding Agreed}"></CheckBox>
+                </StackLayout>
+                <Button Margin="10" x:Name ="ContinueButton" Clicked="ContinueButton_Clicked" Text="CONTINUE" IsEnabled="{Binding Agreed}" Style="{DynamicResource ButtonStyle}"></Button>
+            </StackLayout>
+        </ScrollView>
+    </ContentPage.Content>
+</ContentPage>

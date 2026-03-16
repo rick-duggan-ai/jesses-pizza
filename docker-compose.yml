@@ -1,0 +1,65 @@
+version: '3.4'
+
+services:
+
+  jessespizza.mobileappservice:
+    image: ${DOCKER_REGISTRY-}jessespizzamobileappservice
+    ports:
+      - "127.0.0.1:5000:443"
+    build:
+      context: .
+      dockerfile: JessesPizza/JessesPizza.MobileAppService/Dockerfile
+
+    networks:
+      clusternetwork:
+        ipv4_address: 172.16.0.12
+
+  jessespizza.webapp:
+    image: ${DOCKER_REGISTRY-}jessespizzawebapp
+    environment:
+      - MONGO_CONNECTION_STRING=mongodb+srv://mert:Passw00rd@jessespizzaaws-4xeqz.mongodb.net/test?retryWrites=true&w=majority
+    ports:
+      - "127.0.0.1:5001:443"
+    build:
+      context: .
+      dockerfile: JessesPizza.WebApp/Dockerfile
+    networks:
+      clusternetwork:
+        ipv4_address: 172.16.0.13
+
+  mongodb:
+    image: mongo:latest
+    container_name: "mongodb"
+    environment:
+      - MONGO_INITDB_ROOT_USERNAME=test
+      - MONGO_INITDB_ROOT_PASSWORD=test
+    ports:
+      - "27014:27017"
+    networks:
+      clusternetwork:
+        ipv4_address: 172.16.0.14
+
+
+  mongo-express:
+    container_name: mongo-express
+    image: mongo-express
+    depends_on:
+      - mongodb
+    environment:
+      - ME_CONFIG_MONGODB_ADMINUSERNAME=test
+      - ME_CONFIG_MONGODB_ADMINPASSWORD=test
+      - ME_CONFIG_MONGODB_SERVER=mongodb
+      - ME_CONFIG_BASICAUTH_USERNAME=user   
+      - ME_CONFIG_BASICAUTH_PASSWORD=pass
+    ports:
+      - '8081:8081'
+    networks:
+      clusternetwork:
+        ipv4_address: 172.16.0.15
+networks:
+  clusternetwork:
+    driver: bridge
+    ipam:
+      driver: default
+      config:
+        - subnet: 172.16.0.0/24

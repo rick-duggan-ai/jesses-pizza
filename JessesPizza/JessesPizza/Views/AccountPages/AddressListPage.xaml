@@ -1,0 +1,111 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://xamarin.com/schemas/2014/forms"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:d="http://xamarin.com/schemas/2014/forms/design"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" xmlns:dataControls="clr-namespace:Telerik.XamarinForms.DataControls;assembly=Telerik.XamarinForms.DataControls" xmlns:listView="clr-namespace:Telerik.XamarinForms.DataControls.ListView;assembly=Telerik.XamarinForms.DataControls" xmlns:input="clr-namespace:Telerik.XamarinForms.Input;assembly=Telerik.XamarinForms.Input" xmlns:Helpers="clr-namespace:JessesPizza.Helpers"
+             mc:Ignorable="d"
+             x:Class="JessesPizza.Views.AddressListPage" Title="{Binding Title}">
+    <ContentPage.ToolbarItems>
+        <ToolbarItem Clicked="NewAddress_Clicked" >
+            <ToolbarItem.IconImageSource>
+                <FontImageSource Glyph="{DynamicResource PlusSign}" FontFamily="{DynamicResource MaterialFontFamily}"/>
+            </ToolbarItem.IconImageSource>
+        </ToolbarItem>
+    </ContentPage.ToolbarItems>
+    <ContentPage.Content>
+        <Grid BackgroundColor="{DynamicResource backgroundColor}">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width ="*"/>
+                <ColumnDefinition Width ="*"/>
+                <ColumnDefinition Width ="*"/>
+            </Grid.ColumnDefinitions>
+            <Grid.RowDefinitions>
+                <RowDefinition Height ="*" />
+                <RowDefinition Height ="Auto" />
+            </Grid.RowDefinitions>
+            <dataControls:RadListView  BackgroundColor="{DynamicResource backgroundColor}" Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="4"  Margin="0,0,0,0"  ItemsSource="{Binding Addresses}" x:Name="AddressList" SelectionMode="Single" SelectionChanged="AddressList_SelectionChanged">
+                <dataControls:RadListView.ItemTemplate>
+                    <DataTemplate>
+                        <listView:ListViewTemplateCell >
+                            <listView:ListViewTemplateCell.View>
+                                <Frame CornerRadius="10" Padding="10" Margin="2"  BackgroundColor="{Binding IsSelected,Converter={StaticResource BoolToColorConverter}}">
+                                    <Grid >
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="*"/>
+                                            <ColumnDefinition Width ="100"/>
+                                        </Grid.ColumnDefinitions>
+                                        <Grid.RowDefinitions>
+                                            <RowDefinition Height ="Auto"/>
+                                            <RowDefinition Height ="Auto" />
+
+                                        </Grid.RowDefinitions>
+                                        <Label HorizontalTextAlignment="Center" Margin="5,0,0,0" Grid.ColumnSpan="2" Grid.Row="0" Grid.Column="0" Text="{Binding DisplayName}" FontSize="Medium" FontAttributes="Bold" TextColor="{DynamicResource TextPrimaryColor}" VerticalOptions="Center" />
+                                        <StackLayout Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="2" >
+                                            <Label Margin="10,10,10,0"   HorizontalOptions="Start"  Text="{Binding AddressLine1}" FontSize="Medium" TextColor="{DynamicResource TextPrimaryColor}"  />
+                                            <StackLayout Orientation="Horizontal">
+                                                <Label Margin="10,0,0,0"   Text="{Binding City}" FontSize="Medium"  TextColor="{DynamicResource TextPrimaryColor}"  />
+                                                <Label  Text="{Binding ZipCode}" FontSize="Medium"  TextColor="{DynamicResource TextPrimaryColor}"/>
+                                            </StackLayout>
+                                        </StackLayout>
+
+                                        <StackLayout  MinimumHeightRequest="75" BackgroundColor = "Transparent" Grid.RowSpan="3" Grid.Row="0" Grid.Column="2"  Padding="0" Margin="0,0,5,0">
+                                            <Button 
+                                                 CommandParameter="{Binding }"        
+                                                 x:Name="editButton" 
+                                                         Text="EDIT"
+                                                        
+                                                        Style="{DynamicResource ButtonStyle}"
+                                                         Clicked="editButton_Clicked"
+                                                 />
+                                            <Button
+                                                         x:Name="deleteButton" 
+                                                         CommandParameter="{Binding }"       
+                                                         IsVisible="{Binding IsDefault, Converter={Helpers:InverseBoolConverter}}"         
+                                                         Text="DELETE"  
+                                                         Style="{DynamicResource ButtonStyle}"
+                                                         Clicked="deleteButton_Clicked"/>
+                                        </StackLayout>
+                                    </Grid>
+                                </Frame>
+                            </listView:ListViewTemplateCell.View>
+                        </listView:ListViewTemplateCell>
+                    </DataTemplate>
+                </dataControls:RadListView.ItemTemplate>
+                <dataControls:RadListView.ItemStyle>
+                    <listView:ListViewItemStyle BackgroundColor="{DynamicResource backgroundColor}"
+                                        TextCellTextColor="{DynamicResource TextPrimaryColor}"
+                                        BorderColor="{DynamicResource TextPrimaryColor}"
+                                        BorderWidth="0"
+                                        BorderLocation="All"
+                                            RelativeLayout.HeightConstraint="50"
+                                         />
+                </dataControls:RadListView.ItemStyle>
+                <dataControls:RadListView.SelectedItemStyle>
+                    <listView:ListViewItemStyle BackgroundColor="{DynamicResource backgroundColor}"
+                                        TextCellTextColor="{DynamicResource TextPrimaryColor}"
+                                        BorderColor="{DynamicResource TextPrimaryColor}"
+                                        BorderWidth="0"
+                                        BorderLocation="All"
+                                            RelativeLayout.HeightConstraint="50"
+                                         />
+                </dataControls:RadListView.SelectedItemStyle>
+
+            </dataControls:RadListView>
+            <input:RadButton  Grid.Row="1" Grid.Column="1"  Grid.ColumnSpan="2" 
+                              x:Name="proceedButton" 
+                              Text="PROCEED"  
+                                Style="{DynamicResource ButtonStyle}"
+                                BorderWidth="3"
+                              Clicked="proceedButton_Clicked">
+                <input:RadButton.Margin>
+                    <OnPlatform x:TypeArguments="Thickness">
+                        <On Platform="iOS" Value="0,0,0,25" />
+                        <On Platform="Android, UWP" Value="0,0,0,10" />
+                    </OnPlatform>
+                </input:RadButton.Margin>
+            </input:RadButton>
+        </Grid>
+    </ContentPage.Content>
+</ContentPage>
+    

@@ -1,0 +1,22 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://xamarin.com/schemas/2014/forms"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:d="http://xamarin.com/schemas/2014/forms/design"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             mc:Ignorable="d"
+             x:Class="JessesPizza.Views.HomeScreen"
+             BackgroundColor="{DynamicResource backgroundColor}" Title="Welcome">
+    <NavigationPage.TitleView>
+        <Label Text="Welcome!" TextColor="White" FontSize="Title" HorizontalTextAlignment="Center"/>
+    </NavigationPage.TitleView>
+    <ContentPage.Content>
+        <StackLayout>
+            <Button Style="{DynamicResource ButtonStyle}" Text="SIGN UP" Margin="10,80,10,0" Clicked="SignUpButton_Clicked">
+            </Button>
+            <Button Style="{DynamicResource ButtonStyle}" Text="SIGN IN" Margin="10,40,10,0" Clicked="SignInButton_Clicked">
+            </Button>
+            <Button Style="{DynamicResource ButtonStyle}" Text="CONTINUE AS GUEST" Margin="10,40,10,0" Clicked="GuestButton_Clicked">
+            </Button>
+        </StackLayout>
+    </ContentPage.Content>
+</ContentPage>
