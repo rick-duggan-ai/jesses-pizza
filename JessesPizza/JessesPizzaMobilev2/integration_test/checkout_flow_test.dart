@@ -11,6 +11,7 @@ import 'package:mocktail/mocktail.dart';
 
 import 'package:jesses_pizza_app/data/api/api_client.dart';
 import 'package:jesses_pizza_app/domain/models/user.dart';
+import 'package:jesses_pizza_app/domain/models/menu_category.dart';
 import 'package:jesses_pizza_app/domain/models/menu_group.dart';
 import 'package:jesses_pizza_app/domain/models/menu_item.dart';
 import 'package:jesses_pizza_app/domain/models/cart_item.dart';
@@ -65,12 +66,17 @@ final _tGroups = [
   const MenuGroup(id: 'grp-1', name: 'Pizzas'),
 ];
 
-final _tMenuItems = [
-  MenuItem(
-    id: 'pizza-1',
-    name: 'Margherita',
-    groupId: 'grp-1',
-    sizes: const [MenuItemSize(name: 'Large', price: 14.99)],
+final _tMenuCategories = [
+  MenuCategory(
+    id: 'grp-1',
+    name: 'Pizzas',
+    menuItems: [
+      MenuItem(
+        id: 'pizza-1',
+        name: 'Margherita',
+        sizes: const [MenuItemSize(name: 'Large', price: 14.99)],
+      ),
+    ],
   ),
 ];
 
@@ -137,7 +143,7 @@ void main() {
 
     // Menu repo stubs
     when(() => mockMenuRepo.getGroups()).thenAnswer((_) async => _tGroups);
-    when(() => mockMenuRepo.getMenuItems()).thenAnswer((_) async => _tMenuItems);
+    when(() => mockMenuRepo.getMenuItems()).thenAnswer((_) async => _tMenuCategories);
     when(() => mockMenuRepo.checkHours()).thenAnswer((_) async => true);
 
     // Account repo stubs

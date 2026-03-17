@@ -3,8 +3,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mocktail/mocktail.dart';
+import 'package:jesses_pizza_app/domain/models/menu_category.dart';
 import 'package:jesses_pizza_app/domain/models/menu_group.dart';
-import 'package:jesses_pizza_app/domain/models/menu_item.dart';
 import 'package:jesses_pizza_app/presentation/blocs/menu/menu_bloc.dart';
 import 'package:jesses_pizza_app/presentation/blocs/menu/menu_event.dart';
 import 'package:jesses_pizza_app/presentation/blocs/menu/menu_state.dart';
@@ -42,16 +42,16 @@ void main() {
       expect(find.byType(CircularProgressIndicator), findsOneWidget);
     });
 
-    testWidgets('shows list of groups when state is loaded', (tester) async {
-      final groups = [
-        const MenuGroup(id: '1', name: 'Pizzas', description: 'Our pizzas'),
-        const MenuGroup(id: '2', name: 'Drinks'),
+    testWidgets('shows list of categories when state is loaded', (tester) async {
+      final categories = [
+        const MenuCategory(id: '1', name: 'Pizzas'),
+        const MenuCategory(id: '2', name: 'Drinks'),
       ];
 
       when(() => mockMenuBloc.state).thenReturn(
         MenuState.loaded(
-          groups: groups,
-          items: const <MenuItem>[],
+          categories: categories,
+          groups: const <MenuGroup>[],
           isStoreOpen: true,
         ),
       );
@@ -60,15 +60,14 @@ void main() {
 
       expect(find.text('Pizzas'), findsOneWidget);
       expect(find.text('Drinks'), findsOneWidget);
-      expect(find.text('Our pizzas'), findsOneWidget);
     });
 
     testWidgets('shows StoreClosedBanner when isStoreOpen is false',
         (tester) async {
       when(() => mockMenuBloc.state).thenReturn(
         MenuState.loaded(
+          categories: const <MenuCategory>[],
           groups: const <MenuGroup>[],
-          items: const <MenuItem>[],
           isStoreOpen: false,
         ),
       );
@@ -83,8 +82,8 @@ void main() {
         (tester) async {
       when(() => mockMenuBloc.state).thenReturn(
         MenuState.loaded(
+          categories: const <MenuCategory>[],
           groups: const <MenuGroup>[],
-          items: const <MenuItem>[],
           isStoreOpen: true,
         ),
       );

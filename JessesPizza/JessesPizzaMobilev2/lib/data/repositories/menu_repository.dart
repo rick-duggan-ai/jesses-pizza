@@ -1,7 +1,7 @@
 import 'package:jesses_pizza_app/data/api/api_client.dart';
 import 'package:jesses_pizza_app/data/api/api_endpoints.dart';
+import 'package:jesses_pizza_app/domain/models/menu_category.dart';
 import 'package:jesses_pizza_app/domain/models/menu_group.dart';
-import 'package:jesses_pizza_app/domain/models/menu_item.dart';
 import 'package:jesses_pizza_app/domain/repositories/i_menu_repository.dart';
 
 class MenuRepository implements IMenuRepository {
@@ -21,13 +21,13 @@ class MenuRepository implements IMenuRepository {
   }
 
   @override
-  Future<List<MenuItem>> getMenuItems() async {
+  Future<List<MenuCategory>> getMenuItems() async {
     final response = await apiClient.get<List<dynamic>>(
       ApiEndpoints.mainMenuItems,
       apiVersion: '1.0',
     );
     return (response.data as List)
-        .map((json) => MenuItem.fromJson(json as Map<String, dynamic>))
+        .map((json) => MenuCategory.fromJson(json as Map<String, dynamic>))
         .toList();
   }
 

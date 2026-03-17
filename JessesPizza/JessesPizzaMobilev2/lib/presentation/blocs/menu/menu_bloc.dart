@@ -16,12 +16,12 @@ class MenuBloc extends Bloc<MenuEvent, MenuState> {
   Future<void> _onLoadMenu(LoadMenu event, Emitter<MenuState> emit) async {
     emit(const MenuState.loading());
     try {
+      final categories = await _repo.getMenuItems();
       final groups = await _repo.getGroups();
-      final items = await _repo.getMenuItems();
       final isStoreOpen = await _repo.checkHours();
       emit(MenuState.loaded(
+        categories: categories,
         groups: groups,
-        items: items,
         isStoreOpen: isStoreOpen,
       ));
     } catch (e) {

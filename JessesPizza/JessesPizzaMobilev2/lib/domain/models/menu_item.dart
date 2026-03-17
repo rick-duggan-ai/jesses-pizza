@@ -6,11 +6,10 @@ part 'menu_item.g.dart';
 @freezed
 abstract class MenuItem with _$MenuItem {
   const factory MenuItem({
-    required String id,
-    required String name,
-    String? description,
-    String? groupId,
+    String? id,
+    String? name,
     String? imageUrl,
+    String? description,
     @Default([]) List<MenuItemSize> sizes,
   }) = _MenuItem;
 
@@ -21,8 +20,11 @@ abstract class MenuItem with _$MenuItem {
 @freezed
 abstract class MenuItemSize with _$MenuItemSize {
   const factory MenuItemSize({
+    String? id,
     required String name,
     required double price,
+    @Default(false) bool isDefault,
+    @Default([]) List<String> groupIds,
   }) = _MenuItemSize;
 
   factory MenuItemSize.fromJson(Map<String, dynamic> json) =>

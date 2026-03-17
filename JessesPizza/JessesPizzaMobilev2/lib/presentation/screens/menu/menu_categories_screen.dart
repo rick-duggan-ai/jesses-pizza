@@ -30,21 +30,21 @@ class _MenuCategoriesScreenState extends State<MenuCategoriesScreen> {
           return state.when(
             initial: () => const Center(child: CircularProgressIndicator()),
             loading: () => const Center(child: CircularProgressIndicator()),
-            loaded: (groups, items, isStoreOpen) {
+            loaded: (categories, groups, isStoreOpen) {
               return Column(
                 children: [
                   if (!isStoreOpen) const StoreClosedBanner(),
                   Expanded(
                     child: ListView.builder(
-                      itemCount: groups.length,
+                      itemCount: categories.length,
                       itemBuilder: (context, index) {
-                        final group = groups[index];
+                        final category = categories[index];
                         return ListTile(
-                          leading: group.imageUrl != null
+                          leading: category.imageUrl != null
                               ? ClipRRect(
                                   borderRadius: BorderRadius.circular(8),
                                   child: CachedNetworkImage(
-                                    imageUrl: group.imageUrl!,
+                                    imageUrl: category.imageUrl!,
                                     width: 56,
                                     height: 56,
                                     fit: BoxFit.cover,
@@ -60,16 +60,13 @@ class _MenuCategoriesScreenState extends State<MenuCategoriesScreen> {
                                   ),
                                 )
                               : const Icon(Icons.fastfood, size: 40),
-                          title: Text(group.name),
-                          subtitle: group.description != null
-                              ? Text(group.description!)
-                              : null,
+                          title: Text(category.name),
                           trailing: const Icon(Icons.chevron_right),
                           onTap: () {
                             Navigator.of(context).push(
                               MaterialPageRoute(
                                 builder: (_) =>
-                                    CategoryItemsScreen(group: group),
+                                    CategoryItemsScreen(category: category),
                               ),
                             );
                           },

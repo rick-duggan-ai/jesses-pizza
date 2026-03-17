@@ -27,7 +27,7 @@ class _ItemDetailScreenState extends State<ItemDetailScreen> {
     final sizes = item.sizes;
 
     return Scaffold(
-      appBar: AppBar(title: Text(item.name)),
+      appBar: AppBar(title: Text(item.name ?? '')),
       body: BlocBuilder<MenuBloc, MenuState>(
         builder: (context, menuState) {
           final isStoreOpen = menuState.whenOrNull(
@@ -74,7 +74,7 @@ class _ItemDetailScreenState extends State<ItemDetailScreen> {
 
                 // Name
                 Text(
-                  item.name,
+                  item.name ?? '',
                   style: Theme.of(context).textTheme.headlineSmall,
                 ),
 
@@ -179,8 +179,8 @@ class _ItemDetailScreenState extends State<ItemDetailScreen> {
     final size = item.sizes[_selectedSizeIndex];
 
     final cartItem = CartItem(
-      menuItemId: item.id,
-      name: item.name,
+      menuItemId: item.id ?? '',
+      name: item.name ?? '',
       sizeName: size.name,
       price: size.price,
       quantity: _quantity,

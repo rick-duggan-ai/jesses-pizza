@@ -1,8 +1,8 @@
 import 'package:bloc_test/bloc_test.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mocktail/mocktail.dart';
+import 'package:jesses_pizza_app/domain/models/menu_category.dart';
 import 'package:jesses_pizza_app/domain/models/menu_group.dart';
-import 'package:jesses_pizza_app/domain/models/menu_item.dart';
 import 'package:jesses_pizza_app/domain/repositories/i_menu_repository.dart';
 import 'package:jesses_pizza_app/presentation/blocs/menu/menu_bloc.dart';
 import 'package:jesses_pizza_app/presentation/blocs/menu/menu_event.dart';
@@ -13,8 +13,8 @@ class MockMenuRepository extends Mock implements IMenuRepository {}
 void main() {
   late MockMenuRepository mockRepo;
 
+  final tCategories = <MenuCategory>[];
   final tGroups = <MenuGroup>[];
-  final tItems = <MenuItem>[];
 
   setUp(() {
     mockRepo = MockMenuRepository();
@@ -30,23 +30,27 @@ void main() {
     blocTest<MenuBloc, MenuState>(
       'emits [loading, loaded] on LoadMenu success',
       build: () {
+        when(() => mockRepo.getMenuItems()).thenAnswer((_) async => tCategories);
         when(() => mockRepo.getGroups()).thenAnswer((_) async => tGroups);
-        when(() => mockRepo.getMenuItems()).thenAnswer((_) async => tItems);
         when(() => mockRepo.checkHours()).thenAnswer((_) async => true);
         return MenuBloc(repository: mockRepo);
       },
       act: (bloc) => bloc.add(const MenuEvent.loadMenu()),
       expect: () => [
         const MenuState.loading(),
-        MenuState.loaded(groups: tGroups, items: tItems, isStoreOpen: true),
+        MenuState.loaded(
+          categories: tCategories,
+          groups: tGroups,
+          isStoreOpen: true,
+        ),
       ],
     );
 
     blocTest<MenuBloc, MenuState>(
       'emits [loading, error] on LoadMenu failure',
       build: () {
-        when(() => mockRepo.getGroups()).thenThrow(Exception('Network error'));
-        when(() => mockRepo.getMenuItems()).thenAnswer((_) async => tItems);
+        when(() => mockRepo.getMenuItems()).thenThrow(Exception('Network error'));
+        when(() => mockRepo.getGroups()).thenAnswer((_) async => tGroups);
         when(() => mockRepo.checkHours()).thenAnswer((_) async => false);
         return MenuBloc(repository: mockRepo);
       },

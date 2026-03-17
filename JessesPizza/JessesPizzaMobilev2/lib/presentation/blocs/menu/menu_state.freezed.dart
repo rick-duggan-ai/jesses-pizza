@@ -128,12 +128,12 @@ return error(_that);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult maybeWhen<TResult extends Object?>({TResult Function()?  initial,TResult Function()?  loading,TResult Function( List<MenuGroup> groups,  List<MenuItem> items,  bool isStoreOpen)?  loaded,TResult Function( String message)?  error,required TResult orElse(),}) {final _that = this;
+@optionalTypeArgs TResult maybeWhen<TResult extends Object?>({TResult Function()?  initial,TResult Function()?  loading,TResult Function( List<MenuCategory> categories,  List<MenuGroup> groups,  bool isStoreOpen)?  loaded,TResult Function( String message)?  error,required TResult orElse(),}) {final _that = this;
 switch (_that) {
 case MenuInitial() when initial != null:
 return initial();case MenuLoading() when loading != null:
 return loading();case MenuLoaded() when loaded != null:
-return loaded(_that.groups,_that.items,_that.isStoreOpen);case MenuError() when error != null:
+return loaded(_that.categories,_that.groups,_that.isStoreOpen);case MenuError() when error != null:
 return error(_that.message);case _:
   return orElse();
 
@@ -152,12 +152,12 @@ return error(_that.message);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult when<TResult extends Object?>({required TResult Function()  initial,required TResult Function()  loading,required TResult Function( List<MenuGroup> groups,  List<MenuItem> items,  bool isStoreOpen)  loaded,required TResult Function( String message)  error,}) {final _that = this;
+@optionalTypeArgs TResult when<TResult extends Object?>({required TResult Function()  initial,required TResult Function()  loading,required TResult Function( List<MenuCategory> categories,  List<MenuGroup> groups,  bool isStoreOpen)  loaded,required TResult Function( String message)  error,}) {final _that = this;
 switch (_that) {
 case MenuInitial():
 return initial();case MenuLoading():
 return loading();case MenuLoaded():
-return loaded(_that.groups,_that.items,_that.isStoreOpen);case MenuError():
+return loaded(_that.categories,_that.groups,_that.isStoreOpen);case MenuError():
 return error(_that.message);case _:
   throw StateError('Unexpected subclass');
 
@@ -175,12 +175,12 @@ return error(_that.message);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>({TResult? Function()?  initial,TResult? Function()?  loading,TResult? Function( List<MenuGroup> groups,  List<MenuItem> items,  bool isStoreOpen)?  loaded,TResult? Function( String message)?  error,}) {final _that = this;
+@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>({TResult? Function()?  initial,TResult? Function()?  loading,TResult? Function( List<MenuCategory> categories,  List<MenuGroup> groups,  bool isStoreOpen)?  loaded,TResult? Function( String message)?  error,}) {final _that = this;
 switch (_that) {
 case MenuInitial() when initial != null:
 return initial();case MenuLoading() when loading != null:
 return loading();case MenuLoaded() when loaded != null:
-return loaded(_that.groups,_that.items,_that.isStoreOpen);case MenuError() when error != null:
+return loaded(_that.categories,_that.groups,_that.isStoreOpen);case MenuError() when error != null:
 return error(_that.message);case _:
   return null;
 
@@ -257,21 +257,21 @@ String toString() {
 
 
 class MenuLoaded implements MenuState {
-  const MenuLoaded({required final  List<MenuGroup> groups, required final  List<MenuItem> items, required this.isStoreOpen}): _groups = groups,_items = items;
+  const MenuLoaded({required final  List<MenuCategory> categories, required final  List<MenuGroup> groups, required this.isStoreOpen}): _categories = categories,_groups = groups;
   
+
+ final  List<MenuCategory> _categories;
+ List<MenuCategory> get categories {
+  if (_categories is EqualUnmodifiableListView) return _categories;
+  // ignore: implicit_dynamic_type
+  return EqualUnmodifiableListView(_categories);
+}
 
  final  List<MenuGroup> _groups;
  List<MenuGroup> get groups {
   if (_groups is EqualUnmodifiableListView) return _groups;
   // ignore: implicit_dynamic_type
   return EqualUnmodifiableListView(_groups);
-}
-
- final  List<MenuItem> _items;
- List<MenuItem> get items {
-  if (_items is EqualUnmodifiableListView) return _items;
-  // ignore: implicit_dynamic_type
-  return EqualUnmodifiableListView(_items);
 }
 
  final  bool isStoreOpen;
@@ -286,16 +286,16 @@ $MenuLoadedCopyWith<MenuLoaded> get copyWith => _$MenuLoadedCopyWithImpl<MenuLoa
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is MenuLoaded&&const DeepCollectionEquality().equals(other._groups, _groups)&&const DeepCollectionEquality().equals(other._items, _items)&&(identical(other.isStoreOpen, isStoreOpen) || other.isStoreOpen == isStoreOpen));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is MenuLoaded&&const DeepCollectionEquality().equals(other._categories, _categories)&&const DeepCollectionEquality().equals(other._groups, _groups)&&(identical(other.isStoreOpen, isStoreOpen) || other.isStoreOpen == isStoreOpen));
 }
 
 
 @override
-int get hashCode => Object.hash(runtimeType,const DeepCollectionEquality().hash(_groups),const DeepCollectionEquality().hash(_items),isStoreOpen);
+int get hashCode => Object.hash(runtimeType,const DeepCollectionEquality().hash(_categories),const DeepCollectionEquality().hash(_groups),isStoreOpen);
 
 @override
 String toString() {
-  return 'MenuState.loaded(groups: $groups, items: $items, isStoreOpen: $isStoreOpen)';
+  return 'MenuState.loaded(categories: $categories, groups: $groups, isStoreOpen: $isStoreOpen)';
 }
 
 
@@ -306,7 +306,7 @@ abstract mixin class $MenuLoadedCopyWith<$Res> implements $MenuStateCopyWith<$Re
   factory $MenuLoadedCopyWith(MenuLoaded value, $Res Function(MenuLoaded) _then) = _$MenuLoadedCopyWithImpl;
 @useResult
 $Res call({
- List<MenuGroup> groups, List<MenuItem> items, bool isStoreOpen
+ List<MenuCategory> categories, List<MenuGroup> groups, bool isStoreOpen
 });
 
 
@@ -323,11 +323,11 @@ class _$MenuLoadedCopyWithImpl<$Res>
 
 /// Create a copy of MenuState
 /// with the given fields replaced by the non-null parameter values.
-@pragma('vm:prefer-inline') $Res call({Object? groups = null,Object? items = null,Object? isStoreOpen = null,}) {
+@pragma('vm:prefer-inline') $Res call({Object? categories = null,Object? groups = null,Object? isStoreOpen = null,}) {
   return _then(MenuLoaded(
-groups: null == groups ? _self._groups : groups // ignore: cast_nullable_to_non_nullable
-as List<MenuGroup>,items: null == items ? _self._items : items // ignore: cast_nullable_to_non_nullable
-as List<MenuItem>,isStoreOpen: null == isStoreOpen ? _self.isStoreOpen : isStoreOpen // ignore: cast_nullable_to_non_nullable
+categories: null == categories ? _self._categories : categories // ignore: cast_nullable_to_non_nullable
+as List<MenuCategory>,groups: null == groups ? _self._groups : groups // ignore: cast_nullable_to_non_nullable
+as List<MenuGroup>,isStoreOpen: null == isStoreOpen ? _self.isStoreOpen : isStoreOpen // ignore: cast_nullable_to_non_nullable
 as bool,
   ));
 }

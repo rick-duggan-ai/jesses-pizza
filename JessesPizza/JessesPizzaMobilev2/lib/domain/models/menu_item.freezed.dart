@@ -15,7 +15,7 @@ T _$identity<T>(T value) => value;
 /// @nodoc
 mixin _$MenuItem {
 
- String get id; String get name; String? get description; String? get groupId; String? get imageUrl; List<MenuItemSize> get sizes;
+ String? get id; String? get name; String? get imageUrl; String? get description; List<MenuItemSize> get sizes;
 /// Create a copy of MenuItem
 /// with the given fields replaced by the non-null parameter values.
 @JsonKey(includeFromJson: false, includeToJson: false)
@@ -28,16 +28,16 @@ $MenuItemCopyWith<MenuItem> get copyWith => _$MenuItemCopyWithImpl<MenuItem>(thi
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is MenuItem&&(identical(other.id, id) || other.id == id)&&(identical(other.name, name) || other.name == name)&&(identical(other.description, description) || other.description == description)&&(identical(other.groupId, groupId) || other.groupId == groupId)&&(identical(other.imageUrl, imageUrl) || other.imageUrl == imageUrl)&&const DeepCollectionEquality().equals(other.sizes, sizes));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is MenuItem&&(identical(other.id, id) || other.id == id)&&(identical(other.name, name) || other.name == name)&&(identical(other.imageUrl, imageUrl) || other.imageUrl == imageUrl)&&(identical(other.description, description) || other.description == description)&&const DeepCollectionEquality().equals(other.sizes, sizes));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
 @override
-int get hashCode => Object.hash(runtimeType,id,name,description,groupId,imageUrl,const DeepCollectionEquality().hash(sizes));
+int get hashCode => Object.hash(runtimeType,id,name,imageUrl,description,const DeepCollectionEquality().hash(sizes));
 
 @override
 String toString() {
-  return 'MenuItem(id: $id, name: $name, description: $description, groupId: $groupId, imageUrl: $imageUrl, sizes: $sizes)';
+  return 'MenuItem(id: $id, name: $name, imageUrl: $imageUrl, description: $description, sizes: $sizes)';
 }
 
 
@@ -48,7 +48,7 @@ abstract mixin class $MenuItemCopyWith<$Res>  {
   factory $MenuItemCopyWith(MenuItem value, $Res Function(MenuItem) _then) = _$MenuItemCopyWithImpl;
 @useResult
 $Res call({
- String id, String name, String? description, String? groupId, String? imageUrl, List<MenuItemSize> sizes
+ String? id, String? name, String? imageUrl, String? description, List<MenuItemSize> sizes
 });
 
 
@@ -65,13 +65,12 @@ class _$MenuItemCopyWithImpl<$Res>
 
 /// Create a copy of MenuItem
 /// with the given fields replaced by the non-null parameter values.
-@pragma('vm:prefer-inline') @override $Res call({Object? id = null,Object? name = null,Object? description = freezed,Object? groupId = freezed,Object? imageUrl = freezed,Object? sizes = null,}) {
+@pragma('vm:prefer-inline') @override $Res call({Object? id = freezed,Object? name = freezed,Object? imageUrl = freezed,Object? description = freezed,Object? sizes = null,}) {
   return _then(_self.copyWith(
-id: null == id ? _self.id : id // ignore: cast_nullable_to_non_nullable
-as String,name: null == name ? _self.name : name // ignore: cast_nullable_to_non_nullable
-as String,description: freezed == description ? _self.description : description // ignore: cast_nullable_to_non_nullable
-as String?,groupId: freezed == groupId ? _self.groupId : groupId // ignore: cast_nullable_to_non_nullable
+id: freezed == id ? _self.id : id // ignore: cast_nullable_to_non_nullable
+as String?,name: freezed == name ? _self.name : name // ignore: cast_nullable_to_non_nullable
 as String?,imageUrl: freezed == imageUrl ? _self.imageUrl : imageUrl // ignore: cast_nullable_to_non_nullable
+as String?,description: freezed == description ? _self.description : description // ignore: cast_nullable_to_non_nullable
 as String?,sizes: null == sizes ? _self.sizes : sizes // ignore: cast_nullable_to_non_nullable
 as List<MenuItemSize>,
   ));
@@ -158,10 +157,10 @@ return $default(_that);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( String id,  String name,  String? description,  String? groupId,  String? imageUrl,  List<MenuItemSize> sizes)?  $default,{required TResult orElse(),}) {final _that = this;
+@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( String? id,  String? name,  String? imageUrl,  String? description,  List<MenuItemSize> sizes)?  $default,{required TResult orElse(),}) {final _that = this;
 switch (_that) {
 case _MenuItem() when $default != null:
-return $default(_that.id,_that.name,_that.description,_that.groupId,_that.imageUrl,_that.sizes);case _:
+return $default(_that.id,_that.name,_that.imageUrl,_that.description,_that.sizes);case _:
   return orElse();
 
 }
@@ -179,10 +178,10 @@ return $default(_that.id,_that.name,_that.description,_that.groupId,_that.imageU
 /// }
 /// ```
 
-@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( String id,  String name,  String? description,  String? groupId,  String? imageUrl,  List<MenuItemSize> sizes)  $default,) {final _that = this;
+@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( String? id,  String? name,  String? imageUrl,  String? description,  List<MenuItemSize> sizes)  $default,) {final _that = this;
 switch (_that) {
 case _MenuItem():
-return $default(_that.id,_that.name,_that.description,_that.groupId,_that.imageUrl,_that.sizes);case _:
+return $default(_that.id,_that.name,_that.imageUrl,_that.description,_that.sizes);case _:
   throw StateError('Unexpected subclass');
 
 }
@@ -199,10 +198,10 @@ return $default(_that.id,_that.name,_that.description,_that.groupId,_that.imageU
 /// }
 /// ```
 
-@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( String id,  String name,  String? description,  String? groupId,  String? imageUrl,  List<MenuItemSize> sizes)?  $default,) {final _that = this;
+@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( String? id,  String? name,  String? imageUrl,  String? description,  List<MenuItemSize> sizes)?  $default,) {final _that = this;
 switch (_that) {
 case _MenuItem() when $default != null:
-return $default(_that.id,_that.name,_that.description,_that.groupId,_that.imageUrl,_that.sizes);case _:
+return $default(_that.id,_that.name,_that.imageUrl,_that.description,_that.sizes);case _:
   return null;
 
 }
@@ -214,14 +213,13 @@ return $default(_that.id,_that.name,_that.description,_that.groupId,_that.imageU
 @JsonSerializable()
 
 class _MenuItem implements MenuItem {
-  const _MenuItem({required this.id, required this.name, this.description, this.groupId, this.imageUrl, final  List<MenuItemSize> sizes = const []}): _sizes = sizes;
+  const _MenuItem({this.id, this.name, this.imageUrl, this.description, final  List<MenuItemSize> sizes = const []}): _sizes = sizes;
   factory _MenuItem.fromJson(Map<String, dynamic> json) => _$MenuItemFromJson(json);
 
-@override final  String id;
-@override final  String name;
-@override final  String? description;
-@override final  String? groupId;
+@override final  String? id;
+@override final  String? name;
 @override final  String? imageUrl;
+@override final  String? description;
  final  List<MenuItemSize> _sizes;
 @override@JsonKey() List<MenuItemSize> get sizes {
   if (_sizes is EqualUnmodifiableListView) return _sizes;
@@ -243,16 +241,16 @@ Map<String, dynamic> toJson() {
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is _MenuItem&&(identical(other.id, id) || other.id == id)&&(identical(other.name, name) || other.name == name)&&(identical(other.description, description) || other.description == description)&&(identical(other.groupId, groupId) || other.groupId == groupId)&&(identical(other.imageUrl, imageUrl) || other.imageUrl == imageUrl)&&const DeepCollectionEquality().equals(other._sizes, _sizes));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is _MenuItem&&(identical(other.id, id) || other.id == id)&&(identical(other.name, name) || other.name == name)&&(identical(other.imageUrl, imageUrl) || other.imageUrl == imageUrl)&&(identical(other.description, description) || other.description == description)&&const DeepCollectionEquality().equals(other._sizes, _sizes));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
 @override
-int get hashCode => Object.hash(runtimeType,id,name,description,groupId,imageUrl,const DeepCollectionEquality().hash(_sizes));
+int get hashCode => Object.hash(runtimeType,id,name,imageUrl,description,const DeepCollectionEquality().hash(_sizes));
 
 @override
 String toString() {
-  return 'MenuItem(id: $id, name: $name, description: $description, groupId: $groupId, imageUrl: $imageUrl, sizes: $sizes)';
+  return 'MenuItem(id: $id, name: $name, imageUrl: $imageUrl, description: $description, sizes: $sizes)';
 }
 
 
@@ -263,7 +261,7 @@ abstract mixin class _$MenuItemCopyWith<$Res> implements $MenuItemCopyWith<$Res>
   factory _$MenuItemCopyWith(_MenuItem value, $Res Function(_MenuItem) _then) = __$MenuItemCopyWithImpl;
 @override @useResult
 $Res call({
- String id, String name, String? description, String? groupId, String? imageUrl, List<MenuItemSize> sizes
+ String? id, String? name, String? imageUrl, String? description, List<MenuItemSize> sizes
 });
 
 
@@ -280,13 +278,12 @@ class __$MenuItemCopyWithImpl<$Res>
 
 /// Create a copy of MenuItem
 /// with the given fields replaced by the non-null parameter values.
-@override @pragma('vm:prefer-inline') $Res call({Object? id = null,Object? name = null,Object? description = freezed,Object? groupId = freezed,Object? imageUrl = freezed,Object? sizes = null,}) {
+@override @pragma('vm:prefer-inline') $Res call({Object? id = freezed,Object? name = freezed,Object? imageUrl = freezed,Object? description = freezed,Object? sizes = null,}) {
   return _then(_MenuItem(
-id: null == id ? _self.id : id // ignore: cast_nullable_to_non_nullable
-as String,name: null == name ? _self.name : name // ignore: cast_nullable_to_non_nullable
-as String,description: freezed == description ? _self.description : description // ignore: cast_nullable_to_non_nullable
-as String?,groupId: freezed == groupId ? _self.groupId : groupId // ignore: cast_nullable_to_non_nullable
+id: freezed == id ? _self.id : id // ignore: cast_nullable_to_non_nullable
+as String?,name: freezed == name ? _self.name : name // ignore: cast_nullable_to_non_nullable
 as String?,imageUrl: freezed == imageUrl ? _self.imageUrl : imageUrl // ignore: cast_nullable_to_non_nullable
+as String?,description: freezed == description ? _self.description : description // ignore: cast_nullable_to_non_nullable
 as String?,sizes: null == sizes ? _self._sizes : sizes // ignore: cast_nullable_to_non_nullable
 as List<MenuItemSize>,
   ));
@@ -299,7 +296,7 @@ as List<MenuItemSize>,
 /// @nodoc
 mixin _$MenuItemSize {
 
- String get name; double get price;
+ String? get id; String get name; double get price; bool get isDefault; List<String> get groupIds;
 /// Create a copy of MenuItemSize
 /// with the given fields replaced by the non-null parameter values.
 @JsonKey(includeFromJson: false, includeToJson: false)
@@ -312,16 +309,16 @@ $MenuItemSizeCopyWith<MenuItemSize> get copyWith => _$MenuItemSizeCopyWithImpl<M
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is MenuItemSize&&(identical(other.name, name) || other.name == name)&&(identical(other.price, price) || other.price == price));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is MenuItemSize&&(identical(other.id, id) || other.id == id)&&(identical(other.name, name) || other.name == name)&&(identical(other.price, price) || other.price == price)&&(identical(other.isDefault, isDefault) || other.isDefault == isDefault)&&const DeepCollectionEquality().equals(other.groupIds, groupIds));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
 @override
-int get hashCode => Object.hash(runtimeType,name,price);
+int get hashCode => Object.hash(runtimeType,id,name,price,isDefault,const DeepCollectionEquality().hash(groupIds));
 
 @override
 String toString() {
-  return 'MenuItemSize(name: $name, price: $price)';
+  return 'MenuItemSize(id: $id, name: $name, price: $price, isDefault: $isDefault, groupIds: $groupIds)';
 }
 
 
@@ -332,7 +329,7 @@ abstract mixin class $MenuItemSizeCopyWith<$Res>  {
   factory $MenuItemSizeCopyWith(MenuItemSize value, $Res Function(MenuItemSize) _then) = _$MenuItemSizeCopyWithImpl;
 @useResult
 $Res call({
- String name, double price
+ String? id, String name, double price, bool isDefault, List<String> groupIds
 });
 
 
@@ -349,11 +346,14 @@ class _$MenuItemSizeCopyWithImpl<$Res>
 
 /// Create a copy of MenuItemSize
 /// with the given fields replaced by the non-null parameter values.
-@pragma('vm:prefer-inline') @override $Res call({Object? name = null,Object? price = null,}) {
+@pragma('vm:prefer-inline') @override $Res call({Object? id = freezed,Object? name = null,Object? price = null,Object? isDefault = null,Object? groupIds = null,}) {
   return _then(_self.copyWith(
-name: null == name ? _self.name : name // ignore: cast_nullable_to_non_nullable
+id: freezed == id ? _self.id : id // ignore: cast_nullable_to_non_nullable
+as String?,name: null == name ? _self.name : name // ignore: cast_nullable_to_non_nullable
 as String,price: null == price ? _self.price : price // ignore: cast_nullable_to_non_nullable
-as double,
+as double,isDefault: null == isDefault ? _self.isDefault : isDefault // ignore: cast_nullable_to_non_nullable
+as bool,groupIds: null == groupIds ? _self.groupIds : groupIds // ignore: cast_nullable_to_non_nullable
+as List<String>,
   ));
 }
 
@@ -438,10 +438,10 @@ return $default(_that);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( String name,  double price)?  $default,{required TResult orElse(),}) {final _that = this;
+@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( String? id,  String name,  double price,  bool isDefault,  List<String> groupIds)?  $default,{required TResult orElse(),}) {final _that = this;
 switch (_that) {
 case _MenuItemSize() when $default != null:
-return $default(_that.name,_that.price);case _:
+return $default(_that.id,_that.name,_that.price,_that.isDefault,_that.groupIds);case _:
   return orElse();
 
 }
@@ -459,10 +459,10 @@ return $default(_that.name,_that.price);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( String name,  double price)  $default,) {final _that = this;
+@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( String? id,  String name,  double price,  bool isDefault,  List<String> groupIds)  $default,) {final _that = this;
 switch (_that) {
 case _MenuItemSize():
-return $default(_that.name,_that.price);case _:
+return $default(_that.id,_that.name,_that.price,_that.isDefault,_that.groupIds);case _:
   throw StateError('Unexpected subclass');
 
 }
@@ -479,10 +479,10 @@ return $default(_that.name,_that.price);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( String name,  double price)?  $default,) {final _that = this;
+@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( String? id,  String name,  double price,  bool isDefault,  List<String> groupIds)?  $default,) {final _that = this;
 switch (_that) {
 case _MenuItemSize() when $default != null:
-return $default(_that.name,_that.price);case _:
+return $default(_that.id,_that.name,_that.price,_that.isDefault,_that.groupIds);case _:
   return null;
 
 }
@@ -494,11 +494,20 @@ return $default(_that.name,_that.price);case _:
 @JsonSerializable()
 
 class _MenuItemSize implements MenuItemSize {
-  const _MenuItemSize({required this.name, required this.price});
+  const _MenuItemSize({this.id, required this.name, required this.price, this.isDefault = false, final  List<String> groupIds = const []}): _groupIds = groupIds;
   factory _MenuItemSize.fromJson(Map<String, dynamic> json) => _$MenuItemSizeFromJson(json);
 
+@override final  String? id;
 @override final  String name;
 @override final  double price;
+@override@JsonKey() final  bool isDefault;
+ final  List<String> _groupIds;
+@override@JsonKey() List<String> get groupIds {
+  if (_groupIds is EqualUnmodifiableListView) return _groupIds;
+  // ignore: implicit_dynamic_type
+  return EqualUnmodifiableListView(_groupIds);
+}
+
 
 /// Create a copy of MenuItemSize
 /// with the given fields replaced by the non-null parameter values.
@@ -513,16 +522,16 @@ Map<String, dynamic> toJson() {
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is _MenuItemSize&&(identical(other.name, name) || other.name == name)&&(identical(other.price, price) || other.price == price));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is _MenuItemSize&&(identical(other.id, id) || other.id == id)&&(identical(other.name, name) || other.name == name)&&(identical(other.price, price) || other.price == price)&&(identical(other.isDefault, isDefault) || other.isDefault == isDefault)&&const DeepCollectionEquality().equals(other._groupIds, _groupIds));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
 @override
-int get hashCode => Object.hash(runtimeType,name,price);
+int get hashCode => Object.hash(runtimeType,id,name,price,isDefault,const DeepCollectionEquality().hash(_groupIds));
 
 @override
 String toString() {
-  return 'MenuItemSize(name: $name, price: $price)';
+  return 'MenuItemSize(id: $id, name: $name, price: $price, isDefault: $isDefault, groupIds: $groupIds)';
 }
 
 
@@ -533,7 +542,7 @@ abstract mixin class _$MenuItemSizeCopyWith<$Res> implements $MenuItemSizeCopyWi
   factory _$MenuItemSizeCopyWith(_MenuItemSize value, $Res Function(_MenuItemSize) _then) = __$MenuItemSizeCopyWithImpl;
 @override @useResult
 $Res call({
- String name, double price
+ String? id, String name, double price, bool isDefault, List<String> groupIds
 });
 
 
@@ -550,11 +559,14 @@ class __$MenuItemSizeCopyWithImpl<$Res>
 
 /// Create a copy of MenuItemSize
 /// with the given fields replaced by the non-null parameter values.
-@override @pragma('vm:prefer-inline') $Res call({Object? name = null,Object? price = null,}) {
+@override @pragma('vm:prefer-inline') $Res call({Object? id = freezed,Object? name = null,Object? price = null,Object? isDefault = null,Object? groupIds = null,}) {
   return _then(_MenuItemSize(
-name: null == name ? _self.name : name // ignore: cast_nullable_to_non_nullable
+id: freezed == id ? _self.id : id // ignore: cast_nullable_to_non_nullable
+as String?,name: null == name ? _self.name : name // ignore: cast_nullable_to_non_nullable
 as String,price: null == price ? _self.price : price // ignore: cast_nullable_to_non_nullable
-as double,
+as double,isDefault: null == isDefault ? _self.isDefault : isDefault // ignore: cast_nullable_to_non_nullable
+as bool,groupIds: null == groupIds ? _self._groupIds : groupIds // ignore: cast_nullable_to_non_nullable
+as List<String>,
   ));
 }
 
