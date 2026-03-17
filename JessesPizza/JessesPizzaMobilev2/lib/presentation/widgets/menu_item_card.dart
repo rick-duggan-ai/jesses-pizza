@@ -1,3 +1,4 @@
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:jesses_pizza_app/domain/models/menu_item.dart';
 
@@ -21,10 +22,14 @@ class MenuItemCard extends StatelessWidget {
           children: [
             Expanded(
               child: item.imageUrl != null
-                  ? Image.network(
-                      item.imageUrl!,
+                  ? CachedNetworkImage(
+                      imageUrl: item.imageUrl!,
                       fit: BoxFit.cover,
-                      errorBuilder: (_, __, ___) => const Center(
+                      width: double.infinity,
+                      placeholder: (_, __) => const Center(
+                        child: CircularProgressIndicator(strokeWidth: 2),
+                      ),
+                      errorWidget: (_, __, ___) => const Center(
                         child: Icon(Icons.local_pizza, size: 48),
                       ),
                     )

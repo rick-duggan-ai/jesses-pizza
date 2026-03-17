@@ -1,3 +1,4 @@
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:jesses_pizza_app/domain/models/cart_item.dart';
@@ -40,31 +41,34 @@ class _ItemDetailScreenState extends State<ItemDetailScreen> {
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
                 // Image
-                if (item.imageUrl != null)
-                  ClipRRect(
-                    borderRadius: BorderRadius.circular(12),
-                    child: Image.network(
-                      item.imageUrl!,
-                      height: 220,
-                      fit: BoxFit.cover,
-                      errorBuilder: (_, __, ___) => Container(
-                        height: 220,
-                        color: Colors.grey.shade200,
-                        child: const Center(
-                            child: Icon(Icons.local_pizza, size: 80)),
-                      ),
-                    ),
-                  )
-                else
-                  Container(
-                    height: 220,
-                    decoration: BoxDecoration(
-                      color: Colors.grey.shade200,
-                      borderRadius: BorderRadius.circular(12),
-                    ),
-                    child: const Center(
-                        child: Icon(Icons.local_pizza, size: 80)),
-                  ),
+                ClipRRect(
+                  borderRadius: BorderRadius.circular(12),
+                  child: item.imageUrl != null
+                      ? CachedNetworkImage(
+                          imageUrl: item.imageUrl!,
+                          height: 220,
+                          width: double.infinity,
+                          fit: BoxFit.cover,
+                          placeholder: (_, __) => Container(
+                            height: 220,
+                            color: Colors.grey.shade200,
+                            child: const Center(
+                                child: CircularProgressIndicator()),
+                          ),
+                          errorWidget: (_, __, ___) => Container(
+                            height: 220,
+                            color: Colors.grey.shade200,
+                            child: const Center(
+                                child: Icon(Icons.local_pizza, size: 80)),
+                          ),
+                        )
+                      : Container(
+                          height: 220,
+                          color: Colors.grey.shade200,
+                          child: const Center(
+                              child: Icon(Icons.local_pizza, size: 80)),
+                        ),
+                ),
 
                 const SizedBox(height: 16),
 

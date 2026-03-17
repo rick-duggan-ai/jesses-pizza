@@ -1,3 +1,4 @@
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:jesses_pizza_app/presentation/blocs/menu/menu_bloc.dart';
@@ -40,13 +41,23 @@ class _MenuCategoriesScreenState extends State<MenuCategoriesScreen> {
                         final group = groups[index];
                         return ListTile(
                           leading: group.imageUrl != null
-                              ? Image.network(
-                                  group.imageUrl!,
-                                  width: 56,
-                                  height: 56,
-                                  fit: BoxFit.cover,
-                                  errorBuilder: (_, __, ___) =>
-                                      const Icon(Icons.fastfood, size: 40),
+                              ? ClipRRect(
+                                  borderRadius: BorderRadius.circular(8),
+                                  child: CachedNetworkImage(
+                                    imageUrl: group.imageUrl!,
+                                    width: 56,
+                                    height: 56,
+                                    fit: BoxFit.cover,
+                                    placeholder: (_, __) => const SizedBox(
+                                      width: 56,
+                                      height: 56,
+                                      child: Center(
+                                          child: CircularProgressIndicator(
+                                              strokeWidth: 2)),
+                                    ),
+                                    errorWidget: (_, __, ___) =>
+                                        const Icon(Icons.fastfood, size: 40),
+                                  ),
                                 )
                               : const Icon(Icons.fastfood, size: 40),
                           title: Text(group.name),
