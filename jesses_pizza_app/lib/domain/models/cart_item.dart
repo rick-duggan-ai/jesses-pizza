@@ -24,4 +24,23 @@ class CartItem {
       quantity: quantity ?? this.quantity,
     );
   }
+
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      other is CartItem &&
+          runtimeType == other.runtimeType &&
+          menuItemId == other.menuItemId &&
+          name == other.name &&
+          sizeName == other.sizeName &&
+          price == other.price &&
+          quantity == other.quantity;
+
+  @override
+  int get hashCode =>
+      menuItemId.hashCode ^
+      name.hashCode ^
+      sizeName.hashCode ^
+      price.hashCode ^
+      quantity.hashCode;
 }
