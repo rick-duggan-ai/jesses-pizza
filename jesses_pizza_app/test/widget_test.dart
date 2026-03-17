@@ -8,7 +8,10 @@ void main() {
   });
 
   testWidgets('App smoke test', (WidgetTester tester) async {
-    await tester.pumpWidget(const JessesPizzaApp());
+    await tester.runAsync(() async {
+      await tester.pumpWidget(const JessesPizzaApp());
+      await tester.pump();
+    });
     expect(find.text("Jesse's Pizza"), findsOneWidget);
   });
 }

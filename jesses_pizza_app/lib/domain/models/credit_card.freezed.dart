@@ -15,7 +15,7 @@ T _$identity<T>(T value) => value;
 /// @nodoc
 mixin _$CreditCard {
 
- String get id; String get cardNumber; String get expirationDate;
+ String get id;@JsonKey(name: 'cardNumber') String get maskedCardNumber; String get expirationDate;
 /// Create a copy of CreditCard
 /// with the given fields replaced by the non-null parameter values.
 @JsonKey(includeFromJson: false, includeToJson: false)
@@ -28,16 +28,16 @@ $CreditCardCopyWith<CreditCard> get copyWith => _$CreditCardCopyWithImpl<CreditC
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is CreditCard&&(identical(other.id, id) || other.id == id)&&(identical(other.cardNumber, cardNumber) || other.cardNumber == cardNumber)&&(identical(other.expirationDate, expirationDate) || other.expirationDate == expirationDate));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is CreditCard&&(identical(other.id, id) || other.id == id)&&(identical(other.maskedCardNumber, maskedCardNumber) || other.maskedCardNumber == maskedCardNumber)&&(identical(other.expirationDate, expirationDate) || other.expirationDate == expirationDate));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
 @override
-int get hashCode => Object.hash(runtimeType,id,cardNumber,expirationDate);
+int get hashCode => Object.hash(runtimeType,id,maskedCardNumber,expirationDate);
 
 @override
 String toString() {
-  return 'CreditCard(id: $id, cardNumber: $cardNumber, expirationDate: $expirationDate)';
+  return 'CreditCard(id: $id, maskedCardNumber: $maskedCardNumber, expirationDate: $expirationDate)';
 }
 
 
@@ -48,7 +48,7 @@ abstract mixin class $CreditCardCopyWith<$Res>  {
   factory $CreditCardCopyWith(CreditCard value, $Res Function(CreditCard) _then) = _$CreditCardCopyWithImpl;
 @useResult
 $Res call({
- String id, String cardNumber, String expirationDate
+ String id,@JsonKey(name: 'cardNumber') String maskedCardNumber, String expirationDate
 });
 
 
@@ -65,10 +65,10 @@ class _$CreditCardCopyWithImpl<$Res>
 
 /// Create a copy of CreditCard
 /// with the given fields replaced by the non-null parameter values.
-@pragma('vm:prefer-inline') @override $Res call({Object? id = null,Object? cardNumber = null,Object? expirationDate = null,}) {
+@pragma('vm:prefer-inline') @override $Res call({Object? id = null,Object? maskedCardNumber = null,Object? expirationDate = null,}) {
   return _then(_self.copyWith(
 id: null == id ? _self.id : id // ignore: cast_nullable_to_non_nullable
-as String,cardNumber: null == cardNumber ? _self.cardNumber : cardNumber // ignore: cast_nullable_to_non_nullable
+as String,maskedCardNumber: null == maskedCardNumber ? _self.maskedCardNumber : maskedCardNumber // ignore: cast_nullable_to_non_nullable
 as String,expirationDate: null == expirationDate ? _self.expirationDate : expirationDate // ignore: cast_nullable_to_non_nullable
 as String,
   ));
@@ -155,10 +155,10 @@ return $default(_that);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( String id,  String cardNumber,  String expirationDate)?  $default,{required TResult orElse(),}) {final _that = this;
+@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( String id, @JsonKey(name: 'cardNumber')  String maskedCardNumber,  String expirationDate)?  $default,{required TResult orElse(),}) {final _that = this;
 switch (_that) {
 case _CreditCard() when $default != null:
-return $default(_that.id,_that.cardNumber,_that.expirationDate);case _:
+return $default(_that.id,_that.maskedCardNumber,_that.expirationDate);case _:
   return orElse();
 
 }
@@ -176,10 +176,10 @@ return $default(_that.id,_that.cardNumber,_that.expirationDate);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( String id,  String cardNumber,  String expirationDate)  $default,) {final _that = this;
+@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( String id, @JsonKey(name: 'cardNumber')  String maskedCardNumber,  String expirationDate)  $default,) {final _that = this;
 switch (_that) {
 case _CreditCard():
-return $default(_that.id,_that.cardNumber,_that.expirationDate);case _:
+return $default(_that.id,_that.maskedCardNumber,_that.expirationDate);case _:
   throw StateError('Unexpected subclass');
 
 }
@@ -196,10 +196,10 @@ return $default(_that.id,_that.cardNumber,_that.expirationDate);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( String id,  String cardNumber,  String expirationDate)?  $default,) {final _that = this;
+@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( String id, @JsonKey(name: 'cardNumber')  String maskedCardNumber,  String expirationDate)?  $default,) {final _that = this;
 switch (_that) {
 case _CreditCard() when $default != null:
-return $default(_that.id,_that.cardNumber,_that.expirationDate);case _:
+return $default(_that.id,_that.maskedCardNumber,_that.expirationDate);case _:
   return null;
 
 }
@@ -211,11 +211,11 @@ return $default(_that.id,_that.cardNumber,_that.expirationDate);case _:
 @JsonSerializable()
 
 class _CreditCard implements CreditCard {
-  const _CreditCard({required this.id, required this.cardNumber, required this.expirationDate});
+  const _CreditCard({required this.id, @JsonKey(name: 'cardNumber') required this.maskedCardNumber, required this.expirationDate});
   factory _CreditCard.fromJson(Map<String, dynamic> json) => _$CreditCardFromJson(json);
 
 @override final  String id;
-@override final  String cardNumber;
+@override@JsonKey(name: 'cardNumber') final  String maskedCardNumber;
 @override final  String expirationDate;
 
 /// Create a copy of CreditCard
@@ -231,16 +231,16 @@ Map<String, dynamic> toJson() {
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is _CreditCard&&(identical(other.id, id) || other.id == id)&&(identical(other.cardNumber, cardNumber) || other.cardNumber == cardNumber)&&(identical(other.expirationDate, expirationDate) || other.expirationDate == expirationDate));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is _CreditCard&&(identical(other.id, id) || other.id == id)&&(identical(other.maskedCardNumber, maskedCardNumber) || other.maskedCardNumber == maskedCardNumber)&&(identical(other.expirationDate, expirationDate) || other.expirationDate == expirationDate));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
 @override
-int get hashCode => Object.hash(runtimeType,id,cardNumber,expirationDate);
+int get hashCode => Object.hash(runtimeType,id,maskedCardNumber,expirationDate);
 
 @override
 String toString() {
-  return 'CreditCard(id: $id, cardNumber: $cardNumber, expirationDate: $expirationDate)';
+  return 'CreditCard(id: $id, maskedCardNumber: $maskedCardNumber, expirationDate: $expirationDate)';
 }
 
 
@@ -251,7 +251,7 @@ abstract mixin class _$CreditCardCopyWith<$Res> implements $CreditCardCopyWith<$
   factory _$CreditCardCopyWith(_CreditCard value, $Res Function(_CreditCard) _then) = __$CreditCardCopyWithImpl;
 @override @useResult
 $Res call({
- String id, String cardNumber, String expirationDate
+ String id,@JsonKey(name: 'cardNumber') String maskedCardNumber, String expirationDate
 });
 
 
@@ -268,10 +268,10 @@ class __$CreditCardCopyWithImpl<$Res>
 
 /// Create a copy of CreditCard
 /// with the given fields replaced by the non-null parameter values.
-@override @pragma('vm:prefer-inline') $Res call({Object? id = null,Object? cardNumber = null,Object? expirationDate = null,}) {
+@override @pragma('vm:prefer-inline') $Res call({Object? id = null,Object? maskedCardNumber = null,Object? expirationDate = null,}) {
   return _then(_CreditCard(
 id: null == id ? _self.id : id // ignore: cast_nullable_to_non_nullable
-as String,cardNumber: null == cardNumber ? _self.cardNumber : cardNumber // ignore: cast_nullable_to_non_nullable
+as String,maskedCardNumber: null == maskedCardNumber ? _self.maskedCardNumber : maskedCardNumber // ignore: cast_nullable_to_non_nullable
 as String,expirationDate: null == expirationDate ? _self.expirationDate : expirationDate // ignore: cast_nullable_to_non_nullable
 as String,
   ));

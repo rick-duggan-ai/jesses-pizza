@@ -31,13 +31,15 @@ class CartBloc extends Bloc<CartEvent, CartState> {
 
   void _onRemoveItem(RemoveItem event, Emitter<CartState> emit) {
     emit(state.copyWith(
-      items: state.items.where((i) => i.menuItemId != event.menuItemId).toList(),
+      items: state.items
+          .where((i) => !(i.menuItemId == event.menuItemId && i.sizeName == event.sizeName))
+          .toList(),
     ));
   }
 
   void _onUpdateQuantity(UpdateQuantity event, Emitter<CartState> emit) {
     final updated = state.items.map((i) {
-      if (i.menuItemId == event.menuItemId) {
+      if (i.menuItemId == event.menuItemId && i.sizeName == event.sizeName) {
         return i.copyWith(quantity: event.quantity);
       }
       return i;
@@ -46,7 +48,11 @@ class CartBloc extends Bloc<CartEvent, CartState> {
   }
 
   void _onSetDeliveryMode(SetDeliveryMode event, Emitter<CartState> emit) {
-    emit(state.copyWith(isDelivery: event.isDelivery));
+    if (!event.isDelivery) {
+      emit(state.withAddressCleared().copyWith(isDelivery: false));
+    } else {
+      emit(state.copyWith(isDelivery: true));
+    }
   }
 
   void _onSetAddress(SetAddress event, Emitter<CartState> emit) {

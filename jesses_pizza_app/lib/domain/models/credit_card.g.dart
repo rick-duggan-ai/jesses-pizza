@@ -8,13 +8,13 @@ part of 'credit_card.dart';
 
 _CreditCard _$CreditCardFromJson(Map<String, dynamic> json) => _CreditCard(
   id: json['id'] as String,
-  cardNumber: json['cardNumber'] as String,
+  maskedCardNumber: json['cardNumber'] as String,
   expirationDate: json['expirationDate'] as String,
 );
 
 Map<String, dynamic> _$CreditCardToJson(_CreditCard instance) =>
     <String, dynamic>{
       'id': instance.id,
-      'cardNumber': instance.cardNumber,
+      'cardNumber': instance.maskedCardNumber,
       'expirationDate': instance.expirationDate,
     };

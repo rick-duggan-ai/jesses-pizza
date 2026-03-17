@@ -7,7 +7,7 @@ part 'credit_card.g.dart';
 abstract class CreditCard with _$CreditCard {
   const factory CreditCard({
     required String id,
-    required String cardNumber,
+    @JsonKey(name: 'cardNumber') required String maskedCardNumber,
     required String expirationDate,
   }) = _CreditCard;
 

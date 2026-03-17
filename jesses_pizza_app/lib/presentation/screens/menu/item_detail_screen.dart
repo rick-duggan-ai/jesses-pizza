@@ -95,9 +95,7 @@ class _ItemDetailScreenState extends State<ItemDetailScreen> {
                   RadioGroup<int>(
                     groupValue: _selectedSizeIndex,
                     onChanged: (val) {
-                      if (val != null) {
-                        setState(() => _selectedSizeIndex = val);
-                      }
+                      if (val != null) setState(() => _selectedSizeIndex = val);
                     },
                     child: Column(
                       children: sizes.asMap().entries.map((entry) {

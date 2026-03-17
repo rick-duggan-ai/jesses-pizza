@@ -19,7 +19,11 @@ class OrderBloc extends Bloc<OrderEvent, OrderState> {
       SubmitOrder event, Emitter<OrderState> emit) async {
     emit(const OrderState.loading());
     try {
-      await _repo.validateTransaction(event.transaction);
+      final validation = await _repo.validateTransaction(event.transaction);
+      if (!validation.succeeded) {
+        emit(OrderState.error(message: validation.message ?? 'Validation failed'));
+        return;
+      }
       await _repo.postTransaction(event.transaction);
       emit(const OrderState.orderSubmitted());
     } catch (e) {

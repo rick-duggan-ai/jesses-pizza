@@ -61,11 +61,18 @@ class _PaymentScreenState extends State<PaymentScreen> {
             (route) => route.isFirst,
           );
         } else if (state is HppTokenReady) {
-          Navigator.of(context).push(
+          final nav = Navigator.of(context);
+          nav.push<bool>(
             MaterialPageRoute(
               builder: (_) => HppWebviewScreen(tokenUrl: state.token),
             ),
-          );
+          ).then((result) {
+            if (result == true) {
+              nav.push(
+                MaterialPageRoute(builder: (_) => const OrderConfirmationScreen()),
+              );
+            }
+          });
         } else if (state is OrderError) {
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(content: Text(state.message), backgroundColor: Colors.red),

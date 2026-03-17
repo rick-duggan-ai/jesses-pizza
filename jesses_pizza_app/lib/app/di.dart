@@ -37,7 +37,10 @@ void setupDependencies() {
     () => AccountRepository(apiClient: getIt<ApiClient>()),
   );
   getIt.registerFactory<AuthBloc>(
-    () => AuthBloc(repository: getIt<IAuthRepository>()),
+    () => AuthBloc(
+      repository: getIt<IAuthRepository>(),
+      apiClient: getIt<ApiClient>(),
+    ),
   );
   getIt.registerFactory<MenuBloc>(
     () => MenuBloc(repository: getIt<IMenuRepository>()),

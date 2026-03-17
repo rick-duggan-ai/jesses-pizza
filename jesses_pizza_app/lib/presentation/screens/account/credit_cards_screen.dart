@@ -41,9 +41,9 @@ class _CreditCardsScreenState extends State<CreditCardsScreen> {
               separatorBuilder: (_, __) => const Divider(height: 1),
               itemBuilder: (context, index) {
                 final card = cards[index];
-                final maskedNumber = card.cardNumber.length >= 4
-                    ? '**** **** **** ${card.cardNumber.substring(card.cardNumber.length - 4)}'
-                    : card.cardNumber;
+                final maskedNumber = card.maskedCardNumber.length >= 4
+                    ? '**** **** **** ${card.maskedCardNumber.substring(card.maskedCardNumber.length - 4)}'
+                    : card.maskedCardNumber;
                 return ListTile(
                   leading: const Icon(Icons.credit_card),
                   title: Text(maskedNumber),
@@ -106,7 +106,7 @@ class _CreditCardsScreenState extends State<CreditCardsScreen> {
               if (formKey.currentState?.validate() ?? false) {
                 final card = CreditCard(
                   id: '',
-                  cardNumber: cardNumberController.text,
+                  maskedCardNumber: cardNumberController.text,
                   expirationDate: expirationController.text,
                 );
                 context.read<AccountBloc>().add(AccountEvent.saveCard(card: card));

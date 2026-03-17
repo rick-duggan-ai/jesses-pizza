@@ -1,5 +1,4 @@
 import 'package:flutter_test/flutter_test.dart';
-import 'package:dio/dio.dart';
 import 'package:jesses_pizza_app/data/api/api_client.dart';
 import 'package:jesses_pizza_app/data/api/api_endpoints.dart';
 

@@ -43,7 +43,7 @@ void main() {
         'expirationDate': '12/28',
       };
       final card = CreditCard.fromJson(json);
-      expect(card.cardNumber, '****1234');
+      expect(card.maskedCardNumber, '****1234');
     });
   });
 

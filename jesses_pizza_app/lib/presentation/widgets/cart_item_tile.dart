@@ -37,9 +37,9 @@ class CartItemTile extends StatelessWidget {
                   icon: const Icon(Icons.remove_circle_outline),
                   onPressed: () {
                     if (item.quantity > 1) {
-                      cart.add(UpdateQuantity(item.menuItemId, item.quantity - 1));
+                      cart.add(UpdateQuantity(item.menuItemId, item.sizeName, item.quantity - 1));
                     } else {
-                      cart.add(RemoveItem(item.menuItemId));
+                      cart.add(RemoveItem(item.menuItemId, item.sizeName));
                     }
                   },
                 ),
@@ -48,7 +48,7 @@ class CartItemTile extends StatelessWidget {
                 IconButton(
                   icon: const Icon(Icons.add_circle_outline),
                   onPressed: () {
-                    cart.add(UpdateQuantity(item.menuItemId, item.quantity + 1));
+                    cart.add(UpdateQuantity(item.menuItemId, item.sizeName, item.quantity + 1));
                   },
                 ),
               ],
@@ -56,7 +56,7 @@ class CartItemTile extends StatelessWidget {
             IconButton(
               icon: const Icon(Icons.delete_outline, color: Colors.red),
               onPressed: () {
-                cart.add(RemoveItem(item.menuItemId));
+                cart.add(RemoveItem(item.menuItemId, item.sizeName));
               },
             ),
           ],

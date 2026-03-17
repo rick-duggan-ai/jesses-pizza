@@ -96,7 +96,7 @@ void main() {
       final cards = await accountRepository.getCreditCards();
 
       expect(cards, isA<List<CreditCard>>());
-      expect(cards.first.cardNumber, '****1234');
+      expect(cards.first.maskedCardNumber, '****1234');
     });
 
     test('saveAddress calls correct endpoint with apiVersion 1.0', () async {

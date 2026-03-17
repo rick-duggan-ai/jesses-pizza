@@ -4,6 +4,7 @@ import 'package:jesses_pizza_app/presentation/blocs/auth/auth_bloc.dart';
 import 'package:jesses_pizza_app/presentation/blocs/auth/auth_state.dart';
 import 'package:jesses_pizza_app/presentation/blocs/cart/cart_bloc.dart';
 import 'package:jesses_pizza_app/presentation/blocs/cart/cart_state.dart';
+import 'package:jesses_pizza_app/presentation/screens/auth/login_screen.dart';
 import 'package:jesses_pizza_app/presentation/screens/cart/delivery_mode_screen.dart';
 import 'package:jesses_pizza_app/presentation/widgets/cart_item_tile.dart';
 
@@ -28,7 +29,12 @@ class CartScreen extends StatelessWidget {
               child: const Text('Cancel'),
             ),
             TextButton(
-              onPressed: () => Navigator.of(ctx).pop(),
+              onPressed: () {
+                Navigator.of(ctx).pop();
+                Navigator.of(context).push(
+                  MaterialPageRoute(builder: (_) => const LoginScreen()),
+                );
+              },
               child: const Text('Log In'),
             ),
           ],

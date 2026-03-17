@@ -15,15 +15,25 @@ class CartState extends Equatable {
 
   double get total => items.fold(0.0, (sum, item) => sum + item.lineTotal);
 
+  static const _clearAddress = Object();
+
   CartState copyWith({
     List<CartItem>? items,
     bool? isDelivery,
-    Address? address,
+    Object? address = _clearAddress,
   }) {
     return CartState(
       items: items ?? this.items,
       isDelivery: isDelivery ?? this.isDelivery,
-      address: address ?? this.address,
+      address: identical(address, _clearAddress) ? this.address : address as Address?,
+    );
+  }
+
+  CartState withAddressCleared() {
+    return CartState(
+      items: items,
+      isDelivery: isDelivery,
+      address: null,
     );
   }
 

@@ -1,13 +1,16 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:jesses_pizza_app/data/api/api_client.dart';
 import 'package:jesses_pizza_app/domain/repositories/i_auth_repository.dart';
 import 'auth_event.dart';
 import 'auth_state.dart';
 
 class AuthBloc extends Bloc<AuthEvent, AuthState> {
   final IAuthRepository _repo;
+  final ApiClient _apiClient;
 
-  AuthBloc({required IAuthRepository repository})
+  AuthBloc({required IAuthRepository repository, required ApiClient apiClient})
       : _repo = repository,
+        _apiClient = apiClient,
         super(const AuthState.initial()) {
     on<LoginRequested>(_onLoginRequested);
     on<SignUpRequested>(_onSignUpRequested);
@@ -22,6 +25,7 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
     emit(const AuthState.loading());
     try {
       final user = await _repo.login(event.email, event.password, event.deviceId);
+      _apiClient.setToken(user.token);
       emit(AuthState.authenticated(user: user));
     } catch (e) {
       emit(AuthState.error(message: e.toString()));
@@ -58,10 +62,12 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
   }
 
   void _onLogoutRequested(LogoutRequested event, Emitter<AuthState> emit) {
+    _apiClient.clearToken();
     emit(const AuthState.unauthenticated());
   }
 
   void _onTokenExpired(TokenExpired event, Emitter<AuthState> emit) {
+    _apiClient.clearToken();
     emit(const AuthState.unauthenticated());
   }
 

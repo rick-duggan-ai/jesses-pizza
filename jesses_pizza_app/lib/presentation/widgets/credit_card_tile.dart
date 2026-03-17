@@ -14,7 +14,7 @@ class CreditCardTile extends StatelessWidget {
   });
 
   String get _maskedNumber {
-    final n = card.cardNumber;
+    final n = card.maskedCardNumber;
     if (n.length >= 4) {
       return '**** **** **** ${n.substring(n.length - 4)}';
     }

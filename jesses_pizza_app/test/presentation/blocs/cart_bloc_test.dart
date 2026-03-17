@@ -48,7 +48,7 @@ void main() {
       'RemoveItem removes item by menuItemId',
       build: () => CartBloc(),
       seed: () => CartState(items: [tItem]),
-      act: (bloc) => bloc.add(const RemoveItem('item-1')),
+      act: (bloc) => bloc.add(const RemoveItem('item-1', 'Large')),
       expect: () => [const CartState(items: [])],
     );
 
@@ -56,7 +56,7 @@ void main() {
       'UpdateQuantity updates item quantity',
       build: () => CartBloc(),
       seed: () => CartState(items: [tItem]),
-      act: (bloc) => bloc.add(const UpdateQuantity('item-1', 3)),
+      act: (bloc) => bloc.add(const UpdateQuantity('item-1', 'Large', 3)),
       expect: () => [
         CartState(items: [tItem.copyWith(quantity: 3)]),
       ],
