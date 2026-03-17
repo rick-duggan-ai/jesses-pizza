@@ -43,7 +43,7 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
         lastName: event.lastName,
         phoneNumber: event.phoneNumber,
       );
-      emit(const AuthState.unauthenticated());
+      emit(AuthState.signupPending(email: event.email));
     } catch (e) {
       emit(AuthState.error(message: e.toString()));
     }

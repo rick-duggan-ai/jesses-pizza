@@ -49,10 +49,30 @@ class _AddressesScreenState extends State<AddressesScreen> {
                   ),
                   trailing: IconButton(
                     icon: const Icon(Icons.delete, color: Colors.red),
-                    onPressed: () {
-                      context
-                          .read<AccountBloc>()
-                          .add(AccountEvent.deleteAddress(address: address));
+                    onPressed: () async {
+                      final confirm = await showDialog<bool>(
+                        context: context,
+                        builder: (ctx) => AlertDialog(
+                          title: const Text('Delete Address?'),
+                          content: const Text('This cannot be undone.'),
+                          actions: [
+                            TextButton(
+                              onPressed: () => Navigator.of(ctx).pop(false),
+                              child: const Text('Cancel'),
+                            ),
+                            TextButton(
+                              onPressed: () => Navigator.of(ctx).pop(true),
+                              style: TextButton.styleFrom(foregroundColor: Colors.red),
+                              child: const Text('Delete'),
+                            ),
+                          ],
+                        ),
+                      );
+                      if (confirm == true && context.mounted) {
+                        context
+                            .read<AccountBloc>()
+                            .add(AccountEvent.deleteAddress(address: address));
+                      }
                     },
                   ),
                 );

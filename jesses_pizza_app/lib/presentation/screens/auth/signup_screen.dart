@@ -75,12 +75,12 @@ class _SignupScreenState extends State<SignupScreen> {
   Widget build(BuildContext context) {
     return BlocListener<AuthBloc, AuthState>(
       listener: (context, state) {
-        if (state is AuthUnauthenticated) {
+        if (state is AuthSignupPending) {
           // Signup succeeded — go to SMS verification
           Navigator.of(context).pushReplacement(
             MaterialPageRoute(
               builder: (_) => SmsVerificationScreen(
-                email: _emailController.text.trim(),
+                email: state.email,
                 verificationContext: 'signup',
               ),
             ),

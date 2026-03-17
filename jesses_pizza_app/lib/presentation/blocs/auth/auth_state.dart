@@ -9,5 +9,6 @@ abstract class AuthState with _$AuthState {
   const factory AuthState.loading() = AuthLoading;
   const factory AuthState.authenticated({required User user}) = AuthAuthenticated;
   const factory AuthState.unauthenticated() = AuthUnauthenticated;
+  const factory AuthState.signupPending({required String email}) = AuthSignupPending;
   const factory AuthState.error({required String message}) = AuthError;
 }

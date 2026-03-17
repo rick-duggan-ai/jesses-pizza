@@ -50,10 +50,30 @@ class _CreditCardsScreenState extends State<CreditCardsScreen> {
                   subtitle: Text('Expires: ${card.expirationDate}'),
                   trailing: IconButton(
                     icon: const Icon(Icons.delete, color: Colors.red),
-                    onPressed: () {
-                      context
-                          .read<AccountBloc>()
-                          .add(AccountEvent.deleteCard(cardId: card.id));
+                    onPressed: () async {
+                      final confirm = await showDialog<bool>(
+                        context: context,
+                        builder: (ctx) => AlertDialog(
+                          title: const Text('Delete Card?'),
+                          content: const Text('This cannot be undone.'),
+                          actions: [
+                            TextButton(
+                              onPressed: () => Navigator.of(ctx).pop(false),
+                              child: const Text('Cancel'),
+                            ),
+                            TextButton(
+                              onPressed: () => Navigator.of(ctx).pop(true),
+                              style: TextButton.styleFrom(foregroundColor: Colors.red),
+                              child: const Text('Delete'),
+                            ),
+                          ],
+                        ),
+                      );
+                      if (confirm == true && context.mounted) {
+                        context
+                            .read<AccountBloc>()
+                            .add(AccountEvent.deleteCard(cardId: card.id));
+                      }
                     },
                   ),
                 );
@@ -86,7 +106,15 @@ class _CreditCardsScreenState extends State<CreditCardsScreen> {
                 controller: cardNumberController,
                 decoration: const InputDecoration(labelText: 'Card Number'),
                 keyboardType: TextInputType.number,
-                validator: (v) => (v == null || v.isEmpty) ? 'Required' : null,
+                obscureText: true,
+                validator: (v) {
+                  if (v == null || v.isEmpty) return 'Required';
+                  final digits = v.replaceAll(RegExp(r'\D'), '');
+                  if (digits.length < 13 || digits.length > 19) {
+                    return 'Enter a valid card number (13–19 digits)';
+                  }
+                  return null;
+                },
               ),
               TextFormField(
                 controller: expirationController,

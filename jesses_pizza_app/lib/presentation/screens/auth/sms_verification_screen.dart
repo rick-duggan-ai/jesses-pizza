@@ -71,11 +71,12 @@ class _SmsVerificationScreenState extends State<SmsVerificationScreen> {
       setState(() => _repoLoading = true);
       try {
         final repo = getIt<IAuthRepository>();
-        await repo.confirmPasswordChange(widget.email, _codeController.text.trim());
+        final code = _codeController.text.trim();
+        await repo.confirmPasswordChange(widget.email, code);
         if (mounted) {
           Navigator.of(context).pushReplacement(
             MaterialPageRoute(
-              builder: (_) => NewPasswordScreen(email: widget.email),
+              builder: (_) => NewPasswordScreen(email: widget.email, token: code),
             ),
           );
         }
@@ -93,7 +94,7 @@ class _SmsVerificationScreenState extends State<SmsVerificationScreen> {
   Future<void> _resendCode() async {
     if (_countdown > 0) return;
     try {
-      final repo = context.read<IAuthRepository>();
+      final repo = getIt<IAuthRepository>();
       if (widget.verificationContext == 'signup') {
         await repo.resendSignupCode(widget.email);
       } else {
