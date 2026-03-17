@@ -23,7 +23,7 @@ class AuthRepository implements IAuthRepository {
   Future<User> guestLogin(String deviceId) async {
     final response = await apiClient.post<Map<String, dynamic>>(
       ApiEndpoints.guestLogin,
-      data: {'deviceId': deviceId},
+      data: {'secret': 'JessesPizzaAppSecret', 'deviceId': deviceId},
       apiVersion: '1.0',
     );
     return User.fromJson(response.data!);

@@ -73,7 +73,13 @@ class _MenuCategoriesScreenState extends State<MenuCategoriesScreen> {
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  Text('Error: $message'),
+                  const Icon(Icons.error_outline, size: 48, color: Colors.red),
+                  const SizedBox(height: 16),
+                  const Text(
+                    'Unable to load menu. Please try again.',
+                    textAlign: TextAlign.center,
+                    style: TextStyle(fontSize: 16),
+                  ),
                   const SizedBox(height: 16),
                   ElevatedButton(
                     onPressed: () {

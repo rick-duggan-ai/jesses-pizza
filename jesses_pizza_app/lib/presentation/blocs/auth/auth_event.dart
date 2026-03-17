@@ -23,6 +23,10 @@ abstract class AuthEvent with _$AuthEvent {
     required String code,
   }) = ConfirmAccountRequested;
 
+  const factory AuthEvent.guestLoginRequested({
+    required String deviceId,
+  }) = GuestLoginRequested;
+
   const factory AuthEvent.logoutRequested() = LogoutRequested;
 
   const factory AuthEvent.tokenExpired() = TokenExpired;

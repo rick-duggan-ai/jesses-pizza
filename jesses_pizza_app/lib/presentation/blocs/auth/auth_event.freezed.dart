@@ -55,13 +55,14 @@ extension AuthEventPatterns on AuthEvent {
 /// }
 /// ```
 
-@optionalTypeArgs TResult maybeMap<TResult extends Object?>({TResult Function( LoginRequested value)?  loginRequested,TResult Function( SignUpRequested value)?  signUpRequested,TResult Function( ConfirmAccountRequested value)?  confirmAccountRequested,TResult Function( LogoutRequested value)?  logoutRequested,TResult Function( TokenExpired value)?  tokenExpired,TResult Function( DeleteAccountRequested value)?  deleteAccountRequested,required TResult orElse(),}){
+@optionalTypeArgs TResult maybeMap<TResult extends Object?>({TResult Function( LoginRequested value)?  loginRequested,TResult Function( SignUpRequested value)?  signUpRequested,TResult Function( ConfirmAccountRequested value)?  confirmAccountRequested,TResult Function( GuestLoginRequested value)?  guestLoginRequested,TResult Function( LogoutRequested value)?  logoutRequested,TResult Function( TokenExpired value)?  tokenExpired,TResult Function( DeleteAccountRequested value)?  deleteAccountRequested,required TResult orElse(),}){
 final _that = this;
 switch (_that) {
 case LoginRequested() when loginRequested != null:
 return loginRequested(_that);case SignUpRequested() when signUpRequested != null:
 return signUpRequested(_that);case ConfirmAccountRequested() when confirmAccountRequested != null:
-return confirmAccountRequested(_that);case LogoutRequested() when logoutRequested != null:
+return confirmAccountRequested(_that);case GuestLoginRequested() when guestLoginRequested != null:
+return guestLoginRequested(_that);case LogoutRequested() when logoutRequested != null:
 return logoutRequested(_that);case TokenExpired() when tokenExpired != null:
 return tokenExpired(_that);case DeleteAccountRequested() when deleteAccountRequested != null:
 return deleteAccountRequested(_that);case _:
@@ -82,13 +83,14 @@ return deleteAccountRequested(_that);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult map<TResult extends Object?>({required TResult Function( LoginRequested value)  loginRequested,required TResult Function( SignUpRequested value)  signUpRequested,required TResult Function( ConfirmAccountRequested value)  confirmAccountRequested,required TResult Function( LogoutRequested value)  logoutRequested,required TResult Function( TokenExpired value)  tokenExpired,required TResult Function( DeleteAccountRequested value)  deleteAccountRequested,}){
+@optionalTypeArgs TResult map<TResult extends Object?>({required TResult Function( LoginRequested value)  loginRequested,required TResult Function( SignUpRequested value)  signUpRequested,required TResult Function( ConfirmAccountRequested value)  confirmAccountRequested,required TResult Function( GuestLoginRequested value)  guestLoginRequested,required TResult Function( LogoutRequested value)  logoutRequested,required TResult Function( TokenExpired value)  tokenExpired,required TResult Function( DeleteAccountRequested value)  deleteAccountRequested,}){
 final _that = this;
 switch (_that) {
 case LoginRequested():
 return loginRequested(_that);case SignUpRequested():
 return signUpRequested(_that);case ConfirmAccountRequested():
-return confirmAccountRequested(_that);case LogoutRequested():
+return confirmAccountRequested(_that);case GuestLoginRequested():
+return guestLoginRequested(_that);case LogoutRequested():
 return logoutRequested(_that);case TokenExpired():
 return tokenExpired(_that);case DeleteAccountRequested():
 return deleteAccountRequested(_that);case _:
@@ -108,13 +110,14 @@ return deleteAccountRequested(_that);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult? mapOrNull<TResult extends Object?>({TResult? Function( LoginRequested value)?  loginRequested,TResult? Function( SignUpRequested value)?  signUpRequested,TResult? Function( ConfirmAccountRequested value)?  confirmAccountRequested,TResult? Function( LogoutRequested value)?  logoutRequested,TResult? Function( TokenExpired value)?  tokenExpired,TResult? Function( DeleteAccountRequested value)?  deleteAccountRequested,}){
+@optionalTypeArgs TResult? mapOrNull<TResult extends Object?>({TResult? Function( LoginRequested value)?  loginRequested,TResult? Function( SignUpRequested value)?  signUpRequested,TResult? Function( ConfirmAccountRequested value)?  confirmAccountRequested,TResult? Function( GuestLoginRequested value)?  guestLoginRequested,TResult? Function( LogoutRequested value)?  logoutRequested,TResult? Function( TokenExpired value)?  tokenExpired,TResult? Function( DeleteAccountRequested value)?  deleteAccountRequested,}){
 final _that = this;
 switch (_that) {
 case LoginRequested() when loginRequested != null:
 return loginRequested(_that);case SignUpRequested() when signUpRequested != null:
 return signUpRequested(_that);case ConfirmAccountRequested() when confirmAccountRequested != null:
-return confirmAccountRequested(_that);case LogoutRequested() when logoutRequested != null:
+return confirmAccountRequested(_that);case GuestLoginRequested() when guestLoginRequested != null:
+return guestLoginRequested(_that);case LogoutRequested() when logoutRequested != null:
 return logoutRequested(_that);case TokenExpired() when tokenExpired != null:
 return tokenExpired(_that);case DeleteAccountRequested() when deleteAccountRequested != null:
 return deleteAccountRequested(_that);case _:
@@ -134,12 +137,13 @@ return deleteAccountRequested(_that);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult maybeWhen<TResult extends Object?>({TResult Function( String email,  String password,  String deviceId)?  loginRequested,TResult Function( String email,  String password,  String firstName,  String lastName,  String phoneNumber)?  signUpRequested,TResult Function( String email,  String code)?  confirmAccountRequested,TResult Function()?  logoutRequested,TResult Function()?  tokenExpired,TResult Function()?  deleteAccountRequested,required TResult orElse(),}) {final _that = this;
+@optionalTypeArgs TResult maybeWhen<TResult extends Object?>({TResult Function( String email,  String password,  String deviceId)?  loginRequested,TResult Function( String email,  String password,  String firstName,  String lastName,  String phoneNumber)?  signUpRequested,TResult Function( String email,  String code)?  confirmAccountRequested,TResult Function( String deviceId)?  guestLoginRequested,TResult Function()?  logoutRequested,TResult Function()?  tokenExpired,TResult Function()?  deleteAccountRequested,required TResult orElse(),}) {final _that = this;
 switch (_that) {
 case LoginRequested() when loginRequested != null:
 return loginRequested(_that.email,_that.password,_that.deviceId);case SignUpRequested() when signUpRequested != null:
 return signUpRequested(_that.email,_that.password,_that.firstName,_that.lastName,_that.phoneNumber);case ConfirmAccountRequested() when confirmAccountRequested != null:
-return confirmAccountRequested(_that.email,_that.code);case LogoutRequested() when logoutRequested != null:
+return confirmAccountRequested(_that.email,_that.code);case GuestLoginRequested() when guestLoginRequested != null:
+return guestLoginRequested(_that.deviceId);case LogoutRequested() when logoutRequested != null:
 return logoutRequested();case TokenExpired() when tokenExpired != null:
 return tokenExpired();case DeleteAccountRequested() when deleteAccountRequested != null:
 return deleteAccountRequested();case _:
@@ -160,12 +164,13 @@ return deleteAccountRequested();case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult when<TResult extends Object?>({required TResult Function( String email,  String password,  String deviceId)  loginRequested,required TResult Function( String email,  String password,  String firstName,  String lastName,  String phoneNumber)  signUpRequested,required TResult Function( String email,  String code)  confirmAccountRequested,required TResult Function()  logoutRequested,required TResult Function()  tokenExpired,required TResult Function()  deleteAccountRequested,}) {final _that = this;
+@optionalTypeArgs TResult when<TResult extends Object?>({required TResult Function( String email,  String password,  String deviceId)  loginRequested,required TResult Function( String email,  String password,  String firstName,  String lastName,  String phoneNumber)  signUpRequested,required TResult Function( String email,  String code)  confirmAccountRequested,required TResult Function( String deviceId)  guestLoginRequested,required TResult Function()  logoutRequested,required TResult Function()  tokenExpired,required TResult Function()  deleteAccountRequested,}) {final _that = this;
 switch (_that) {
 case LoginRequested():
 return loginRequested(_that.email,_that.password,_that.deviceId);case SignUpRequested():
 return signUpRequested(_that.email,_that.password,_that.firstName,_that.lastName,_that.phoneNumber);case ConfirmAccountRequested():
-return confirmAccountRequested(_that.email,_that.code);case LogoutRequested():
+return confirmAccountRequested(_that.email,_that.code);case GuestLoginRequested():
+return guestLoginRequested(_that.deviceId);case LogoutRequested():
 return logoutRequested();case TokenExpired():
 return tokenExpired();case DeleteAccountRequested():
 return deleteAccountRequested();case _:
@@ -185,12 +190,13 @@ return deleteAccountRequested();case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>({TResult? Function( String email,  String password,  String deviceId)?  loginRequested,TResult? Function( String email,  String password,  String firstName,  String lastName,  String phoneNumber)?  signUpRequested,TResult? Function( String email,  String code)?  confirmAccountRequested,TResult? Function()?  logoutRequested,TResult? Function()?  tokenExpired,TResult? Function()?  deleteAccountRequested,}) {final _that = this;
+@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>({TResult? Function( String email,  String password,  String deviceId)?  loginRequested,TResult? Function( String email,  String password,  String firstName,  String lastName,  String phoneNumber)?  signUpRequested,TResult? Function( String email,  String code)?  confirmAccountRequested,TResult? Function( String deviceId)?  guestLoginRequested,TResult? Function()?  logoutRequested,TResult? Function()?  tokenExpired,TResult? Function()?  deleteAccountRequested,}) {final _that = this;
 switch (_that) {
 case LoginRequested() when loginRequested != null:
 return loginRequested(_that.email,_that.password,_that.deviceId);case SignUpRequested() when signUpRequested != null:
 return signUpRequested(_that.email,_that.password,_that.firstName,_that.lastName,_that.phoneNumber);case ConfirmAccountRequested() when confirmAccountRequested != null:
-return confirmAccountRequested(_that.email,_that.code);case LogoutRequested() when logoutRequested != null:
+return confirmAccountRequested(_that.email,_that.code);case GuestLoginRequested() when guestLoginRequested != null:
+return guestLoginRequested(_that.deviceId);case LogoutRequested() when logoutRequested != null:
 return logoutRequested();case TokenExpired() when tokenExpired != null:
 return tokenExpired();case DeleteAccountRequested() when deleteAccountRequested != null:
 return deleteAccountRequested();case _:
@@ -406,6 +412,72 @@ class _$ConfirmAccountRequestedCopyWithImpl<$Res>
   return _then(ConfirmAccountRequested(
 email: null == email ? _self.email : email // ignore: cast_nullable_to_non_nullable
 as String,code: null == code ? _self.code : code // ignore: cast_nullable_to_non_nullable
+as String,
+  ));
+}
+
+
+}
+
+/// @nodoc
+
+
+class GuestLoginRequested implements AuthEvent {
+  const GuestLoginRequested({required this.deviceId});
+  
+
+ final  String deviceId;
+
+/// Create a copy of AuthEvent
+/// with the given fields replaced by the non-null parameter values.
+@JsonKey(includeFromJson: false, includeToJson: false)
+@pragma('vm:prefer-inline')
+$GuestLoginRequestedCopyWith<GuestLoginRequested> get copyWith => _$GuestLoginRequestedCopyWithImpl<GuestLoginRequested>(this, _$identity);
+
+
+
+@override
+bool operator ==(Object other) {
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is GuestLoginRequested&&(identical(other.deviceId, deviceId) || other.deviceId == deviceId));
+}
+
+
+@override
+int get hashCode => Object.hash(runtimeType,deviceId);
+
+@override
+String toString() {
+  return 'AuthEvent.guestLoginRequested(deviceId: $deviceId)';
+}
+
+
+}
+
+/// @nodoc
+abstract mixin class $GuestLoginRequestedCopyWith<$Res> implements $AuthEventCopyWith<$Res> {
+  factory $GuestLoginRequestedCopyWith(GuestLoginRequested value, $Res Function(GuestLoginRequested) _then) = _$GuestLoginRequestedCopyWithImpl;
+@useResult
+$Res call({
+ String deviceId
+});
+
+
+
+
+}
+/// @nodoc
+class _$GuestLoginRequestedCopyWithImpl<$Res>
+    implements $GuestLoginRequestedCopyWith<$Res> {
+  _$GuestLoginRequestedCopyWithImpl(this._self, this._then);
+
+  final GuestLoginRequested _self;
+  final $Res Function(GuestLoginRequested) _then;
+
+/// Create a copy of AuthEvent
+/// with the given fields replaced by the non-null parameter values.
+@pragma('vm:prefer-inline') $Res call({Object? deviceId = null,}) {
+  return _then(GuestLoginRequested(
+deviceId: null == deviceId ? _self.deviceId : deviceId // ignore: cast_nullable_to_non_nullable
 as String,
   ));
 }

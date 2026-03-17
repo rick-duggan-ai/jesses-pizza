@@ -13,6 +13,7 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
         _apiClient = apiClient,
         super(const AuthState.initial()) {
     on<LoginRequested>(_onLoginRequested);
+    on<GuestLoginRequested>(_onGuestLoginRequested);
     on<SignUpRequested>(_onSignUpRequested);
     on<ConfirmAccountRequested>(_onConfirmAccountRequested);
     on<LogoutRequested>(_onLogoutRequested);
@@ -25,6 +26,18 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
     emit(const AuthState.loading());
     try {
       final user = await _repo.login(event.email, event.password, event.deviceId);
+      _apiClient.setToken(user.token);
+      emit(AuthState.authenticated(user: user));
+    } catch (e) {
+      emit(AuthState.error(message: e.toString()));
+    }
+  }
+
+  Future<void> _onGuestLoginRequested(
+      GuestLoginRequested event, Emitter<AuthState> emit) async {
+    emit(const AuthState.loading());
+    try {
+      final user = await _repo.guestLogin(event.deviceId);
       _apiClient.setToken(user.token);
       emit(AuthState.authenticated(user: user));
     } catch (e) {

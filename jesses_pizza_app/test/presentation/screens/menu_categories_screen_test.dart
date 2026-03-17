@@ -101,7 +101,7 @@ void main() {
 
       await tester.pumpWidget(buildSubject());
 
-      expect(find.text('Error: Network error'), findsOneWidget);
+      expect(find.text('Unable to load menu. Please try again.'), findsOneWidget);
       expect(find.text('Retry'), findsOneWidget);
     });
   });

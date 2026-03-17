@@ -3,10 +3,12 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:jesses_pizza_app/app/di.dart';
 import 'package:jesses_pizza_app/app/theme.dart';
 import 'package:jesses_pizza_app/presentation/blocs/auth/auth_bloc.dart';
+import 'package:jesses_pizza_app/presentation/blocs/auth/auth_state.dart';
 import 'package:jesses_pizza_app/presentation/blocs/menu/menu_bloc.dart';
 import 'package:jesses_pizza_app/presentation/blocs/cart/cart_bloc.dart';
 import 'package:jesses_pizza_app/presentation/blocs/order/order_bloc.dart';
 import 'package:jesses_pizza_app/presentation/blocs/account/account_bloc.dart';
+import 'package:jesses_pizza_app/presentation/screens/auth/welcome_screen.dart';
 import 'package:jesses_pizza_app/presentation/screens/menu/menu_categories_screen.dart';
 import 'package:jesses_pizza_app/presentation/screens/cart/cart_screen.dart';
 import 'package:jesses_pizza_app/presentation/screens/account/account_screen.dart';
@@ -27,7 +29,14 @@ class JessesPizzaApp extends StatelessWidget {
       child: MaterialApp(
         title: "Jesse's Pizza",
         theme: AppTheme.light,
-        home: const AppShell(),
+        home: BlocBuilder<AuthBloc, AuthState>(
+          builder: (context, state) {
+            if (state is AuthAuthenticated) {
+              return const AppShell();
+            }
+            return const WelcomeScreen();
+          },
+        ),
       ),
     );
   }
