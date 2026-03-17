@@ -1,0 +1,26 @@
+import 'package:flutter/material.dart';
+
+class AppTheme {
+  AppTheme._();
+
+  static const _primaryColor = Color(0xFFE94560);
+  static const _backgroundColor = Color(0xFFF5F5F5);
+
+  static ThemeData get light => ThemeData(
+        primaryColor: _primaryColor,
+        colorScheme: ColorScheme.fromSeed(
+          seedColor: _primaryColor,
+          brightness: Brightness.light,
+        ),
+        scaffoldBackgroundColor: _backgroundColor,
+        appBarTheme: const AppBarTheme(
+          backgroundColor: _primaryColor,
+          foregroundColor: Colors.white,
+          elevation: 0,
+        ),
+        bottomNavigationBarTheme: const BottomNavigationBarThemeData(
+          selectedItemColor: _primaryColor,
+          unselectedItemColor: Colors.grey,
+        ),
+      );
+}

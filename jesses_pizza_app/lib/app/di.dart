@@ -25,28 +25,28 @@ void setupDependencies() {
     () => const FlutterSecureStorage(),
   );
   getIt.registerLazySingleton<IAuthRepository>(
-    () => AuthRepository(getIt<ApiClient>()),
+    () => AuthRepository(apiClient: getIt<ApiClient>()),
   );
   getIt.registerLazySingleton<IMenuRepository>(
-    () => MenuRepository(getIt<ApiClient>()),
+    () => MenuRepository(apiClient: getIt<ApiClient>()),
   );
   getIt.registerLazySingleton<IOrderRepository>(
-    () => OrderRepository(getIt<ApiClient>()),
+    () => OrderRepository(apiClient: getIt<ApiClient>()),
   );
   getIt.registerLazySingleton<IAccountRepository>(
-    () => AccountRepository(getIt<ApiClient>()),
+    () => AccountRepository(apiClient: getIt<ApiClient>()),
   );
   getIt.registerFactory<AuthBloc>(
-    () => AuthBloc(authRepository: getIt<IAuthRepository>()),
+    () => AuthBloc(repository: getIt<IAuthRepository>()),
   );
   getIt.registerFactory<MenuBloc>(
-    () => MenuBloc(menuRepository: getIt<IMenuRepository>()),
+    () => MenuBloc(repository: getIt<IMenuRepository>()),
   );
   getIt.registerFactory<CartBloc>(() => CartBloc());
   getIt.registerFactory<OrderBloc>(
-    () => OrderBloc(orderRepository: getIt<IOrderRepository>()),
+    () => OrderBloc(repository: getIt<IOrderRepository>()),
   );
   getIt.registerFactory<AccountBloc>(
-    () => AccountBloc(accountRepository: getIt<IAccountRepository>()),
+    () => AccountBloc(repository: getIt<IAccountRepository>()),
   );
 }
