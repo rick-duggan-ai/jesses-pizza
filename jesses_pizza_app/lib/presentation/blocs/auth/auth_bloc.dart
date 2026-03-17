@@ -14,6 +14,7 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
     on<ConfirmAccountRequested>(_onConfirmAccountRequested);
     on<LogoutRequested>(_onLogoutRequested);
     on<TokenExpired>(_onTokenExpired);
+    on<DeleteAccountRequested>(_onDeleteAccountRequested);
   }
 
   Future<void> _onLoginRequested(
@@ -62,5 +63,16 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
 
   void _onTokenExpired(TokenExpired event, Emitter<AuthState> emit) {
     emit(const AuthState.unauthenticated());
+  }
+
+  Future<void> _onDeleteAccountRequested(
+      DeleteAccountRequested event, Emitter<AuthState> emit) async {
+    emit(const AuthState.loading());
+    try {
+      await _repo.deleteAccount();
+      emit(const AuthState.unauthenticated());
+    } catch (e) {
+      emit(AuthState.error(message: e.toString()));
+    }
   }
 }

@@ -26,4 +26,6 @@ abstract class AuthEvent with _$AuthEvent {
   const factory AuthEvent.logoutRequested() = LogoutRequested;
 
   const factory AuthEvent.tokenExpired() = TokenExpired;
+
+  const factory AuthEvent.deleteAccountRequested() = DeleteAccountRequested;
 }

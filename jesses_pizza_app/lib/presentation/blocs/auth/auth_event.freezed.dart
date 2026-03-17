@@ -55,7 +55,7 @@ extension AuthEventPatterns on AuthEvent {
 /// }
 /// ```
 
-@optionalTypeArgs TResult maybeMap<TResult extends Object?>({TResult Function( LoginRequested value)?  loginRequested,TResult Function( SignUpRequested value)?  signUpRequested,TResult Function( ConfirmAccountRequested value)?  confirmAccountRequested,TResult Function( LogoutRequested value)?  logoutRequested,TResult Function( TokenExpired value)?  tokenExpired,required TResult orElse(),}){
+@optionalTypeArgs TResult maybeMap<TResult extends Object?>({TResult Function( LoginRequested value)?  loginRequested,TResult Function( SignUpRequested value)?  signUpRequested,TResult Function( ConfirmAccountRequested value)?  confirmAccountRequested,TResult Function( LogoutRequested value)?  logoutRequested,TResult Function( TokenExpired value)?  tokenExpired,TResult Function( DeleteAccountRequested value)?  deleteAccountRequested,required TResult orElse(),}){
 final _that = this;
 switch (_that) {
 case LoginRequested() when loginRequested != null:
@@ -63,7 +63,8 @@ return loginRequested(_that);case SignUpRequested() when signUpRequested != null
 return signUpRequested(_that);case ConfirmAccountRequested() when confirmAccountRequested != null:
 return confirmAccountRequested(_that);case LogoutRequested() when logoutRequested != null:
 return logoutRequested(_that);case TokenExpired() when tokenExpired != null:
-return tokenExpired(_that);case _:
+return tokenExpired(_that);case DeleteAccountRequested() when deleteAccountRequested != null:
+return deleteAccountRequested(_that);case _:
   return orElse();
 
 }
@@ -81,7 +82,7 @@ return tokenExpired(_that);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult map<TResult extends Object?>({required TResult Function( LoginRequested value)  loginRequested,required TResult Function( SignUpRequested value)  signUpRequested,required TResult Function( ConfirmAccountRequested value)  confirmAccountRequested,required TResult Function( LogoutRequested value)  logoutRequested,required TResult Function( TokenExpired value)  tokenExpired,}){
+@optionalTypeArgs TResult map<TResult extends Object?>({required TResult Function( LoginRequested value)  loginRequested,required TResult Function( SignUpRequested value)  signUpRequested,required TResult Function( ConfirmAccountRequested value)  confirmAccountRequested,required TResult Function( LogoutRequested value)  logoutRequested,required TResult Function( TokenExpired value)  tokenExpired,required TResult Function( DeleteAccountRequested value)  deleteAccountRequested,}){
 final _that = this;
 switch (_that) {
 case LoginRequested():
@@ -89,7 +90,8 @@ return loginRequested(_that);case SignUpRequested():
 return signUpRequested(_that);case ConfirmAccountRequested():
 return confirmAccountRequested(_that);case LogoutRequested():
 return logoutRequested(_that);case TokenExpired():
-return tokenExpired(_that);case _:
+return tokenExpired(_that);case DeleteAccountRequested():
+return deleteAccountRequested(_that);case _:
   throw StateError('Unexpected subclass');
 
 }
@@ -106,7 +108,7 @@ return tokenExpired(_that);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult? mapOrNull<TResult extends Object?>({TResult? Function( LoginRequested value)?  loginRequested,TResult? Function( SignUpRequested value)?  signUpRequested,TResult? Function( ConfirmAccountRequested value)?  confirmAccountRequested,TResult? Function( LogoutRequested value)?  logoutRequested,TResult? Function( TokenExpired value)?  tokenExpired,}){
+@optionalTypeArgs TResult? mapOrNull<TResult extends Object?>({TResult? Function( LoginRequested value)?  loginRequested,TResult? Function( SignUpRequested value)?  signUpRequested,TResult? Function( ConfirmAccountRequested value)?  confirmAccountRequested,TResult? Function( LogoutRequested value)?  logoutRequested,TResult? Function( TokenExpired value)?  tokenExpired,TResult? Function( DeleteAccountRequested value)?  deleteAccountRequested,}){
 final _that = this;
 switch (_that) {
 case LoginRequested() when loginRequested != null:
@@ -114,7 +116,8 @@ return loginRequested(_that);case SignUpRequested() when signUpRequested != null
 return signUpRequested(_that);case ConfirmAccountRequested() when confirmAccountRequested != null:
 return confirmAccountRequested(_that);case LogoutRequested() when logoutRequested != null:
 return logoutRequested(_that);case TokenExpired() when tokenExpired != null:
-return tokenExpired(_that);case _:
+return tokenExpired(_that);case DeleteAccountRequested() when deleteAccountRequested != null:
+return deleteAccountRequested(_that);case _:
   return null;
 
 }
@@ -131,14 +134,15 @@ return tokenExpired(_that);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult maybeWhen<TResult extends Object?>({TResult Function( String email,  String password,  String deviceId)?  loginRequested,TResult Function( String email,  String password,  String firstName,  String lastName,  String phoneNumber)?  signUpRequested,TResult Function( String email,  String code)?  confirmAccountRequested,TResult Function()?  logoutRequested,TResult Function()?  tokenExpired,required TResult orElse(),}) {final _that = this;
+@optionalTypeArgs TResult maybeWhen<TResult extends Object?>({TResult Function( String email,  String password,  String deviceId)?  loginRequested,TResult Function( String email,  String password,  String firstName,  String lastName,  String phoneNumber)?  signUpRequested,TResult Function( String email,  String code)?  confirmAccountRequested,TResult Function()?  logoutRequested,TResult Function()?  tokenExpired,TResult Function()?  deleteAccountRequested,required TResult orElse(),}) {final _that = this;
 switch (_that) {
 case LoginRequested() when loginRequested != null:
 return loginRequested(_that.email,_that.password,_that.deviceId);case SignUpRequested() when signUpRequested != null:
 return signUpRequested(_that.email,_that.password,_that.firstName,_that.lastName,_that.phoneNumber);case ConfirmAccountRequested() when confirmAccountRequested != null:
 return confirmAccountRequested(_that.email,_that.code);case LogoutRequested() when logoutRequested != null:
 return logoutRequested();case TokenExpired() when tokenExpired != null:
-return tokenExpired();case _:
+return tokenExpired();case DeleteAccountRequested() when deleteAccountRequested != null:
+return deleteAccountRequested();case _:
   return orElse();
 
 }
@@ -156,14 +160,15 @@ return tokenExpired();case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult when<TResult extends Object?>({required TResult Function( String email,  String password,  String deviceId)  loginRequested,required TResult Function( String email,  String password,  String firstName,  String lastName,  String phoneNumber)  signUpRequested,required TResult Function( String email,  String code)  confirmAccountRequested,required TResult Function()  logoutRequested,required TResult Function()  tokenExpired,}) {final _that = this;
+@optionalTypeArgs TResult when<TResult extends Object?>({required TResult Function( String email,  String password,  String deviceId)  loginRequested,required TResult Function( String email,  String password,  String firstName,  String lastName,  String phoneNumber)  signUpRequested,required TResult Function( String email,  String code)  confirmAccountRequested,required TResult Function()  logoutRequested,required TResult Function()  tokenExpired,required TResult Function()  deleteAccountRequested,}) {final _that = this;
 switch (_that) {
 case LoginRequested():
 return loginRequested(_that.email,_that.password,_that.deviceId);case SignUpRequested():
 return signUpRequested(_that.email,_that.password,_that.firstName,_that.lastName,_that.phoneNumber);case ConfirmAccountRequested():
 return confirmAccountRequested(_that.email,_that.code);case LogoutRequested():
 return logoutRequested();case TokenExpired():
-return tokenExpired();case _:
+return tokenExpired();case DeleteAccountRequested():
+return deleteAccountRequested();case _:
   throw StateError('Unexpected subclass');
 
 }
@@ -180,14 +185,15 @@ return tokenExpired();case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>({TResult? Function( String email,  String password,  String deviceId)?  loginRequested,TResult? Function( String email,  String password,  String firstName,  String lastName,  String phoneNumber)?  signUpRequested,TResult? Function( String email,  String code)?  confirmAccountRequested,TResult? Function()?  logoutRequested,TResult? Function()?  tokenExpired,}) {final _that = this;
+@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>({TResult? Function( String email,  String password,  String deviceId)?  loginRequested,TResult? Function( String email,  String password,  String firstName,  String lastName,  String phoneNumber)?  signUpRequested,TResult? Function( String email,  String code)?  confirmAccountRequested,TResult? Function()?  logoutRequested,TResult? Function()?  tokenExpired,TResult? Function()?  deleteAccountRequested,}) {final _that = this;
 switch (_that) {
 case LoginRequested() when loginRequested != null:
 return loginRequested(_that.email,_that.password,_that.deviceId);case SignUpRequested() when signUpRequested != null:
 return signUpRequested(_that.email,_that.password,_that.firstName,_that.lastName,_that.phoneNumber);case ConfirmAccountRequested() when confirmAccountRequested != null:
 return confirmAccountRequested(_that.email,_that.code);case LogoutRequested() when logoutRequested != null:
 return logoutRequested();case TokenExpired() when tokenExpired != null:
-return tokenExpired();case _:
+return tokenExpired();case DeleteAccountRequested() when deleteAccountRequested != null:
+return deleteAccountRequested();case _:
   return null;
 
 }
@@ -463,6 +469,38 @@ int get hashCode => runtimeType.hashCode;
 @override
 String toString() {
   return 'AuthEvent.tokenExpired()';
+}
+
+
+}
+
+
+
+
+/// @nodoc
+
+
+class DeleteAccountRequested implements AuthEvent {
+  const DeleteAccountRequested();
+  
+
+
+
+
+
+
+@override
+bool operator ==(Object other) {
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is DeleteAccountRequested);
+}
+
+
+@override
+int get hashCode => runtimeType.hashCode;
+
+@override
+String toString() {
+  return 'AuthEvent.deleteAccountRequested()';
 }
 
 
