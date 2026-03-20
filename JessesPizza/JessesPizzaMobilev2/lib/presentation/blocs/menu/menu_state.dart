@@ -1,6 +1,7 @@
 import 'package:freezed_annotation/freezed_annotation.dart';
 import 'package:jesses_pizza_app/domain/models/menu_category.dart';
 import 'package:jesses_pizza_app/domain/models/menu_group.dart';
+import 'package:jesses_pizza_app/domain/models/store_settings.dart';
 
 part 'menu_state.freezed.dart';
 
@@ -12,6 +13,7 @@ abstract class MenuState with _$MenuState {
     required List<MenuCategory> categories,
     required List<MenuGroup> groups,
     required bool isStoreOpen,
+    required StoreSettings settings,
   }) = MenuLoaded;
   const factory MenuState.error({required String message}) = MenuError;
 }

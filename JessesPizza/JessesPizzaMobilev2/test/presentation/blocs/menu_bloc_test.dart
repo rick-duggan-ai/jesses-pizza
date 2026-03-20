@@ -3,6 +3,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:mocktail/mocktail.dart';
 import 'package:jesses_pizza_app/domain/models/menu_category.dart';
 import 'package:jesses_pizza_app/domain/models/menu_group.dart';
+import 'package:jesses_pizza_app/domain/models/store_settings.dart';
 import 'package:jesses_pizza_app/domain/repositories/i_menu_repository.dart';
 import 'package:jesses_pizza_app/presentation/blocs/menu/menu_bloc.dart';
 import 'package:jesses_pizza_app/presentation/blocs/menu/menu_event.dart';
@@ -33,6 +34,8 @@ void main() {
         when(() => mockRepo.getMenuItems()).thenAnswer((_) async => tCategories);
         when(() => mockRepo.getGroups()).thenAnswer((_) async => tGroups);
         when(() => mockRepo.checkHours()).thenAnswer((_) async => true);
+        when(() => mockRepo.getSettings())
+            .thenAnswer((_) async => const StoreSettings());
         return MenuBloc(repository: mockRepo);
       },
       act: (bloc) => bloc.add(const MenuEvent.loadMenu()),
@@ -42,6 +45,7 @@ void main() {
           categories: tCategories,
           groups: tGroups,
           isStoreOpen: true,
+          settings: const StoreSettings(),
         ),
       ],
     );
@@ -52,6 +56,8 @@ void main() {
         when(() => mockRepo.getMenuItems()).thenThrow(Exception('Network error'));
         when(() => mockRepo.getGroups()).thenAnswer((_) async => tGroups);
         when(() => mockRepo.checkHours()).thenAnswer((_) async => false);
+        when(() => mockRepo.getSettings())
+            .thenAnswer((_) async => const StoreSettings());
         return MenuBloc(repository: mockRepo);
       },
       act: (bloc) => bloc.add(const MenuEvent.loadMenu()),

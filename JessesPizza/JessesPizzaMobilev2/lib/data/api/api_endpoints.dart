@@ -18,6 +18,7 @@ class ApiEndpoints {
   static const checkHours = '/api/Mongo/CheckHours';
   static const groups = '/api/Mongo/Groups';
   static const mainMenuItems = '/api/Mongo/MainMenuItems';
+  static const orderInfo = '/api/Mongo/Transactions/OrderInfo';
 
   // Orders
   static const postTransaction = '/api/Mongo/PostTransaction';

@@ -6,6 +6,7 @@ import 'package:jesses_pizza_app/data/api/api_endpoints.dart';
 import 'package:jesses_pizza_app/data/repositories/menu_repository.dart';
 import 'package:jesses_pizza_app/domain/models/menu_category.dart';
 import 'package:jesses_pizza_app/domain/models/menu_group.dart';
+import 'package:jesses_pizza_app/domain/models/store_settings.dart';
 
 class MockApiClient extends Mock implements ApiClient {}
 
@@ -133,6 +134,51 @@ void main() {
       expect(result, true);
       verify(() => mockApiClient.get<bool>(
             ApiEndpoints.checkHours,
+            apiVersion: '1.0',
+          )).called(1);
+    });
+
+    test('getSettings calls orderInfo endpoint and returns StoreSettings',
+        () async {
+      final responseData = {
+        'id': '507f1f77bcf86cd799439011',
+        'taxRate': 8.0,
+        'deliveryCharge': 3.99,
+        'minimumOrderAmount': 15.0,
+        'storeHours': [
+          {
+            'day': 0,
+            'openingTime': '2026-01-01T11:00:00Z',
+            'closingTime': '2026-01-01T22:00:00Z',
+          },
+        ],
+        'zipCodes': [
+          {'zipCodeValue': '08701'},
+        ],
+        'aboutText': 'Best pizza in town!',
+      };
+
+      when(() => mockApiClient.get<Map<String, dynamic>>(
+            ApiEndpoints.orderInfo,
+            apiVersion: '1.0',
+          )).thenAnswer((_) async => Response(
+            data: responseData,
+            statusCode: 200,
+            requestOptions: RequestOptions(path: ApiEndpoints.orderInfo),
+          ));
+
+      final settings = await menuRepository.getSettings();
+
+      expect(settings, isA<StoreSettings>());
+      expect(settings.taxRate, 8.0);
+      expect(settings.deliveryCharge, 3.99);
+      expect(settings.minimumOrderAmount, 15.0);
+      expect(settings.storeHours.length, 1);
+      expect(settings.zipCodes.length, 1);
+      expect(settings.zipCodes.first.zipCodeValue, '08701');
+      expect(settings.aboutText, 'Best pizza in town!');
+      verify(() => mockApiClient.get<Map<String, dynamic>>(
+            ApiEndpoints.orderInfo,
             apiVersion: '1.0',
           )).called(1);
     });

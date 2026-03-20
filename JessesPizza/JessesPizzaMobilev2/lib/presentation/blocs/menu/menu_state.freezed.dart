@@ -128,12 +128,12 @@ return error(_that);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult maybeWhen<TResult extends Object?>({TResult Function()?  initial,TResult Function()?  loading,TResult Function( List<MenuCategory> categories,  List<MenuGroup> groups,  bool isStoreOpen)?  loaded,TResult Function( String message)?  error,required TResult orElse(),}) {final _that = this;
+@optionalTypeArgs TResult maybeWhen<TResult extends Object?>({TResult Function()?  initial,TResult Function()?  loading,TResult Function( List<MenuCategory> categories,  List<MenuGroup> groups,  bool isStoreOpen,  StoreSettings settings)?  loaded,TResult Function( String message)?  error,required TResult orElse(),}) {final _that = this;
 switch (_that) {
 case MenuInitial() when initial != null:
 return initial();case MenuLoading() when loading != null:
 return loading();case MenuLoaded() when loaded != null:
-return loaded(_that.categories,_that.groups,_that.isStoreOpen);case MenuError() when error != null:
+return loaded(_that.categories,_that.groups,_that.isStoreOpen,_that.settings);case MenuError() when error != null:
 return error(_that.message);case _:
   return orElse();
 
@@ -152,12 +152,12 @@ return error(_that.message);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult when<TResult extends Object?>({required TResult Function()  initial,required TResult Function()  loading,required TResult Function( List<MenuCategory> categories,  List<MenuGroup> groups,  bool isStoreOpen)  loaded,required TResult Function( String message)  error,}) {final _that = this;
+@optionalTypeArgs TResult when<TResult extends Object?>({required TResult Function()  initial,required TResult Function()  loading,required TResult Function( List<MenuCategory> categories,  List<MenuGroup> groups,  bool isStoreOpen,  StoreSettings settings)  loaded,required TResult Function( String message)  error,}) {final _that = this;
 switch (_that) {
 case MenuInitial():
 return initial();case MenuLoading():
 return loading();case MenuLoaded():
-return loaded(_that.categories,_that.groups,_that.isStoreOpen);case MenuError():
+return loaded(_that.categories,_that.groups,_that.isStoreOpen,_that.settings);case MenuError():
 return error(_that.message);case _:
   throw StateError('Unexpected subclass');
 
@@ -175,12 +175,12 @@ return error(_that.message);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>({TResult? Function()?  initial,TResult? Function()?  loading,TResult? Function( List<MenuCategory> categories,  List<MenuGroup> groups,  bool isStoreOpen)?  loaded,TResult? Function( String message)?  error,}) {final _that = this;
+@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>({TResult? Function()?  initial,TResult? Function()?  loading,TResult? Function( List<MenuCategory> categories,  List<MenuGroup> groups,  bool isStoreOpen,  StoreSettings settings)?  loaded,TResult? Function( String message)?  error,}) {final _that = this;
 switch (_that) {
 case MenuInitial() when initial != null:
 return initial();case MenuLoading() when loading != null:
 return loading();case MenuLoaded() when loaded != null:
-return loaded(_that.categories,_that.groups,_that.isStoreOpen);case MenuError() when error != null:
+return loaded(_that.categories,_that.groups,_that.isStoreOpen,_that.settings);case MenuError() when error != null:
 return error(_that.message);case _:
   return null;
 
@@ -257,7 +257,7 @@ String toString() {
 
 
 class MenuLoaded implements MenuState {
-  const MenuLoaded({required final  List<MenuCategory> categories, required final  List<MenuGroup> groups, required this.isStoreOpen}): _categories = categories,_groups = groups;
+  const MenuLoaded({required final  List<MenuCategory> categories, required final  List<MenuGroup> groups, required this.isStoreOpen, required this.settings}): _categories = categories,_groups = groups;
   
 
  final  List<MenuCategory> _categories;
@@ -275,6 +275,7 @@ class MenuLoaded implements MenuState {
 }
 
  final  bool isStoreOpen;
+ final  StoreSettings settings;
 
 /// Create a copy of MenuState
 /// with the given fields replaced by the non-null parameter values.
@@ -286,16 +287,16 @@ $MenuLoadedCopyWith<MenuLoaded> get copyWith => _$MenuLoadedCopyWithImpl<MenuLoa
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is MenuLoaded&&const DeepCollectionEquality().equals(other._categories, _categories)&&const DeepCollectionEquality().equals(other._groups, _groups)&&(identical(other.isStoreOpen, isStoreOpen) || other.isStoreOpen == isStoreOpen));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is MenuLoaded&&const DeepCollectionEquality().equals(other._categories, _categories)&&const DeepCollectionEquality().equals(other._groups, _groups)&&(identical(other.isStoreOpen, isStoreOpen) || other.isStoreOpen == isStoreOpen)&&(identical(other.settings, settings) || other.settings == settings));
 }
 
 
 @override
-int get hashCode => Object.hash(runtimeType,const DeepCollectionEquality().hash(_categories),const DeepCollectionEquality().hash(_groups),isStoreOpen);
+int get hashCode => Object.hash(runtimeType,const DeepCollectionEquality().hash(_categories),const DeepCollectionEquality().hash(_groups),isStoreOpen,settings);
 
 @override
 String toString() {
-  return 'MenuState.loaded(categories: $categories, groups: $groups, isStoreOpen: $isStoreOpen)';
+  return 'MenuState.loaded(categories: $categories, groups: $groups, isStoreOpen: $isStoreOpen, settings: $settings)';
 }
 
 
@@ -306,11 +307,11 @@ abstract mixin class $MenuLoadedCopyWith<$Res> implements $MenuStateCopyWith<$Re
   factory $MenuLoadedCopyWith(MenuLoaded value, $Res Function(MenuLoaded) _then) = _$MenuLoadedCopyWithImpl;
 @useResult
 $Res call({
- List<MenuCategory> categories, List<MenuGroup> groups, bool isStoreOpen
+ List<MenuCategory> categories, List<MenuGroup> groups, bool isStoreOpen, StoreSettings settings
 });
 
 
-
+$StoreSettingsCopyWith<$Res> get settings;
 
 }
 /// @nodoc
@@ -323,16 +324,26 @@ class _$MenuLoadedCopyWithImpl<$Res>
 
 /// Create a copy of MenuState
 /// with the given fields replaced by the non-null parameter values.
-@pragma('vm:prefer-inline') $Res call({Object? categories = null,Object? groups = null,Object? isStoreOpen = null,}) {
+@pragma('vm:prefer-inline') $Res call({Object? categories = null,Object? groups = null,Object? isStoreOpen = null,Object? settings = null,}) {
   return _then(MenuLoaded(
 categories: null == categories ? _self._categories : categories // ignore: cast_nullable_to_non_nullable
 as List<MenuCategory>,groups: null == groups ? _self._groups : groups // ignore: cast_nullable_to_non_nullable
 as List<MenuGroup>,isStoreOpen: null == isStoreOpen ? _self.isStoreOpen : isStoreOpen // ignore: cast_nullable_to_non_nullable
-as bool,
+as bool,settings: null == settings ? _self.settings : settings // ignore: cast_nullable_to_non_nullable
+as StoreSettings,
   ));
 }
 
-
+/// Create a copy of MenuState
+/// with the given fields replaced by the non-null parameter values.
+@override
+@pragma('vm:prefer-inline')
+$StoreSettingsCopyWith<$Res> get settings {
+  
+  return $StoreSettingsCopyWith<$Res>(_self.settings, (value) {
+    return _then(_self.copyWith(settings: value));
+  });
+}
 }
 
 /// @nodoc

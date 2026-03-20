@@ -5,7 +5,9 @@ import 'package:jesses_pizza_app/app/theme.dart';
 import 'package:jesses_pizza_app/presentation/blocs/auth/auth_bloc.dart';
 import 'package:jesses_pizza_app/presentation/blocs/auth/auth_state.dart';
 import 'package:jesses_pizza_app/presentation/blocs/menu/menu_bloc.dart';
+import 'package:jesses_pizza_app/presentation/blocs/menu/menu_state.dart';
 import 'package:jesses_pizza_app/presentation/blocs/cart/cart_bloc.dart';
+import 'package:jesses_pizza_app/presentation/blocs/cart/cart_event.dart';
 import 'package:jesses_pizza_app/presentation/blocs/order/order_bloc.dart';
 import 'package:jesses_pizza_app/presentation/blocs/account/account_bloc.dart';
 import 'package:jesses_pizza_app/presentation/screens/auth/welcome_screen.dart';
@@ -26,16 +28,25 @@ class JessesPizzaApp extends StatelessWidget {
         BlocProvider(create: (_) => getIt<OrderBloc>()),
         BlocProvider(create: (_) => getIt<AccountBloc>()),
       ],
-      child: MaterialApp(
-        title: "Jesse's Pizza",
-        theme: AppTheme.light,
-        home: BlocBuilder<AuthBloc, AuthState>(
-          builder: (context, state) {
-            if (state is AuthAuthenticated) {
-              return const AppShell();
-            }
-            return const WelcomeScreen();
-          },
+      child: BlocListener<MenuBloc, MenuState>(
+        listener: (context, menuState) {
+          if (menuState is MenuLoaded) {
+            context.read<CartBloc>().add(
+                  UpdateSettings(menuState.settings),
+                );
+          }
+        },
+        child: MaterialApp(
+          title: "Jesse's Pizza",
+          theme: AppTheme.light,
+          home: BlocBuilder<AuthBloc, AuthState>(
+            builder: (context, state) {
+              if (state is AuthAuthenticated) {
+                return const AppShell();
+              }
+              return const WelcomeScreen();
+            },
+          ),
         ),
       ),
     );

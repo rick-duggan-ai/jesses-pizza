@@ -2,6 +2,7 @@ import 'package:jesses_pizza_app/data/api/api_client.dart';
 import 'package:jesses_pizza_app/data/api/api_endpoints.dart';
 import 'package:jesses_pizza_app/domain/models/menu_category.dart';
 import 'package:jesses_pizza_app/domain/models/menu_group.dart';
+import 'package:jesses_pizza_app/domain/models/store_settings.dart';
 import 'package:jesses_pizza_app/domain/repositories/i_menu_repository.dart';
 
 class MenuRepository implements IMenuRepository {
@@ -38,5 +39,14 @@ class MenuRepository implements IMenuRepository {
       apiVersion: '1.0',
     );
     return response.data!;
+  }
+
+  @override
+  Future<StoreSettings> getSettings() async {
+    final response = await apiClient.get<Map<String, dynamic>>(
+      ApiEndpoints.orderInfo,
+      apiVersion: '1.0',
+    );
+    return StoreSettings.fromJson(response.data!);
   }
 }

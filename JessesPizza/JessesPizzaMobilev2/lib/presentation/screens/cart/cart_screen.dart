@@ -43,6 +43,16 @@ class CartScreen extends StatelessWidget {
     }
   }
 
+  Widget _totalsRow(BuildContext context, String label, String value) {
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+      children: [
+        Text(label, style: Theme.of(context).textTheme.bodyMedium),
+        Text(value, style: Theme.of(context).textTheme.bodyMedium),
+      ],
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -90,11 +100,32 @@ class CartScreen extends StatelessWidget {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.stretch,
                   children: [
+                    _totalsRow(context, 'Subtotal',
+                        '\$${state.subtotal.toStringAsFixed(2)}'),
+                    const SizedBox(height: 4),
+                    _totalsRow(
+                        context,
+                        'Tax (${state.taxRate.toStringAsFixed(state.taxRate.truncateToDouble() == state.taxRate ? 0 : 1)}%)',
+                        '\$${state.taxAmount.toStringAsFixed(2)}'),
+                    if (state.isDelivery) ...[
+                      const SizedBox(height: 4),
+                      _totalsRow(context, 'Delivery',
+                          '\$${state.deliveryAmount.toStringAsFixed(2)}'),
+                    ],
+                    if (state.tip > 0) ...[
+                      const SizedBox(height: 4),
+                      _totalsRow(context, 'Tip',
+                          '\$${state.tip.toStringAsFixed(2)}'),
+                    ],
+                    const Divider(height: 16),
                     Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
                         Text('Total',
-                            style: Theme.of(context).textTheme.titleLarge),
+                            style: Theme.of(context)
+                                .textTheme
+                                .titleLarge
+                                ?.copyWith(fontWeight: FontWeight.bold)),
                         Text(
                           '\$${state.total.toStringAsFixed(2)}',
                           style: Theme.of(context)
