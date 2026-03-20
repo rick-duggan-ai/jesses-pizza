@@ -1,4 +1,5 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:jesses_pizza_app/domain/models/transaction_request.dart';
 import 'package:jesses_pizza_app/domain/repositories/i_order_repository.dart';
 import 'order_event.dart';
 import 'order_state.dart';
@@ -19,12 +20,35 @@ class OrderBloc extends Bloc<OrderEvent, OrderState> {
       SubmitOrder event, Emitter<OrderState> emit) async {
     emit(const OrderState.loading());
     try {
-      final validation = await _repo.validateTransaction(event.transaction);
+      final tx = event.request.transaction;
+
+      // Validate the transaction (checks store hours, zip code, city)
+      final validation = await _repo.validateTransaction(tx);
       if (!validation.succeeded) {
-        emit(OrderState.error(message: validation.message ?? 'Validation failed'));
+        emit(OrderState.error(
+            message: validation.message ?? 'Validation failed'));
         return;
       }
-      await _repo.postTransaction(event.transaction);
+
+      // Validate the transaction amount meets minimum
+      final amountValidation =
+          await _repo.validateTransactionAmount(tx.totals.total);
+      if (!amountValidation.succeeded) {
+        emit(OrderState.error(
+            message: amountValidation.message ?? 'Amount validation failed'));
+        return;
+      }
+
+      // If validation returned a transactionGuid, attach it to the request
+      final txWithGuid = validation.transactionGuid != null
+          ? tx.copyWith(transactionId: validation.transactionGuid)
+          : tx;
+
+      final postRequest = PostTransactionRequest(
+        transaction: txWithGuid,
+        card: event.request.card,
+      );
+      await _repo.postTransaction(postRequest);
       emit(const OrderState.orderSubmitted());
     } catch (e) {
       emit(OrderState.error(message: e.toString()));
@@ -35,7 +59,27 @@ class OrderBloc extends Bloc<OrderEvent, OrderState> {
       RequestHppToken event, Emitter<OrderState> emit) async {
     emit(const OrderState.loading());
     try {
-      final token = await _repo.getHppToken(event.transaction);
+      // Validate before requesting HPP token
+      final validation = await _repo.validateTransaction(event.transaction);
+      if (!validation.succeeded) {
+        emit(OrderState.error(
+            message: validation.message ?? 'Validation failed'));
+        return;
+      }
+      final amountValidation = await _repo.validateTransactionAmount(
+        event.transaction.totals.total,
+      );
+      if (!amountValidation.succeeded) {
+        emit(OrderState.error(
+            message: amountValidation.message ?? 'Amount validation failed'));
+        return;
+      }
+
+      final txWithGuid = validation.transactionGuid != null
+          ? event.transaction.copyWith(
+              transactionId: validation.transactionGuid)
+          : event.transaction;
+      final token = await _repo.getHppToken(txWithGuid);
       emit(OrderState.hppTokenReady(token: token));
     } catch (e) {
       emit(OrderState.error(message: e.toString()));

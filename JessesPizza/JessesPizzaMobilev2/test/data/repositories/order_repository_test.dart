@@ -5,13 +5,45 @@ import 'package:jesses_pizza_app/data/api/api_client.dart';
 import 'package:jesses_pizza_app/data/api/api_endpoints.dart';
 import 'package:jesses_pizza_app/data/repositories/order_repository.dart';
 import 'package:jesses_pizza_app/domain/models/api_response.dart';
-import 'package:jesses_pizza_app/domain/models/transaction.dart';
+import 'package:jesses_pizza_app/domain/models/transaction.dart' hide TransactionItem;
+import 'package:jesses_pizza_app/domain/models/transaction_request.dart';
 
 class MockApiClient extends Mock implements ApiClient {}
 
 void main() {
   late MockApiClient mockApiClient;
   late OrderRepository orderRepository;
+
+  final tTransaction = TransactionRequest(
+    info: const CustomerInfo(
+      firstName: 'John',
+      lastName: 'Doe',
+      phoneNumber: '7025551234',
+      emailAddress: 'john@example.com',
+      addressLine1: '123 Main St',
+      city: 'Henderson',
+      zipCode: '89012',
+    ),
+    transactionItems: const [
+      TransactionItem(
+        menuItemId: 'item-1',
+        name: 'Large Pepperoni',
+        sizeName: 'Large',
+        quantity: 1,
+        price: 15.99,
+      ),
+    ],
+    totals: const OrderTotals(
+      subTotal: 15.99,
+      total: 15.99,
+    ),
+    isDelivery: true,
+  );
+
+  final tPostRequest = PostTransactionRequest(
+    transaction: tTransaction,
+    card: const CreditCardRef(id: 'card-1'),
+  );
 
   setUp(() {
     mockApiClient = MockApiClient();
@@ -21,8 +53,6 @@ void main() {
   group('OrderRepository', () {
     test('validateTransaction calls correct endpoint with apiVersion 1.1',
         () async {
-      final txn = {'item': 'pizza', 'total': 14.99};
-
       when(() => mockApiClient.post<Map<String, dynamic>>(
             ApiEndpoints.validateTransaction,
             data: any(named: 'data'),
@@ -34,7 +64,7 @@ void main() {
                 RequestOptions(path: ApiEndpoints.validateTransaction),
           ));
 
-      final result = await orderRepository.validateTransaction(txn);
+      final result = await orderRepository.validateTransaction(tTransaction);
 
       expect(result, isA<ApiResponse>());
       expect(result.succeeded, true);
@@ -45,10 +75,30 @@ void main() {
           )).called(1);
     });
 
+    test('validateTransactionAmount calls correct endpoint', () async {
+      when(() => mockApiClient.post<Map<String, dynamic>>(
+            ApiEndpoints.validateTransactionAmount,
+            data: any(named: 'data'),
+            apiVersion: '1.1',
+          )).thenAnswer((_) async => Response(
+            data: {'succeeded': true},
+            statusCode: 200,
+            requestOptions:
+                RequestOptions(path: ApiEndpoints.validateTransactionAmount),
+          ));
+
+      final result = await orderRepository.validateTransactionAmount(15.99);
+
+      expect(result.succeeded, true);
+      verify(() => mockApiClient.post<Map<String, dynamic>>(
+            ApiEndpoints.validateTransactionAmount,
+            data: 15.99,
+            apiVersion: '1.1',
+          )).called(1);
+    });
+
     test('postTransaction calls correct endpoint with apiVersion 1.1',
         () async {
-      final txn = {'item': 'pizza', 'total': 14.99};
-
       when(() => mockApiClient.post<Map<String, dynamic>>(
             ApiEndpoints.postTransaction,
             data: any(named: 'data'),
@@ -60,27 +110,25 @@ void main() {
                 RequestOptions(path: ApiEndpoints.postTransaction),
           ));
 
-      final result = await orderRepository.postTransaction(txn);
+      final result = await orderRepository.postTransaction(tPostRequest);
 
       expect(result.succeeded, true);
     });
 
     test('getHppToken returns token string from response', () async {
-      final txn = {'item': 'pizza'};
-
       when(() => mockApiClient.post<Map<String, dynamic>>(
             ApiEndpoints.getHppToken,
             data: any(named: 'data'),
             apiVersion: '1.1',
           )).thenAnswer((_) async => Response(
-            data: {'token': 'hpp-token-abc'},
+            data: {'hPPToken': 'https://converge.com/hpp?token=abc'},
             statusCode: 200,
             requestOptions: RequestOptions(path: ApiEndpoints.getHppToken),
           ));
 
-      final token = await orderRepository.getHppToken(txn);
+      final token = await orderRepository.getHppToken(tTransaction);
 
-      expect(token, 'hpp-token-abc');
+      expect(token, 'https://converge.com/hpp?token=abc');
     });
 
     test('getOrders calls correct endpoint with apiVersion 1.1 and returns list',

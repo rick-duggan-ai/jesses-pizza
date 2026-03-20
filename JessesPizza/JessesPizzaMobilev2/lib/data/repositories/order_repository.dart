@@ -2,6 +2,7 @@ import 'package:jesses_pizza_app/data/api/api_client.dart';
 import 'package:jesses_pizza_app/data/api/api_endpoints.dart';
 import 'package:jesses_pizza_app/domain/models/api_response.dart';
 import 'package:jesses_pizza_app/domain/models/transaction.dart';
+import 'package:jesses_pizza_app/domain/models/transaction_request.dart';
 import 'package:jesses_pizza_app/domain/repositories/i_order_repository.dart';
 
 class OrderRepository implements IOrderRepository {
@@ -11,10 +12,20 @@ class OrderRepository implements IOrderRepository {
 
   @override
   Future<ApiResponse> validateTransaction(
-      Map<String, dynamic> transaction) async {
+      TransactionRequest transaction) async {
     final response = await apiClient.post<Map<String, dynamic>>(
       ApiEndpoints.validateTransaction,
-      data: transaction,
+      data: transaction.toJson(),
+      apiVersion: '1.1',
+    );
+    return ApiResponse.fromJson(response.data!);
+  }
+
+  @override
+  Future<ApiResponse> validateTransactionAmount(double amount) async {
+    final response = await apiClient.post<Map<String, dynamic>>(
+      ApiEndpoints.validateTransactionAmount,
+      data: amount,
       apiVersion: '1.1',
     );
     return ApiResponse.fromJson(response.data!);
@@ -22,23 +33,24 @@ class OrderRepository implements IOrderRepository {
 
   @override
   Future<ApiResponse> postTransaction(
-      Map<String, dynamic> transaction) async {
+      PostTransactionRequest request) async {
     final response = await apiClient.post<Map<String, dynamic>>(
       ApiEndpoints.postTransaction,
-      data: transaction,
+      data: request.toJson(),
       apiVersion: '1.1',
     );
     return ApiResponse.fromJson(response.data!);
   }
 
   @override
-  Future<String> getHppToken(Map<String, dynamic> transaction) async {
+  Future<String> getHppToken(TransactionRequest transaction) async {
     final response = await apiClient.post<Map<String, dynamic>>(
       ApiEndpoints.getHppToken,
-      data: transaction,
+      data: transaction.toJson(),
       apiVersion: '1.1',
     );
-    return response.data!['token'] as String;
+    // The API returns a MongoTransaction with hPPToken containing the full URL
+    return response.data!['hPPToken'] as String;
   }
 
   @override
@@ -57,7 +69,7 @@ class OrderRepository implements IOrderRepository {
   Future<Transaction> getTransactionByGuid(String guid) async {
     final response = await apiClient.get<Map<String, dynamic>>(
       ApiEndpoints.transactionGuid,
-      queryParameters: {'guid': guid},
+      queryParameters: {'transactionGuid': guid},
       apiVersion: '1.1',
     );
     return Transaction.fromJson(response.data!);

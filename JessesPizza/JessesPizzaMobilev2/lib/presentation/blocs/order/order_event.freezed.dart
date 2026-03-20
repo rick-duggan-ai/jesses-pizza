@@ -128,10 +128,10 @@ return loadOrderDetail(_that);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult maybeWhen<TResult extends Object?>({TResult Function( Map<String, dynamic> transaction)?  submitOrder,TResult Function( Map<String, dynamic> transaction)?  requestHppToken,TResult Function()?  loadOrderHistory,TResult Function( String guid)?  loadOrderDetail,required TResult orElse(),}) {final _that = this;
+@optionalTypeArgs TResult maybeWhen<TResult extends Object?>({TResult Function( PostTransactionRequest request)?  submitOrder,TResult Function( TransactionRequest transaction)?  requestHppToken,TResult Function()?  loadOrderHistory,TResult Function( String guid)?  loadOrderDetail,required TResult orElse(),}) {final _that = this;
 switch (_that) {
 case SubmitOrder() when submitOrder != null:
-return submitOrder(_that.transaction);case RequestHppToken() when requestHppToken != null:
+return submitOrder(_that.request);case RequestHppToken() when requestHppToken != null:
 return requestHppToken(_that.transaction);case LoadOrderHistory() when loadOrderHistory != null:
 return loadOrderHistory();case LoadOrderDetail() when loadOrderDetail != null:
 return loadOrderDetail(_that.guid);case _:
@@ -152,10 +152,10 @@ return loadOrderDetail(_that.guid);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult when<TResult extends Object?>({required TResult Function( Map<String, dynamic> transaction)  submitOrder,required TResult Function( Map<String, dynamic> transaction)  requestHppToken,required TResult Function()  loadOrderHistory,required TResult Function( String guid)  loadOrderDetail,}) {final _that = this;
+@optionalTypeArgs TResult when<TResult extends Object?>({required TResult Function( PostTransactionRequest request)  submitOrder,required TResult Function( TransactionRequest transaction)  requestHppToken,required TResult Function()  loadOrderHistory,required TResult Function( String guid)  loadOrderDetail,}) {final _that = this;
 switch (_that) {
 case SubmitOrder():
-return submitOrder(_that.transaction);case RequestHppToken():
+return submitOrder(_that.request);case RequestHppToken():
 return requestHppToken(_that.transaction);case LoadOrderHistory():
 return loadOrderHistory();case LoadOrderDetail():
 return loadOrderDetail(_that.guid);case _:
@@ -175,10 +175,10 @@ return loadOrderDetail(_that.guid);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>({TResult? Function( Map<String, dynamic> transaction)?  submitOrder,TResult? Function( Map<String, dynamic> transaction)?  requestHppToken,TResult? Function()?  loadOrderHistory,TResult? Function( String guid)?  loadOrderDetail,}) {final _that = this;
+@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>({TResult? Function( PostTransactionRequest request)?  submitOrder,TResult? Function( TransactionRequest transaction)?  requestHppToken,TResult? Function()?  loadOrderHistory,TResult? Function( String guid)?  loadOrderDetail,}) {final _that = this;
 switch (_that) {
 case SubmitOrder() when submitOrder != null:
-return submitOrder(_that.transaction);case RequestHppToken() when requestHppToken != null:
+return submitOrder(_that.request);case RequestHppToken() when requestHppToken != null:
 return requestHppToken(_that.transaction);case LoadOrderHistory() when loadOrderHistory != null:
 return loadOrderHistory();case LoadOrderDetail() when loadOrderDetail != null:
 return loadOrderDetail(_that.guid);case _:
@@ -193,16 +193,10 @@ return loadOrderDetail(_that.guid);case _:
 
 
 class SubmitOrder implements OrderEvent {
-  const SubmitOrder({required final  Map<String, dynamic> transaction}): _transaction = transaction;
+  const SubmitOrder({required this.request});
   
 
- final  Map<String, dynamic> _transaction;
- Map<String, dynamic> get transaction {
-  if (_transaction is EqualUnmodifiableMapView) return _transaction;
-  // ignore: implicit_dynamic_type
-  return EqualUnmodifiableMapView(_transaction);
-}
-
+ final  PostTransactionRequest request;
 
 /// Create a copy of OrderEvent
 /// with the given fields replaced by the non-null parameter values.
@@ -214,16 +208,16 @@ $SubmitOrderCopyWith<SubmitOrder> get copyWith => _$SubmitOrderCopyWithImpl<Subm
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is SubmitOrder&&const DeepCollectionEquality().equals(other._transaction, _transaction));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is SubmitOrder&&(identical(other.request, request) || other.request == request));
 }
 
 
 @override
-int get hashCode => Object.hash(runtimeType,const DeepCollectionEquality().hash(_transaction));
+int get hashCode => Object.hash(runtimeType,request);
 
 @override
 String toString() {
-  return 'OrderEvent.submitOrder(transaction: $transaction)';
+  return 'OrderEvent.submitOrder(request: $request)';
 }
 
 
@@ -234,11 +228,11 @@ abstract mixin class $SubmitOrderCopyWith<$Res> implements $OrderEventCopyWith<$
   factory $SubmitOrderCopyWith(SubmitOrder value, $Res Function(SubmitOrder) _then) = _$SubmitOrderCopyWithImpl;
 @useResult
 $Res call({
- Map<String, dynamic> transaction
+ PostTransactionRequest request
 });
 
 
-
+$PostTransactionRequestCopyWith<$Res> get request;
 
 }
 /// @nodoc
@@ -251,30 +245,33 @@ class _$SubmitOrderCopyWithImpl<$Res>
 
 /// Create a copy of OrderEvent
 /// with the given fields replaced by the non-null parameter values.
-@pragma('vm:prefer-inline') $Res call({Object? transaction = null,}) {
+@pragma('vm:prefer-inline') $Res call({Object? request = null,}) {
   return _then(SubmitOrder(
-transaction: null == transaction ? _self._transaction : transaction // ignore: cast_nullable_to_non_nullable
-as Map<String, dynamic>,
+request: null == request ? _self.request : request // ignore: cast_nullable_to_non_nullable
+as PostTransactionRequest,
   ));
 }
 
-
+/// Create a copy of OrderEvent
+/// with the given fields replaced by the non-null parameter values.
+@override
+@pragma('vm:prefer-inline')
+$PostTransactionRequestCopyWith<$Res> get request {
+  
+  return $PostTransactionRequestCopyWith<$Res>(_self.request, (value) {
+    return _then(_self.copyWith(request: value));
+  });
+}
 }
 
 /// @nodoc
 
 
 class RequestHppToken implements OrderEvent {
-  const RequestHppToken({required final  Map<String, dynamic> transaction}): _transaction = transaction;
+  const RequestHppToken({required this.transaction});
   
 
- final  Map<String, dynamic> _transaction;
- Map<String, dynamic> get transaction {
-  if (_transaction is EqualUnmodifiableMapView) return _transaction;
-  // ignore: implicit_dynamic_type
-  return EqualUnmodifiableMapView(_transaction);
-}
-
+ final  TransactionRequest transaction;
 
 /// Create a copy of OrderEvent
 /// with the given fields replaced by the non-null parameter values.
@@ -286,12 +283,12 @@ $RequestHppTokenCopyWith<RequestHppToken> get copyWith => _$RequestHppTokenCopyW
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is RequestHppToken&&const DeepCollectionEquality().equals(other._transaction, _transaction));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is RequestHppToken&&(identical(other.transaction, transaction) || other.transaction == transaction));
 }
 
 
 @override
-int get hashCode => Object.hash(runtimeType,const DeepCollectionEquality().hash(_transaction));
+int get hashCode => Object.hash(runtimeType,transaction);
 
 @override
 String toString() {
@@ -306,11 +303,11 @@ abstract mixin class $RequestHppTokenCopyWith<$Res> implements $OrderEventCopyWi
   factory $RequestHppTokenCopyWith(RequestHppToken value, $Res Function(RequestHppToken) _then) = _$RequestHppTokenCopyWithImpl;
 @useResult
 $Res call({
- Map<String, dynamic> transaction
+ TransactionRequest transaction
 });
 
 
-
+$TransactionRequestCopyWith<$Res> get transaction;
 
 }
 /// @nodoc
@@ -325,12 +322,21 @@ class _$RequestHppTokenCopyWithImpl<$Res>
 /// with the given fields replaced by the non-null parameter values.
 @pragma('vm:prefer-inline') $Res call({Object? transaction = null,}) {
   return _then(RequestHppToken(
-transaction: null == transaction ? _self._transaction : transaction // ignore: cast_nullable_to_non_nullable
-as Map<String, dynamic>,
+transaction: null == transaction ? _self.transaction : transaction // ignore: cast_nullable_to_non_nullable
+as TransactionRequest,
   ));
 }
 
-
+/// Create a copy of OrderEvent
+/// with the given fields replaced by the non-null parameter values.
+@override
+@pragma('vm:prefer-inline')
+$TransactionRequestCopyWith<$Res> get transaction {
+  
+  return $TransactionRequestCopyWith<$Res>(_self.transaction, (value) {
+    return _then(_self.copyWith(transaction: value));
+  });
+}
 }
 
 /// @nodoc

@@ -1,9 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:jesses_pizza_app/domain/models/credit_card.dart';
+import 'package:jesses_pizza_app/domain/models/transaction_request.dart';
 import 'package:jesses_pizza_app/presentation/blocs/account/account_bloc.dart';
 import 'package:jesses_pizza_app/presentation/blocs/account/account_event.dart';
 import 'package:jesses_pizza_app/presentation/blocs/account/account_state.dart';
+import 'package:jesses_pizza_app/presentation/blocs/auth/auth_bloc.dart';
+import 'package:jesses_pizza_app/presentation/blocs/auth/auth_state.dart';
 import 'package:jesses_pizza_app/presentation/blocs/cart/cart_bloc.dart';
 import 'package:jesses_pizza_app/presentation/blocs/cart/cart_state.dart';
 import 'package:jesses_pizza_app/presentation/blocs/order/order_bloc.dart';
@@ -29,25 +32,39 @@ class _PaymentScreenState extends State<PaymentScreen> {
     context.read<AccountBloc>().add(const LoadCreditCards());
   }
 
-  Map<String, dynamic> _buildTransaction(CartState cartState) {
-    return {
-      'items': cartState.items
-          .map((i) => {
-                'menuItemId': i.menuItemId,
-                'name': i.name,
-                'quantity': i.quantity,
-                'price': i.price,
-              })
-          .toList(),
-      'total': cartState.total,
-      'isDelivery': cartState.isDelivery,
-      if (cartState.address != null)
-        'address': {
-          'addressLine1': cartState.address!.addressLine1,
-          'city': cartState.address!.city,
-          'zipCode': cartState.address!.zipCode,
-        },
-    };
+  /// Builds a complete [TransactionRequest] matching V1's LocalTransactionV1_1
+  /// format from the current cart state and authenticated user info.
+  TransactionRequest _buildTransaction(CartState cartState) {
+    // Get customer info from auth state
+    final authState = context.read<AuthBloc>().state;
+    final userEmail = authState is AuthAuthenticated
+        ? authState.user.email ?? ''
+        : '';
+    final isGuest = authState is AuthAuthenticated && authState.user.isGuest;
+
+    // Build customer info
+    final customerInfo = CustomerInfo(
+      firstName: isGuest ? 'Guest' : '',
+      lastName: '',
+      phoneNumber: '',
+      emailAddress: userEmail,
+      addressLine1: cartState.address?.addressLine1,
+      city: cartState.address?.city,
+      zipCode: cartState.address?.zipCode,
+    );
+
+    // Build order totals from cart
+    final totals = OrderTotals(
+      subTotal: cartState.total,
+      total: cartState.total,
+    );
+
+    return TransactionRequest.fromCartState(
+      items: cartState.items,
+      customerInfo: customerInfo,
+      totals: totals,
+      isDelivery: cartState.isDelivery,
+    );
   }
 
   @override
@@ -173,10 +190,15 @@ class _PaymentScreenState extends State<PaymentScreen> {
                                 ? null
                                 : () {
                                     final tx = _buildTransaction(cartState);
-                                    tx['cardId'] = _selectedCard!.id;
+                                    final postRequest = PostTransactionRequest(
+                                      transaction: tx,
+                                      card: CreditCardRef(
+                                        id: _selectedCard!.id,
+                                      ),
+                                    );
                                     context
                                         .read<OrderBloc>()
-                                        .add(SubmitOrder(transaction: tx));
+                                        .add(SubmitOrder(request: postRequest));
                                   },
                             style: ElevatedButton.styleFrom(
                               padding: const EdgeInsets.symmetric(vertical: 16),

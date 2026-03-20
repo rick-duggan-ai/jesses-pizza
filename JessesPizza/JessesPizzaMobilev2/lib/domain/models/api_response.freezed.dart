@@ -15,7 +15,7 @@ T _$identity<T>(T value) => value;
 /// @nodoc
 mixin _$ApiResponse {
 
- bool get succeeded; String? get message;
+ bool get succeeded; String? get message; String? get transactionGuid;
 /// Create a copy of ApiResponse
 /// with the given fields replaced by the non-null parameter values.
 @JsonKey(includeFromJson: false, includeToJson: false)
@@ -28,16 +28,16 @@ $ApiResponseCopyWith<ApiResponse> get copyWith => _$ApiResponseCopyWithImpl<ApiR
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is ApiResponse&&(identical(other.succeeded, succeeded) || other.succeeded == succeeded)&&(identical(other.message, message) || other.message == message));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is ApiResponse&&(identical(other.succeeded, succeeded) || other.succeeded == succeeded)&&(identical(other.message, message) || other.message == message)&&(identical(other.transactionGuid, transactionGuid) || other.transactionGuid == transactionGuid));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
 @override
-int get hashCode => Object.hash(runtimeType,succeeded,message);
+int get hashCode => Object.hash(runtimeType,succeeded,message,transactionGuid);
 
 @override
 String toString() {
-  return 'ApiResponse(succeeded: $succeeded, message: $message)';
+  return 'ApiResponse(succeeded: $succeeded, message: $message, transactionGuid: $transactionGuid)';
 }
 
 
@@ -48,7 +48,7 @@ abstract mixin class $ApiResponseCopyWith<$Res>  {
   factory $ApiResponseCopyWith(ApiResponse value, $Res Function(ApiResponse) _then) = _$ApiResponseCopyWithImpl;
 @useResult
 $Res call({
- bool succeeded, String? message
+ bool succeeded, String? message, String? transactionGuid
 });
 
 
@@ -65,10 +65,11 @@ class _$ApiResponseCopyWithImpl<$Res>
 
 /// Create a copy of ApiResponse
 /// with the given fields replaced by the non-null parameter values.
-@pragma('vm:prefer-inline') @override $Res call({Object? succeeded = null,Object? message = freezed,}) {
+@pragma('vm:prefer-inline') @override $Res call({Object? succeeded = null,Object? message = freezed,Object? transactionGuid = freezed,}) {
   return _then(_self.copyWith(
 succeeded: null == succeeded ? _self.succeeded : succeeded // ignore: cast_nullable_to_non_nullable
 as bool,message: freezed == message ? _self.message : message // ignore: cast_nullable_to_non_nullable
+as String?,transactionGuid: freezed == transactionGuid ? _self.transactionGuid : transactionGuid // ignore: cast_nullable_to_non_nullable
 as String?,
   ));
 }
@@ -154,10 +155,10 @@ return $default(_that);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( bool succeeded,  String? message)?  $default,{required TResult orElse(),}) {final _that = this;
+@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( bool succeeded,  String? message,  String? transactionGuid)?  $default,{required TResult orElse(),}) {final _that = this;
 switch (_that) {
 case _ApiResponse() when $default != null:
-return $default(_that.succeeded,_that.message);case _:
+return $default(_that.succeeded,_that.message,_that.transactionGuid);case _:
   return orElse();
 
 }
@@ -175,10 +176,10 @@ return $default(_that.succeeded,_that.message);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( bool succeeded,  String? message)  $default,) {final _that = this;
+@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( bool succeeded,  String? message,  String? transactionGuid)  $default,) {final _that = this;
 switch (_that) {
 case _ApiResponse():
-return $default(_that.succeeded,_that.message);case _:
+return $default(_that.succeeded,_that.message,_that.transactionGuid);case _:
   throw StateError('Unexpected subclass');
 
 }
@@ -195,10 +196,10 @@ return $default(_that.succeeded,_that.message);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( bool succeeded,  String? message)?  $default,) {final _that = this;
+@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( bool succeeded,  String? message,  String? transactionGuid)?  $default,) {final _that = this;
 switch (_that) {
 case _ApiResponse() when $default != null:
-return $default(_that.succeeded,_that.message);case _:
+return $default(_that.succeeded,_that.message,_that.transactionGuid);case _:
   return null;
 
 }
@@ -210,11 +211,12 @@ return $default(_that.succeeded,_that.message);case _:
 @JsonSerializable()
 
 class _ApiResponse implements ApiResponse {
-  const _ApiResponse({required this.succeeded, this.message});
+  const _ApiResponse({required this.succeeded, this.message, this.transactionGuid});
   factory _ApiResponse.fromJson(Map<String, dynamic> json) => _$ApiResponseFromJson(json);
 
 @override final  bool succeeded;
 @override final  String? message;
+@override final  String? transactionGuid;
 
 /// Create a copy of ApiResponse
 /// with the given fields replaced by the non-null parameter values.
@@ -229,16 +231,16 @@ Map<String, dynamic> toJson() {
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is _ApiResponse&&(identical(other.succeeded, succeeded) || other.succeeded == succeeded)&&(identical(other.message, message) || other.message == message));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is _ApiResponse&&(identical(other.succeeded, succeeded) || other.succeeded == succeeded)&&(identical(other.message, message) || other.message == message)&&(identical(other.transactionGuid, transactionGuid) || other.transactionGuid == transactionGuid));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
 @override
-int get hashCode => Object.hash(runtimeType,succeeded,message);
+int get hashCode => Object.hash(runtimeType,succeeded,message,transactionGuid);
 
 @override
 String toString() {
-  return 'ApiResponse(succeeded: $succeeded, message: $message)';
+  return 'ApiResponse(succeeded: $succeeded, message: $message, transactionGuid: $transactionGuid)';
 }
 
 
@@ -249,7 +251,7 @@ abstract mixin class _$ApiResponseCopyWith<$Res> implements $ApiResponseCopyWith
   factory _$ApiResponseCopyWith(_ApiResponse value, $Res Function(_ApiResponse) _then) = __$ApiResponseCopyWithImpl;
 @override @useResult
 $Res call({
- bool succeeded, String? message
+ bool succeeded, String? message, String? transactionGuid
 });
 
 
@@ -266,10 +268,11 @@ class __$ApiResponseCopyWithImpl<$Res>
 
 /// Create a copy of ApiResponse
 /// with the given fields replaced by the non-null parameter values.
-@override @pragma('vm:prefer-inline') $Res call({Object? succeeded = null,Object? message = freezed,}) {
+@override @pragma('vm:prefer-inline') $Res call({Object? succeeded = null,Object? message = freezed,Object? transactionGuid = freezed,}) {
   return _then(_ApiResponse(
 succeeded: null == succeeded ? _self.succeeded : succeeded // ignore: cast_nullable_to_non_nullable
 as bool,message: freezed == message ? _self.message : message // ignore: cast_nullable_to_non_nullable
+as String?,transactionGuid: freezed == transactionGuid ? _self.transactionGuid : transactionGuid // ignore: cast_nullable_to_non_nullable
 as String?,
   ));
 }
