@@ -1,3 +1,4 @@
+import 'dart:convert';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:jesses_pizza_app/domain/models/store_settings.dart';
 
@@ -78,7 +79,7 @@ void main() {
         aboutText: 'Hello',
       );
 
-      final json = original.toJson();
+      final json = jsonDecode(jsonEncode(original.toJson())) as Map<String, dynamic>;
       final restored = StoreSettings.fromJson(json);
 
       expect(restored, original);
