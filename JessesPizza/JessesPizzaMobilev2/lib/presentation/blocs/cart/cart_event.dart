@@ -16,18 +16,21 @@ class AddItem extends CartEvent {
 class RemoveItem extends CartEvent {
   final String menuItemId;
   final String sizeName;
-  const RemoveItem(this.menuItemId, this.sizeName);
+  final int? index;
+  const RemoveItem(this.menuItemId, this.sizeName, {this.index});
   @override
-  List<Object?> get props => [menuItemId, sizeName];
+  List<Object?> get props => [menuItemId, sizeName, index];
 }
 
 class UpdateQuantity extends CartEvent {
   final String menuItemId;
   final String sizeName;
   final int quantity;
-  const UpdateQuantity(this.menuItemId, this.sizeName, this.quantity);
+  final int? index;
+  const UpdateQuantity(this.menuItemId, this.sizeName, this.quantity,
+      {this.index});
   @override
-  List<Object?> get props => [menuItemId, sizeName, quantity];
+  List<Object?> get props => [menuItemId, sizeName, quantity, index];
 }
 
 class SetDeliveryMode extends CartEvent {
@@ -42,6 +45,13 @@ class SetAddress extends CartEvent {
   const SetAddress(this.address);
   @override
   List<Object?> get props => [address];
+}
+
+class SetTip extends CartEvent {
+  final double amount;
+  const SetTip(this.amount);
+  @override
+  List<Object?> get props => [amount];
 }
 
 class ClearCart extends CartEvent {

@@ -10,40 +10,42 @@ class CartBloc extends Bloc<CartEvent, CartState> {
     on<UpdateQuantity>(_onUpdateQuantity);
     on<SetDeliveryMode>(_onSetDeliveryMode);
     on<SetAddress>(_onSetAddress);
+    on<SetTip>(_onSetTip);
     on<ClearCart>(_onClearCart);
   }
 
   void _onAddItem(AddItem event, Emitter<CartState> emit) {
-    final existing = state.items.indexWhere(
-      (i) =>
-          i.menuItemId == event.item.menuItemId &&
-          i.sizeName == event.item.sizeName,
-    );
-    if (existing >= 0) {
-      final updated = List<CartItem>.from(state.items);
-      updated[existing] =
-          updated[existing].copyWith(quantity: updated[existing].quantity + event.item.quantity);
-      emit(state.copyWith(items: updated));
-    } else {
-      emit(state.copyWith(items: [...state.items, event.item]));
-    }
+    // Each cart item is added as a distinct entry since group selections
+    // make items unique even with the same menuItemId + sizeName.
+    emit(state.copyWith(items: [...state.items, event.item]));
   }
 
   void _onRemoveItem(RemoveItem event, Emitter<CartState> emit) {
-    emit(state.copyWith(
-      items: state.items
-          .where((i) => !(i.menuItemId == event.menuItemId && i.sizeName == event.sizeName))
-          .toList(),
-    ));
+    final updated = List<CartItem>.from(state.items);
+    if (event.index != null && event.index! < updated.length) {
+      updated.removeAt(event.index!);
+    } else {
+      final idx = updated.indexWhere(
+        (i) => i.menuItemId == event.menuItemId && i.sizeName == event.sizeName,
+      );
+      if (idx >= 0) updated.removeAt(idx);
+    }
+    emit(state.copyWith(items: updated));
   }
 
   void _onUpdateQuantity(UpdateQuantity event, Emitter<CartState> emit) {
-    final updated = state.items.map((i) {
-      if (i.menuItemId == event.menuItemId && i.sizeName == event.sizeName) {
-        return i.copyWith(quantity: event.quantity);
+    final updated = List<CartItem>.from(state.items);
+    if (event.index != null && event.index! < updated.length) {
+      updated[event.index!] =
+          updated[event.index!].copyWith(quantity: event.quantity);
+    } else {
+      final idx = updated.indexWhere(
+        (i) => i.menuItemId == event.menuItemId && i.sizeName == event.sizeName,
+      );
+      if (idx >= 0) {
+        updated[idx] = updated[idx].copyWith(quantity: event.quantity);
       }
-      return i;
-    }).toList();
+    }
     emit(state.copyWith(items: updated));
   }
 
@@ -57,6 +59,10 @@ class CartBloc extends Bloc<CartEvent, CartState> {
 
   void _onSetAddress(SetAddress event, Emitter<CartState> emit) {
     emit(state.copyWith(address: event.address));
+  }
+
+  void _onSetTip(SetTip event, Emitter<CartState> emit) {
+    emit(state.copyWith(tipAmount: event.amount));
   }
 
   void _onClearCart(ClearCart event, Emitter<CartState> emit) {
