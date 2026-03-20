@@ -6,6 +6,22 @@ part of 'menu_group.dart';
 // JsonSerializableGenerator
 // **************************************************************************
 
+_GroupItemOption _$GroupItemOptionFromJson(Map<String, dynamic> json) =>
+    _GroupItemOption(
+      id: json['id'] as String?,
+      name: json['name'] as String,
+      price: (json['price'] as num?)?.toDouble() ?? 0.0,
+      isDefault: json['isDefault'] as bool? ?? false,
+    );
+
+Map<String, dynamic> _$GroupItemOptionToJson(_GroupItemOption instance) =>
+    <String, dynamic>{
+      'id': instance.id,
+      'name': instance.name,
+      'price': instance.price,
+      'isDefault': instance.isDefault,
+    };
+
 _MenuGroupItem _$MenuGroupItemFromJson(Map<String, dynamic> json) =>
     _MenuGroupItem(
       id: json['id'] as String,
@@ -17,7 +33,11 @@ _MenuGroupItem _$MenuGroupItemFromJson(Map<String, dynamic> json) =>
               ?.map((e) => MenuItemSize.fromJson(e as Map<String, dynamic>))
               .toList() ??
           const [],
-      sides: json['sides'] as List<dynamic>? ?? const [],
+      sides:
+          (json['sides'] as List<dynamic>?)
+              ?.map((e) => GroupItemOption.fromJson(e as Map<String, dynamic>))
+              .toList() ??
+          const [],
     );
 
 Map<String, dynamic> _$MenuGroupItemToJson(_MenuGroupItem instance) =>
