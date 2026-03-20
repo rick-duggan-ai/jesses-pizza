@@ -1,6 +1,7 @@
 import 'package:equatable/equatable.dart';
 import 'package:jesses_pizza_app/domain/models/address.dart';
 import 'package:jesses_pizza_app/domain/models/cart_item.dart';
+import 'package:jesses_pizza_app/domain/models/guest_info.dart';
 
 abstract class CartEvent extends Equatable {
   const CartEvent();
@@ -42,6 +43,13 @@ class SetAddress extends CartEvent {
   const SetAddress(this.address);
   @override
   List<Object?> get props => [address];
+}
+
+class SetGuestInfo extends CartEvent {
+  final GuestInfo guestInfo;
+  const SetGuestInfo(this.guestInfo);
+  @override
+  List<Object?> get props => [guestInfo];
 }
 
 class ClearCart extends CartEvent {

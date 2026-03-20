@@ -47,6 +47,8 @@ class _PaymentScreenState extends State<PaymentScreen> {
           'city': cartState.address!.city,
           'zipCode': cartState.address!.zipCode,
         },
+      if (cartState.guestInfo != null)
+        'guestInfo': cartState.guestInfo!.toJson(),
     };
   }
 

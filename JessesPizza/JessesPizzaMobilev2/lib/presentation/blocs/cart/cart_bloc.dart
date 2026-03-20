@@ -10,6 +10,7 @@ class CartBloc extends Bloc<CartEvent, CartState> {
     on<UpdateQuantity>(_onUpdateQuantity);
     on<SetDeliveryMode>(_onSetDeliveryMode);
     on<SetAddress>(_onSetAddress);
+    on<SetGuestInfo>(_onSetGuestInfo);
     on<ClearCart>(_onClearCart);
   }
 
@@ -57,6 +58,10 @@ class CartBloc extends Bloc<CartEvent, CartState> {
 
   void _onSetAddress(SetAddress event, Emitter<CartState> emit) {
     emit(state.copyWith(address: event.address));
+  }
+
+  void _onSetGuestInfo(SetGuestInfo event, Emitter<CartState> emit) {
+    emit(state.copyWith(guestInfo: event.guestInfo));
   }
 
   void _onClearCart(ClearCart event, Emitter<CartState> emit) {

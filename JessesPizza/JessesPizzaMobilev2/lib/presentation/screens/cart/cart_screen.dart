@@ -6,6 +6,7 @@ import 'package:jesses_pizza_app/presentation/blocs/cart/cart_bloc.dart';
 import 'package:jesses_pizza_app/presentation/blocs/cart/cart_state.dart';
 import 'package:jesses_pizza_app/presentation/screens/auth/login_screen.dart';
 import 'package:jesses_pizza_app/presentation/screens/cart/delivery_mode_screen.dart';
+import 'package:jesses_pizza_app/presentation/screens/cart/guest_info_screen.dart';
 import 'package:jesses_pizza_app/presentation/widgets/cart_item_tile.dart';
 
 class CartScreen extends StatelessWidget {
@@ -14,15 +15,22 @@ class CartScreen extends StatelessWidget {
   void _proceedToCheckout(BuildContext context) {
     final authState = context.read<AuthBloc>().state;
     if (authState is AuthAuthenticated) {
-      Navigator.of(context).push(
-        MaterialPageRoute(builder: (_) => const DeliveryModeScreen()),
-      );
+      if (authState.user.isGuest) {
+        // Guest users must provide their info before checkout
+        Navigator.of(context).push(
+          MaterialPageRoute(builder: (_) => const GuestInfoScreen()),
+        );
+      } else {
+        Navigator.of(context).push(
+          MaterialPageRoute(builder: (_) => const DeliveryModeScreen()),
+        );
+      }
     } else {
       showDialog(
         context: context,
         builder: (ctx) => AlertDialog(
           title: const Text('Login Required'),
-          content: const Text('Please log in to proceed to checkout.'),
+          content: const Text('Please log in or continue as guest to proceed.'),
           actions: [
             TextButton(
               onPressed: () => Navigator.of(ctx).pop(),
