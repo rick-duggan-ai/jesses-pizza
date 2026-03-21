@@ -21,6 +21,23 @@ class CreditCardTile extends StatelessWidget {
     return n;
   }
 
+  /// Map card type to an appropriate icon based on the card number prefix.
+  /// Visa starts with 4, Mastercard with 5, Amex with 3 (34/37),
+  /// Discover with 6.
+  IconData get _cardTypeIcon {
+    final n = card.maskedCardNumber.replaceAll(RegExp(r'\D'), '');
+    if (n.isEmpty) return Icons.credit_card;
+
+    if (n.startsWith('4')) return Icons.payment; // Visa
+    if (n.startsWith('5')) return Icons.credit_card; // Mastercard
+    if (n.startsWith('34') || n.startsWith('37')) {
+      return Icons.card_membership; // Amex
+    }
+    if (n.startsWith('6')) return Icons.credit_score; // Discover
+
+    return Icons.credit_card; // fallback
+  }
+
   @override
   Widget build(BuildContext context) {
     return Card(
@@ -32,7 +49,7 @@ class CreditCardTile extends StatelessWidget {
             : BorderSide.none,
       ),
       child: ListTile(
-        leading: const Icon(Icons.credit_card),
+        leading: Icon(_cardTypeIcon),
         title: Text(_maskedNumber),
         subtitle: Text('Exp: ${card.expirationDate}'),
         trailing: selected

@@ -9,6 +9,7 @@ import 'package:jesses_pizza_app/presentation/blocs/menu/menu_bloc.dart';
 import 'package:jesses_pizza_app/presentation/blocs/menu/menu_state.dart';
 import 'package:jesses_pizza_app/presentation/blocs/cart/cart_bloc.dart';
 import 'package:jesses_pizza_app/presentation/blocs/cart/cart_event.dart';
+import 'package:jesses_pizza_app/presentation/blocs/cart/cart_state.dart';
 import 'package:jesses_pizza_app/presentation/blocs/order/order_bloc.dart';
 import 'package:jesses_pizza_app/presentation/blocs/account/account_bloc.dart';
 import 'package:jesses_pizza_app/presentation/screens/auth/welcome_screen.dart';
@@ -40,6 +41,8 @@ class JessesPizzaApp extends StatelessWidget {
         child: MaterialApp(
           title: "Jesse's Pizza",
           theme: AppTheme.light,
+          darkTheme: AppTheme.dark,
+          themeMode: ThemeMode.system,
           home: BlocBuilder<AuthBloc, AuthState>(
             builder: (context, state) {
               if (state is AuthAuthenticated) {
@@ -96,14 +99,33 @@ class _AppShellState extends State<AppShell> {
           ),
         ],
       ),
-      bottomNavigationBar: BottomNavigationBar(
-        currentIndex: _currentIndex,
-        onTap: (index) => setState(() => _currentIndex = index),
-        items: const [
-          BottomNavigationBarItem(icon: Icon(Icons.restaurant_menu), label: 'Menu'),
-          BottomNavigationBarItem(icon: Icon(Icons.shopping_cart), label: 'Cart'),
-          BottomNavigationBarItem(icon: Icon(Icons.person), label: 'Account'),
-        ],
+      bottomNavigationBar: BlocBuilder<CartBloc, CartState>(
+        builder: (context, cartState) {
+          final itemCount = cartState.items.length;
+          return BottomNavigationBar(
+            currentIndex: _currentIndex,
+            onTap: (index) => setState(() => _currentIndex = index),
+            items: [
+              const BottomNavigationBarItem(
+                icon: Icon(Icons.restaurant_menu),
+                label: 'Menu',
+              ),
+              BottomNavigationBarItem(
+                icon: itemCount > 0
+                    ? Badge(
+                        label: Text('$itemCount'),
+                        child: const Icon(Icons.shopping_cart),
+                      )
+                    : const Icon(Icons.shopping_cart),
+                label: 'Cart',
+              ),
+              const BottomNavigationBarItem(
+                icon: Icon(Icons.person),
+                label: 'Account',
+              ),
+            ],
+          );
+        },
       ),
     );
   }
