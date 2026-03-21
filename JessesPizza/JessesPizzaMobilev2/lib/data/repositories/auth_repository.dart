@@ -82,30 +82,30 @@ class AuthRepository implements IAuthRepository {
   }
 
   @override
-  Future<ApiResponse> forgotPassword(String email) async {
+  Future<ApiResponse> forgotPassword(String phoneNumber) async {
     final response = await apiClient.post<Map<String, dynamic>>(
       ApiEndpoints.forgotPassword,
-      data: {'email': email},
+      data: {'phoneNumber': phoneNumber},
       apiVersion: '1.0',
     );
     return ApiResponse.fromJson(response.data!);
   }
 
   @override
-  Future<ApiResponse> confirmPasswordChange(String email, String code) async {
+  Future<ApiResponse> confirmPasswordChange(String phoneNumber, String code) async {
     final response = await apiClient.post<Map<String, dynamic>>(
       ApiEndpoints.confirmPasswordChange,
-      data: {'email': email, 'code': code},
+      data: {'phoneNumber': phoneNumber, 'code': code},
       apiVersion: '1.0',
     );
     return ApiResponse.fromJson(response.data!);
   }
 
   @override
-  Future<ApiResponse> resendChangePasswordCode(String email) async {
+  Future<ApiResponse> resendChangePasswordCode(String phoneNumber) async {
     final response = await apiClient.post<Map<String, dynamic>>(
       ApiEndpoints.resendChangePasswordCode,
-      data: {'email': email},
+      data: {'phoneNumber': phoneNumber},
       apiVersion: '1.0',
     );
     return ApiResponse.fromJson(response.data!);
@@ -113,10 +113,10 @@ class AuthRepository implements IAuthRepository {
 
   @override
   Future<ApiResponse> newPassword(
-      String email, String password, String token) async {
+      String phoneNumber, String password, String token) async {
     final response = await apiClient.post<Map<String, dynamic>>(
       ApiEndpoints.newPassword,
-      data: {'email': email, 'password': password, 'token': token},
+      data: {'phoneNumber': phoneNumber, 'password': password, 'token': token},
       apiVersion: '1.0',
     );
     return ApiResponse.fromJson(response.data!);

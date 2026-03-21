@@ -11,13 +11,17 @@ import 'package:jesses_pizza_app/presentation/screens/auth/login_screen.dart';
 import 'package:jesses_pizza_app/presentation/screens/auth/new_password_screen.dart';
 
 class SmsVerificationScreen extends StatefulWidget {
-  final String email;
+  /// Used for signup verification context.
+  final String? email;
+  /// Used for password_reset verification context.
+  final String? phoneNumber;
   /// Either 'signup' or 'password_reset'
   final String verificationContext;
 
   const SmsVerificationScreen({
     super.key,
-    required this.email,
+    this.email,
+    this.phoneNumber,
     required this.verificationContext,
   });
 
@@ -31,6 +35,14 @@ class _SmsVerificationScreenState extends State<SmsVerificationScreen> {
   int _countdown = 0;
   Timer? _timer;
   bool _repoLoading = false;
+
+  /// Display label: show phone number for password reset, email for signup.
+  String get _recipientDisplay {
+    if (widget.verificationContext == 'password_reset') {
+      return widget.phoneNumber ?? '';
+    }
+    return widget.email ?? '';
+  }
 
   @override
   void initState() {
@@ -62,7 +74,7 @@ class _SmsVerificationScreenState extends State<SmsVerificationScreen> {
     if (widget.verificationContext == 'signup') {
       context.read<AuthBloc>().add(
             AuthEvent.confirmAccountRequested(
-              email: widget.email,
+              email: widget.email!,
               code: _codeController.text.trim(),
             ),
           );
@@ -72,11 +84,11 @@ class _SmsVerificationScreenState extends State<SmsVerificationScreen> {
       try {
         final repo = getIt<IAuthRepository>();
         final code = _codeController.text.trim();
-        await repo.confirmPasswordChange(widget.email, code);
+        await repo.confirmPasswordChange(widget.phoneNumber!, code);
         if (mounted) {
           Navigator.of(context).pushReplacement(
             MaterialPageRoute(
-              builder: (_) => NewPasswordScreen(email: widget.email, token: code),
+              builder: (_) => NewPasswordScreen(phoneNumber: widget.phoneNumber!, token: code),
             ),
           );
         }
@@ -96,9 +108,9 @@ class _SmsVerificationScreenState extends State<SmsVerificationScreen> {
     try {
       final repo = getIt<IAuthRepository>();
       if (widget.verificationContext == 'signup') {
-        await repo.resendSignupCode(widget.email);
+        await repo.resendSignupCode(widget.email!);
       } else {
-        await repo.resendChangePasswordCode(widget.email);
+        await repo.resendChangePasswordCode(widget.phoneNumber!);
       }
       _startCountdown();
       if (mounted) {
@@ -152,7 +164,7 @@ class _SmsVerificationScreenState extends State<SmsVerificationScreen> {
                     const Icon(Icons.sms, size: 64, color: Colors.blue),
                     const SizedBox(height: 16),
                     Text(
-                      'Enter the 6-digit code sent to\n${widget.email}',
+                      'Enter the 6-digit code sent to\n$_recipientDisplay',
                       textAlign: TextAlign.center,
                       style: const TextStyle(fontSize: 16),
                     ),
