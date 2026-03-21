@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:jesses_pizza_app/data/services/signalr_service.dart';
 import 'package:jesses_pizza_app/domain/models/credit_card.dart';
 import 'package:jesses_pizza_app/domain/models/transaction_request.dart';
 import 'package:jesses_pizza_app/presentation/blocs/auth/auth_bloc.dart';
@@ -12,11 +13,10 @@ import 'package:jesses_pizza_app/presentation/blocs/cart/cart_state.dart';
 import 'package:jesses_pizza_app/presentation/blocs/order/order_bloc.dart';
 import 'package:jesses_pizza_app/presentation/blocs/order/order_event.dart';
 import 'package:jesses_pizza_app/presentation/blocs/order/order_state.dart';
-import 'package:jesses_pizza_app/data/services/signalr_service.dart';
 import 'package:jesses_pizza_app/presentation/screens/cart/hpp_webview_screen.dart';
 import 'package:jesses_pizza_app/presentation/screens/cart/order_confirmation_screen.dart';
-import 'package:jesses_pizza_app/presentation/screens/cart/review_order_screen.dart';
 import 'package:jesses_pizza_app/presentation/widgets/credit_card_tile.dart';
+import 'package:jesses_pizza_app/presentation/widgets/save_card_dialog.dart';
 
 class PaymentScreen extends StatefulWidget {
   const PaymentScreen({super.key});
@@ -82,6 +82,56 @@ class _PaymentScreenState extends State<PaymentScreen> {
     );
   }
 
+  void _navigateToOrderConfirmation(NavigatorState nav) {
+    nav.pushAndRemoveUntil(
+      MaterialPageRoute(builder: (_) => const OrderConfirmationScreen()),
+      (route) => route.isFirst,
+    );
+  }
+
+  Future<void> _handleHppApproval(
+    NavigatorState nav,
+    HppResult result,
+  ) async {
+    // Guests cannot save cards -- go straight to confirmation.
+    if (_isGuest) {
+      _navigateToOrderConfirmation(nav);
+      return;
+    }
+
+    // Check if the card is already saved (from HPPApprovalMessage data).
+    final isCardSaved = result.data?['IsCardSaved'] as bool? ?? false;
+    if (isCardSaved) {
+      _navigateToOrderConfirmation(nav);
+      return;
+    }
+
+    // Extract card data from the HPP approval message.
+    final cardData = result.data?['Card'] as Map<String, dynamic>?;
+    if (cardData == null) {
+      // No card data available -- skip save prompt.
+      _navigateToOrderConfirmation(nav);
+      return;
+    }
+
+    // Ask the user if they want to save the card.
+    if (!mounted) return;
+    final wantsSave = await SaveCardDialog.show(context);
+
+    if (wantsSave && mounted) {
+      try {
+        final card = CreditCard.fromJson(cardData);
+        context.read<AccountBloc>().add(SaveCard(card: card));
+      } catch (_) {
+        // If saving fails, still continue to confirmation.
+      }
+    }
+
+    if (mounted) {
+      _navigateToOrderConfirmation(nav);
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return BlocListener<OrderBloc, OrderState>(
@@ -94,7 +144,7 @@ class _PaymentScreenState extends State<PaymentScreen> {
           );
         } else if (state is HppTokenReady) {
           final nav = Navigator.of(context);
-          final scaffoldMessenger = ScaffoldMessenger.of(context);
+          final messenger = ScaffoldMessenger.of(context);
           nav.push<HppResult>(
             MaterialPageRoute(
               builder: (_) => HppWebviewScreen(
@@ -106,13 +156,9 @@ class _PaymentScreenState extends State<PaymentScreen> {
             if (result == null) return;
             switch (result.paymentResult) {
               case HppPaymentResult.approve:
-                nav.pushAndRemoveUntil(
-                  MaterialPageRoute(
-                      builder: (_) => const OrderConfirmationScreen()),
-                  (route) => route.isFirst,
-                );
+                _handleHppApproval(nav, result);
               case HppPaymentResult.decline:
-                scaffoldMessenger.showSnackBar(
+                messenger.showSnackBar(
                   SnackBar(
                     content: Text(result.message ?? 'Card was declined'),
                     backgroundColor: Colors.red,
@@ -122,7 +168,7 @@ class _PaymentScreenState extends State<PaymentScreen> {
                 // User cancelled -- stay on payment screen
                 break;
               case HppPaymentResult.failed:
-                scaffoldMessenger.showSnackBar(
+                messenger.showSnackBar(
                   SnackBar(
                     content: Text(result.message ?? 'Payment failed'),
                     backgroundColor: Colors.red,
@@ -249,19 +295,21 @@ class _PaymentScreenState extends State<PaymentScreen> {
                                         transaction: tx,
                                         card: CreditCardRef(id: _selectedCard!.id),
                                       );
-                                      Navigator.of(context).push(
-                                        MaterialPageRoute(
-                                          builder: (_) => ReviewOrderScreen(
-                                            selectedCard: _selectedCard!,
-                                            postRequest: postRequest,
-                                          ),
-                                        ),
-                                      );
+                                      context
+                                          .read<OrderBloc>()
+                                          .add(SubmitOrder(request: postRequest));
                                     },
                               style: ElevatedButton.styleFrom(
                                 padding: const EdgeInsets.symmetric(vertical: 16),
                               ),
-                              child: const Text('Pay with Selected Card'),
+                              child: isLoading
+                                  ? const SizedBox(
+                                      height: 20,
+                                      width: 20,
+                                      child: CircularProgressIndicator(
+                                          strokeWidth: 2),
+                                    )
+                                  : const Text('Pay with Selected Card'),
                             ),
                             const SizedBox(height: 8),
                           ],
