@@ -80,7 +80,10 @@ class OrderBloc extends Bloc<OrderEvent, OrderState> {
               transactionId: validation.transactionGuid)
           : event.transaction;
       final token = await _repo.getHppToken(txWithGuid);
-      emit(OrderState.hppTokenReady(token: token));
+      emit(OrderState.hppTokenReady(
+        token: token,
+        transactionGuid: txWithGuid.transactionId ?? '',
+      ));
     } catch (e) {
       emit(OrderState.error(message: e.toString()));
     }
