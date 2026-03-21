@@ -4,10 +4,10 @@ import 'package:jesses_pizza_app/domain/repositories/i_auth_repository.dart';
 import 'package:jesses_pizza_app/presentation/screens/auth/login_screen.dart';
 
 class NewPasswordScreen extends StatefulWidget {
-  final String email;
+  final String phoneNumber;
   final String token;
 
-  const NewPasswordScreen({super.key, required this.email, required this.token});
+  const NewPasswordScreen({super.key, required this.phoneNumber, required this.token});
 
   @override
   State<NewPasswordScreen> createState() => _NewPasswordScreenState();
@@ -37,7 +37,7 @@ class _NewPasswordScreenState extends State<NewPasswordScreen> {
     });
     try {
       final repo = getIt<IAuthRepository>();
-      await repo.newPassword(widget.email, _passwordController.text, widget.token);
+      await repo.newPassword(widget.phoneNumber, _passwordController.text, widget.token);
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(

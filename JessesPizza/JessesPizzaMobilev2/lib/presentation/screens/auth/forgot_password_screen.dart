@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:jesses_pizza_app/app/di.dart';
 import 'package:jesses_pizza_app/domain/repositories/i_auth_repository.dart';
 import 'package:jesses_pizza_app/presentation/screens/auth/sms_verification_screen.dart';
@@ -12,14 +13,21 @@ class ForgotPasswordScreen extends StatefulWidget {
 
 class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
   final _formKey = GlobalKey<FormState>();
-  final _emailController = TextEditingController();
+  final _phoneController = TextEditingController();
   bool _isLoading = false;
   String? _error;
 
   @override
   void dispose() {
-    _emailController.dispose();
+    _phoneController.dispose();
     super.dispose();
+  }
+
+  String _normalizePhone(String input) {
+    final digits = input.replaceAll(RegExp(r'\D'), '');
+    if (digits.length == 10) return '+1$digits';
+    if (digits.length == 11 && digits.startsWith('1')) return '+$digits';
+    return '+$digits';
   }
 
   Future<void> _sendResetCode() async {
@@ -30,12 +38,13 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
     });
     try {
       final repo = getIt<IAuthRepository>();
-      await repo.forgotPassword(_emailController.text.trim());
+      final phoneNumber = _normalizePhone(_phoneController.text.trim());
+      await repo.forgotPassword(phoneNumber);
       if (mounted) {
         Navigator.of(context).push(
           MaterialPageRoute(
             builder: (_) => SmsVerificationScreen(
-              email: _emailController.text.trim(),
+              phoneNumber: phoneNumber,
               verificationContext: 'password_reset',
             ),
           ),
@@ -63,7 +72,7 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
               const Icon(Icons.lock_outline, size: 64, color: Colors.orange),
               const SizedBox(height: 16),
               const Text(
-                'Enter your email address and we\'ll send you a verification code to reset your password.',
+                'Enter your phone number and we'\''ll send you a verification code to reset your password.',
                 textAlign: TextAlign.center,
                 style: TextStyle(fontSize: 16),
               ),
@@ -81,18 +90,23 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
                       style: const TextStyle(color: Colors.red)),
                 ),
               TextFormField(
-                controller: _emailController,
+                controller: _phoneController,
                 decoration: const InputDecoration(
-                  labelText: 'Email',
-                  prefixIcon: Icon(Icons.email),
+                  labelText: 'Phone Number',
+                  prefixIcon: Icon(Icons.phone),
                   border: OutlineInputBorder(),
+                  hintText: '(555) 123-4567',
                 ),
-                keyboardType: TextInputType.emailAddress,
+                keyboardType: TextInputType.phone,
+                inputFormatters: [
+                  FilteringTextInputFormatter.allow(RegExp(r'[\d\s\-\(\)\+]')),
+                ],
                 textInputAction: TextInputAction.done,
                 onFieldSubmitted: (_) => _sendResetCode(),
                 validator: (v) {
-                  if (v == null || v.isEmpty) return 'Email is required';
-                  if (!v.contains('@')) return 'Enter a valid email';
+                  if (v == null || v.isEmpty) return 'Phone number is required';
+                  final digits = v.replaceAll(RegExp(r'\D'), '');
+                  if (digits.length < 10) return 'Enter a valid phone number';
                   return null;
                 },
               ),

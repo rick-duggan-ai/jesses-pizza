@@ -12,9 +12,9 @@ abstract class IAuthRepository {
   });
   Future<ApiResponse> confirmAccount(String email, String code);
   Future<ApiResponse> resendSignupCode(String email);
-  Future<ApiResponse> forgotPassword(String email);
-  Future<ApiResponse> confirmPasswordChange(String email, String code);
-  Future<ApiResponse> resendChangePasswordCode(String email);
-  Future<ApiResponse> newPassword(String email, String password, String token);
+  Future<ApiResponse> forgotPassword(String phoneNumber);
+  Future<ApiResponse> confirmPasswordChange(String phoneNumber, String code);
+  Future<ApiResponse> resendChangePasswordCode(String phoneNumber);
+  Future<ApiResponse> newPassword(String phoneNumber, String password, String token);
   Future<ApiResponse> deleteAccount();
 }
