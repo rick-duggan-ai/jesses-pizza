@@ -81,7 +81,7 @@ void main() {
         const UpdateSettings(StoreSettings(taxRate: 9.5, deliveryCharge: 4.99)),
       ),
       expect: () => [
-        const CartState(taxRate: 9.5, deliveryCharge: 4.99),
+        const CartState(taxRate: 9.5, deliveryCharge: 4.99, settingsLoaded: true),
       ],
     );
 

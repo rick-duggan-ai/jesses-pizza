@@ -13,7 +13,44 @@ class MockOrderRepository extends Mock implements IOrderRepository {}
 void main() {
   late MockOrderRepository mockRepo;
 
-  final tTransaction = <String, dynamic>{'amount': 19.99, 'items': []};
+  // Realistic V1.1 nested payload matching PostTransactionRequestV1_1
+  final tTransaction = <String, dynamic>{
+    'transaction': {
+      'info': {
+        'firstName': 'Jane',
+        'lastName': 'Smith',
+        'phoneNumber': '5559876543',
+        'emailAddress': 'jane@example.com',
+        'addressLine1': '456 Oak Ave',
+        'city': 'Shelbyville',
+        'zipCode': '62702',
+      },
+      'transactionItems': [
+        {
+          'menuItemId': 'item-2',
+          'name': 'Margherita Pizza',
+          'sizeName': 'Medium',
+          'quantity': 1,
+          'price': 12.99,
+        },
+      ],
+      'totals': {
+        'subTotal': 12.99,
+        'taxTotal': 1.04,
+        'deliveryCharge': 0.0,
+        'tip': 3.00,
+        'total': 17.03,
+      },
+      'isDelivery': false,
+      'noContactDelivery': false,
+      'specialInstructions': '',
+    },
+    'card': {
+      'id': 'card-1',
+      'cardNumber': '****5678',
+      'expirationDate': '06/27',
+    },
+  };
   final tOrders = <Transaction>[
     Transaction(
       id: 'order-1',

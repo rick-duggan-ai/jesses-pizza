@@ -38,7 +38,7 @@ class OrderRepository implements IOrderRepository {
       data: transaction,
       apiVersion: '1.1',
     );
-    return response.data!['token'] as String;
+    return response.data!['hPPToken'] as String;
   }
 
   @override

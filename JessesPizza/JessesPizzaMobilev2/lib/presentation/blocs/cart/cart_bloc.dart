@@ -62,13 +62,20 @@ class CartBloc extends Bloc<CartEvent, CartState> {
   }
 
   void _onClearCart(ClearCart event, Emitter<CartState> emit) {
-    emit(const CartState());
+    emit(CartState(
+      taxRate: state.taxRate,
+      deliveryCharge: state.deliveryCharge,
+      minimumOrderAmount: state.minimumOrderAmount,
+      settingsLoaded: state.settingsLoaded,
+    ));
   }
 
   void _onUpdateSettings(UpdateSettings event, Emitter<CartState> emit) {
     emit(state.copyWith(
       taxRate: event.settings.taxRate,
       deliveryCharge: event.settings.deliveryCharge,
+      minimumOrderAmount: event.settings.minimumOrderAmount,
+      settingsLoaded: true,
     ));
   }
 
