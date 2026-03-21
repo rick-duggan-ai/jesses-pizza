@@ -6,6 +6,7 @@ import 'package:jesses_pizza_app/data/repositories/menu_repository.dart';
 import 'package:jesses_pizza_app/data/repositories/order_repository.dart';
 import 'package:jesses_pizza_app/data/repositories/account_repository.dart';
 import 'package:jesses_pizza_app/data/services/signalr_service.dart';
+import 'package:jesses_pizza_app/data/services/token_storage_service.dart';
 import 'package:jesses_pizza_app/domain/repositories/i_auth_repository.dart';
 import 'package:jesses_pizza_app/domain/repositories/i_menu_repository.dart';
 import 'package:jesses_pizza_app/domain/repositories/i_order_repository.dart';
@@ -24,6 +25,9 @@ void setupDependencies() {
   );
   getIt.registerLazySingleton<FlutterSecureStorage>(
     () => const FlutterSecureStorage(),
+  );
+  getIt.registerLazySingleton<TokenStorageService>(
+    () => TokenStorageService(storage: getIt<FlutterSecureStorage>()),
   );
   getIt.registerLazySingleton<SignalRService>(
     () => SignalRService(baseUrl: 'https://services.jessespizza.com:5000'),
@@ -44,6 +48,7 @@ void setupDependencies() {
     () => AuthBloc(
       repository: getIt<IAuthRepository>(),
       apiClient: getIt<ApiClient>(),
+      tokenStorage: getIt<TokenStorageService>(),
     ),
   );
   getIt.registerFactory<MenuBloc>(

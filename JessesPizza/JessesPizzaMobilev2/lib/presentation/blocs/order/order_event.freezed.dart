@@ -55,13 +55,14 @@ extension OrderEventPatterns on OrderEvent {
 /// }
 /// ```
 
-@optionalTypeArgs TResult maybeMap<TResult extends Object?>({TResult Function( SubmitOrder value)?  submitOrder,TResult Function( RequestHppToken value)?  requestHppToken,TResult Function( LoadOrderHistory value)?  loadOrderHistory,TResult Function( LoadOrderDetail value)?  loadOrderDetail,required TResult orElse(),}){
+@optionalTypeArgs TResult maybeMap<TResult extends Object?>({TResult Function( SubmitOrder value)?  submitOrder,TResult Function( RequestHppToken value)?  requestHppToken,TResult Function( LoadOrderHistory value)?  loadOrderHistory,TResult Function( LoadGuestOrderHistory value)?  loadGuestOrderHistory,TResult Function( LoadOrderDetail value)?  loadOrderDetail,required TResult orElse(),}){
 final _that = this;
 switch (_that) {
 case SubmitOrder() when submitOrder != null:
 return submitOrder(_that);case RequestHppToken() when requestHppToken != null:
 return requestHppToken(_that);case LoadOrderHistory() when loadOrderHistory != null:
-return loadOrderHistory(_that);case LoadOrderDetail() when loadOrderDetail != null:
+return loadOrderHistory(_that);case LoadGuestOrderHistory() when loadGuestOrderHistory != null:
+return loadGuestOrderHistory(_that);case LoadOrderDetail() when loadOrderDetail != null:
 return loadOrderDetail(_that);case _:
   return orElse();
 
@@ -80,13 +81,14 @@ return loadOrderDetail(_that);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult map<TResult extends Object?>({required TResult Function( SubmitOrder value)  submitOrder,required TResult Function( RequestHppToken value)  requestHppToken,required TResult Function( LoadOrderHistory value)  loadOrderHistory,required TResult Function( LoadOrderDetail value)  loadOrderDetail,}){
+@optionalTypeArgs TResult map<TResult extends Object?>({required TResult Function( SubmitOrder value)  submitOrder,required TResult Function( RequestHppToken value)  requestHppToken,required TResult Function( LoadOrderHistory value)  loadOrderHistory,required TResult Function( LoadGuestOrderHistory value)  loadGuestOrderHistory,required TResult Function( LoadOrderDetail value)  loadOrderDetail,}){
 final _that = this;
 switch (_that) {
 case SubmitOrder():
 return submitOrder(_that);case RequestHppToken():
 return requestHppToken(_that);case LoadOrderHistory():
-return loadOrderHistory(_that);case LoadOrderDetail():
+return loadOrderHistory(_that);case LoadGuestOrderHistory():
+return loadGuestOrderHistory(_that);case LoadOrderDetail():
 return loadOrderDetail(_that);case _:
   throw StateError('Unexpected subclass');
 
@@ -104,13 +106,14 @@ return loadOrderDetail(_that);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult? mapOrNull<TResult extends Object?>({TResult? Function( SubmitOrder value)?  submitOrder,TResult? Function( RequestHppToken value)?  requestHppToken,TResult? Function( LoadOrderHistory value)?  loadOrderHistory,TResult? Function( LoadOrderDetail value)?  loadOrderDetail,}){
+@optionalTypeArgs TResult? mapOrNull<TResult extends Object?>({TResult? Function( SubmitOrder value)?  submitOrder,TResult? Function( RequestHppToken value)?  requestHppToken,TResult? Function( LoadOrderHistory value)?  loadOrderHistory,TResult? Function( LoadGuestOrderHistory value)?  loadGuestOrderHistory,TResult? Function( LoadOrderDetail value)?  loadOrderDetail,}){
 final _that = this;
 switch (_that) {
 case SubmitOrder() when submitOrder != null:
 return submitOrder(_that);case RequestHppToken() when requestHppToken != null:
 return requestHppToken(_that);case LoadOrderHistory() when loadOrderHistory != null:
-return loadOrderHistory(_that);case LoadOrderDetail() when loadOrderDetail != null:
+return loadOrderHistory(_that);case LoadGuestOrderHistory() when loadGuestOrderHistory != null:
+return loadGuestOrderHistory(_that);case LoadOrderDetail() when loadOrderDetail != null:
 return loadOrderDetail(_that);case _:
   return null;
 
@@ -128,12 +131,13 @@ return loadOrderDetail(_that);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult maybeWhen<TResult extends Object?>({TResult Function( PostTransactionRequest request)?  submitOrder,TResult Function( TransactionRequest transaction)?  requestHppToken,TResult Function()?  loadOrderHistory,TResult Function( String guid)?  loadOrderDetail,required TResult orElse(),}) {final _that = this;
+@optionalTypeArgs TResult maybeWhen<TResult extends Object?>({TResult Function( PostTransactionRequest request)?  submitOrder,TResult Function( TransactionRequest transaction)?  requestHppToken,TResult Function()?  loadOrderHistory,TResult Function()?  loadGuestOrderHistory,TResult Function( String guid)?  loadOrderDetail,required TResult orElse(),}) {final _that = this;
 switch (_that) {
 case SubmitOrder() when submitOrder != null:
 return submitOrder(_that.request);case RequestHppToken() when requestHppToken != null:
 return requestHppToken(_that.transaction);case LoadOrderHistory() when loadOrderHistory != null:
-return loadOrderHistory();case LoadOrderDetail() when loadOrderDetail != null:
+return loadOrderHistory();case LoadGuestOrderHistory() when loadGuestOrderHistory != null:
+return loadGuestOrderHistory();case LoadOrderDetail() when loadOrderDetail != null:
 return loadOrderDetail(_that.guid);case _:
   return orElse();
 
@@ -152,12 +156,13 @@ return loadOrderDetail(_that.guid);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult when<TResult extends Object?>({required TResult Function( PostTransactionRequest request)  submitOrder,required TResult Function( TransactionRequest transaction)  requestHppToken,required TResult Function()  loadOrderHistory,required TResult Function( String guid)  loadOrderDetail,}) {final _that = this;
+@optionalTypeArgs TResult when<TResult extends Object?>({required TResult Function( PostTransactionRequest request)  submitOrder,required TResult Function( TransactionRequest transaction)  requestHppToken,required TResult Function()  loadOrderHistory,required TResult Function()  loadGuestOrderHistory,required TResult Function( String guid)  loadOrderDetail,}) {final _that = this;
 switch (_that) {
 case SubmitOrder():
 return submitOrder(_that.request);case RequestHppToken():
 return requestHppToken(_that.transaction);case LoadOrderHistory():
-return loadOrderHistory();case LoadOrderDetail():
+return loadOrderHistory();case LoadGuestOrderHistory():
+return loadGuestOrderHistory();case LoadOrderDetail():
 return loadOrderDetail(_that.guid);case _:
   throw StateError('Unexpected subclass');
 
@@ -175,12 +180,13 @@ return loadOrderDetail(_that.guid);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>({TResult? Function( PostTransactionRequest request)?  submitOrder,TResult? Function( TransactionRequest transaction)?  requestHppToken,TResult? Function()?  loadOrderHistory,TResult? Function( String guid)?  loadOrderDetail,}) {final _that = this;
+@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>({TResult? Function( PostTransactionRequest request)?  submitOrder,TResult? Function( TransactionRequest transaction)?  requestHppToken,TResult? Function()?  loadOrderHistory,TResult? Function()?  loadGuestOrderHistory,TResult? Function( String guid)?  loadOrderDetail,}) {final _that = this;
 switch (_that) {
 case SubmitOrder() when submitOrder != null:
 return submitOrder(_that.request);case RequestHppToken() when requestHppToken != null:
 return requestHppToken(_that.transaction);case LoadOrderHistory() when loadOrderHistory != null:
-return loadOrderHistory();case LoadOrderDetail() when loadOrderDetail != null:
+return loadOrderHistory();case LoadGuestOrderHistory() when loadGuestOrderHistory != null:
+return loadGuestOrderHistory();case LoadOrderDetail() when loadOrderDetail != null:
 return loadOrderDetail(_that.guid);case _:
   return null;
 
@@ -345,6 +351,38 @@ int get hashCode => runtimeType.hashCode;
 @override
 String toString() {
   return 'OrderEvent.loadOrderHistory()';
+}
+
+
+}
+
+
+
+
+/// @nodoc
+
+
+class LoadGuestOrderHistory implements OrderEvent {
+  const LoadGuestOrderHistory();
+  
+
+
+
+
+
+
+@override
+bool operator ==(Object other) {
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is LoadGuestOrderHistory);
+}
+
+
+@override
+int get hashCode => runtimeType.hashCode;
+
+@override
+String toString() {
+  return 'OrderEvent.loadGuestOrderHistory()';
 }
 
 

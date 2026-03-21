@@ -3,6 +3,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:jesses_pizza_app/app/di.dart';
 import 'package:jesses_pizza_app/app/theme.dart';
 import 'package:jesses_pizza_app/presentation/blocs/auth/auth_bloc.dart';
+import 'package:jesses_pizza_app/presentation/blocs/auth/auth_event.dart';
 import 'package:jesses_pizza_app/presentation/blocs/auth/auth_state.dart';
 import 'package:jesses_pizza_app/presentation/blocs/menu/menu_bloc.dart';
 import 'package:jesses_pizza_app/presentation/blocs/menu/menu_state.dart';
@@ -22,7 +23,7 @@ class JessesPizzaApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MultiBlocProvider(
       providers: [
-        BlocProvider(create: (_) => getIt<AuthBloc>()),
+        BlocProvider(create: (_) => getIt<AuthBloc>()..add(const AuthEvent.checkStoredAuth())),
         BlocProvider(create: (_) => getIt<MenuBloc>()),
         BlocProvider(create: (_) => getIt<CartBloc>()),
         BlocProvider(create: (_) => getIt<OrderBloc>()),

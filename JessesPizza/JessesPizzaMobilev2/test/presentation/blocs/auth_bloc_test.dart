@@ -2,6 +2,7 @@ import 'package:bloc_test/bloc_test.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mocktail/mocktail.dart';
 import 'package:jesses_pizza_app/data/api/api_client.dart';
+import 'package:jesses_pizza_app/data/services/token_storage_service.dart';
 import 'package:jesses_pizza_app/domain/models/user.dart';
 import 'package:jesses_pizza_app/domain/repositories/i_auth_repository.dart';
 import 'package:jesses_pizza_app/presentation/blocs/auth/auth_bloc.dart';
@@ -10,10 +11,12 @@ import 'package:jesses_pizza_app/presentation/blocs/auth/auth_state.dart';
 
 class MockAuthRepository extends Mock implements IAuthRepository {}
 class MockApiClient extends Mock implements ApiClient {}
+class MockTokenStorageService extends Mock implements TokenStorageService {}
 
 void main() {
   late MockAuthRepository mockRepo;
   late MockApiClient mockApiClient;
+  late MockTokenStorageService mockTokenStorage;
 
   final tUser = User(
     token: 'test-token',
@@ -25,13 +28,25 @@ void main() {
   setUp(() {
     mockRepo = MockAuthRepository();
     mockApiClient = MockApiClient();
+    mockTokenStorage = MockTokenStorageService();
     when(() => mockApiClient.setToken(any())).thenReturn(null);
     when(() => mockApiClient.clearToken()).thenReturn(null);
+    when(() => mockTokenStorage.saveUser(any())).thenAnswer((_) async {});
+    when(() => mockTokenStorage.clearAll()).thenAnswer((_) async {});
+    when(() => mockTokenStorage.restoreUser()).thenAnswer((_) async => null);
+  });
+
+  setUpAll(() {
+    registerFallbackValue(User(
+      token: 'fallback',
+      tokenExpires: DateTime(2030),
+      isGuest: false,
+    ));
   });
 
   group('AuthBloc', () {
     test('initial state is AuthInitial', () {
-      final bloc = AuthBloc(repository: mockRepo, apiClient: mockApiClient);
+      final bloc = AuthBloc(repository: mockRepo, apiClient: mockApiClient, tokenStorage: mockTokenStorage);
       expect(bloc.state, const AuthState.initial());
       bloc.close();
     });
@@ -41,7 +56,7 @@ void main() {
       build: () {
         when(() => mockRepo.login(any(), any(), any()))
             .thenAnswer((_) async => tUser);
-        return AuthBloc(repository: mockRepo, apiClient: mockApiClient);
+        return AuthBloc(repository: mockRepo, apiClient: mockApiClient, tokenStorage: mockTokenStorage);
       },
       act: (bloc) => bloc.add(const AuthEvent.loginRequested(
         email: 'test@example.com',
@@ -59,7 +74,7 @@ void main() {
       build: () {
         when(() => mockRepo.login(any(), any(), any()))
             .thenThrow(Exception('Invalid credentials'));
-        return AuthBloc(repository: mockRepo, apiClient: mockApiClient);
+        return AuthBloc(repository: mockRepo, apiClient: mockApiClient, tokenStorage: mockTokenStorage);
       },
       act: (bloc) => bloc.add(const AuthEvent.loginRequested(
         email: 'bad@example.com',
@@ -74,14 +89,14 @@ void main() {
 
     blocTest<AuthBloc, AuthState>(
       'emits [unauthenticated] on logout',
-      build: () => AuthBloc(repository: mockRepo, apiClient: mockApiClient),
+      build: () => AuthBloc(repository: mockRepo, apiClient: mockApiClient, tokenStorage: mockTokenStorage),
       act: (bloc) => bloc.add(const AuthEvent.logoutRequested()),
       expect: () => [const AuthState.unauthenticated()],
     );
 
     blocTest<AuthBloc, AuthState>(
       'emits [unauthenticated] on token expired',
-      build: () => AuthBloc(repository: mockRepo, apiClient: mockApiClient),
+      build: () => AuthBloc(repository: mockRepo, apiClient: mockApiClient, tokenStorage: mockTokenStorage),
       act: (bloc) => bloc.add(const AuthEvent.tokenExpired()),
       expect: () => [const AuthState.unauthenticated()],
     );

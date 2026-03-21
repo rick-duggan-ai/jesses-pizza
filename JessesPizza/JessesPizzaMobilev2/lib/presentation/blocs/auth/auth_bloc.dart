@@ -1,5 +1,6 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:jesses_pizza_app/data/api/api_client.dart';
+import 'package:jesses_pizza_app/data/services/token_storage_service.dart';
 import 'package:jesses_pizza_app/domain/repositories/i_auth_repository.dart';
 import 'auth_event.dart';
 import 'auth_state.dart';
@@ -7,10 +8,15 @@ import 'auth_state.dart';
 class AuthBloc extends Bloc<AuthEvent, AuthState> {
   final IAuthRepository _repo;
   final ApiClient _apiClient;
+  final TokenStorageService _tokenStorage;
 
-  AuthBloc({required IAuthRepository repository, required ApiClient apiClient})
-      : _repo = repository,
+  AuthBloc({
+    required IAuthRepository repository,
+    required ApiClient apiClient,
+    required TokenStorageService tokenStorage,
+  })  : _repo = repository,
         _apiClient = apiClient,
+        _tokenStorage = tokenStorage,
         super(const AuthState.initial()) {
     on<LoginRequested>(_onLoginRequested);
     on<GuestLoginRequested>(_onGuestLoginRequested);
@@ -19,6 +25,7 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
     on<LogoutRequested>(_onLogoutRequested);
     on<TokenExpired>(_onTokenExpired);
     on<DeleteAccountRequested>(_onDeleteAccountRequested);
+    on<CheckStoredAuth>(_onCheckStoredAuth);
   }
 
   Future<void> _onLoginRequested(
@@ -27,6 +34,7 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
     try {
       final user = await _repo.login(event.email, event.password, event.deviceId);
       _apiClient.setToken(user.token);
+      await _tokenStorage.saveUser(user);
       emit(AuthState.authenticated(user: user));
     } catch (e) {
       emit(AuthState.error(message: e.toString()));
@@ -39,6 +47,7 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
     try {
       final user = await _repo.guestLogin(event.deviceId);
       _apiClient.setToken(user.token);
+      await _tokenStorage.saveUser(user);
       emit(AuthState.authenticated(user: user));
     } catch (e) {
       emit(AuthState.error(message: e.toString()));
@@ -74,13 +83,15 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
     }
   }
 
-  void _onLogoutRequested(LogoutRequested event, Emitter<AuthState> emit) {
+  Future<void> _onLogoutRequested(LogoutRequested event, Emitter<AuthState> emit) async {
     _apiClient.clearToken();
+    await _tokenStorage.clearAll();
     emit(const AuthState.unauthenticated());
   }
 
-  void _onTokenExpired(TokenExpired event, Emitter<AuthState> emit) {
+  Future<void> _onTokenExpired(TokenExpired event, Emitter<AuthState> emit) async {
     _apiClient.clearToken();
+    await _tokenStorage.clearAll();
     emit(const AuthState.unauthenticated());
   }
 
@@ -89,9 +100,26 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
     emit(const AuthState.loading());
     try {
       await _repo.deleteAccount();
+      await _tokenStorage.clearAll();
       emit(const AuthState.unauthenticated());
     } catch (e) {
       emit(AuthState.error(message: e.toString()));
+    }
+  }
+
+  Future<void> _onCheckStoredAuth(
+      CheckStoredAuth event, Emitter<AuthState> emit) async {
+    emit(const AuthState.loading());
+    try {
+      final user = await _tokenStorage.restoreUser();
+      if (user != null) {
+        _apiClient.setToken(user.token);
+        emit(AuthState.authenticated(user: user));
+      } else {
+        emit(const AuthState.unauthenticated());
+      }
+    } catch (_) {
+      emit(const AuthState.unauthenticated());
     }
   }
 }

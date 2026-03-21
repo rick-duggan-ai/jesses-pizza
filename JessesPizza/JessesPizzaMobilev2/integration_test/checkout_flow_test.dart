@@ -10,6 +10,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:mocktail/mocktail.dart';
 
 import 'package:jesses_pizza_app/data/api/api_client.dart';
+import 'package:jesses_pizza_app/data/services/token_storage_service.dart';
 import 'package:jesses_pizza_app/domain/models/user.dart';
 import 'package:jesses_pizza_app/domain/models/menu_category.dart';
 import 'package:jesses_pizza_app/domain/models/menu_group.dart';
@@ -42,6 +43,7 @@ class MockMenuRepository extends Mock implements IMenuRepository {}
 class MockOrderRepository extends Mock implements IOrderRepository {}
 class MockAccountRepository extends Mock implements IAccountRepository {}
 class MockApiClient extends Mock implements ApiClient {}
+class MockTokenStorageService extends Mock implements TokenStorageService {}
 
 // ---------------------------------------------------------------------------
 // Test data
@@ -114,6 +116,7 @@ void main() {
   late MockOrderRepository mockOrderRepo;
   late MockAccountRepository mockAccountRepo;
   late MockApiClient mockApiClient;
+  late MockTokenStorageService mockTokenStorage;
 
   late AuthBloc authBloc;
   late MenuBloc menuBloc;
@@ -122,6 +125,11 @@ void main() {
   late AccountBloc accountBloc;
 
   setUpAll(() {
+    registerFallbackValue(User(
+      token: 'fallback',
+      tokenExpires: DateTime(2030),
+      isGuest: false,
+    ));
     registerFallbackValue(
       const Address(addressLine1: '1 Main St', city: 'Anytown', zipCode: '00000'),
     );
@@ -137,9 +145,13 @@ void main() {
     mockOrderRepo = MockOrderRepository();
     mockAccountRepo = MockAccountRepository();
     mockApiClient = MockApiClient();
+    mockTokenStorage = MockTokenStorageService();
 
     when(() => mockApiClient.setToken(any())).thenReturn(null);
     when(() => mockApiClient.clearToken()).thenReturn(null);
+    when(() => mockTokenStorage.saveUser(any())).thenAnswer((_) async {});
+    when(() => mockTokenStorage.clearAll()).thenAnswer((_) async {});
+    when(() => mockTokenStorage.restoreUser()).thenAnswer((_) async => null);
 
     // Menu repo stubs
     when(() => mockMenuRepo.getGroups()).thenAnswer((_) async => _tGroups);
@@ -159,6 +171,7 @@ void main() {
     authBloc = AuthBloc(
       repository: mockAuthRepo,
       apiClient: mockApiClient,
+      tokenStorage: mockTokenStorage,
     );
     menuBloc = MenuBloc(repository: mockMenuRepo);
     cartBloc = CartBloc();

@@ -1,6 +1,7 @@
 import 'package:bloc_test/bloc_test.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mocktail/mocktail.dart';
+import 'package:jesses_pizza_app/data/services/guest_transaction_storage.dart';
 import 'package:jesses_pizza_app/domain/models/api_response.dart';
 import 'package:jesses_pizza_app/domain/models/transaction.dart' hide TransactionItem;
 import 'package:jesses_pizza_app/domain/models/transaction_request.dart';
@@ -10,6 +11,9 @@ import 'package:jesses_pizza_app/presentation/blocs/order/order_event.dart';
 import 'package:jesses_pizza_app/presentation/blocs/order/order_state.dart';
 
 class MockOrderRepository extends Mock implements IOrderRepository {}
+
+class MockGuestTransactionStorage extends Mock
+    implements GuestTransactionStorage {}
 
 class FakeTransactionRequest extends Fake implements TransactionRequest {}
 
@@ -123,6 +127,102 @@ void main() {
       expect: () => [
         const OrderState.loading(),
         isA<OrderError>(),
+      ],
+    );
+  });
+
+  group('OrderBloc - guest order history', () {
+    late MockGuestTransactionStorage mockStorage;
+
+    setUp(() {
+      mockRepo = MockOrderRepository();
+      mockStorage = MockGuestTransactionStorage();
+    });
+
+    blocTest<OrderBloc, OrderState>(
+      'emits [loading, historyLoaded] with orders fetched by GUID',
+      build: () {
+        when(() => mockStorage.getGuids())
+            .thenReturn(['guid-1', 'guid-2']);
+        when(() => mockRepo.getTransactionByGuid('guid-1'))
+            .thenAnswer((_) async => tOrders.first);
+        when(() => mockRepo.getTransactionByGuid('guid-2'))
+            .thenAnswer((_) async => Transaction(
+                  id: 'order-2',
+                  date: DateTime(2026, 2, 1),
+                  total: 25.00,
+                  isDelivery: true,
+                ));
+        return OrderBloc(
+          repository: mockRepo,
+          guestTransactionStorage: mockStorage,
+        );
+      },
+      act: (bloc) =>
+          bloc.add(const OrderEvent.loadGuestOrderHistory()),
+      expect: () => [
+        const OrderState.loading(),
+        isA<HistoryLoaded>().having(
+          (s) => s.orders.length,
+          'orders.length',
+          2,
+        ),
+      ],
+    );
+
+    blocTest<OrderBloc, OrderState>(
+      'emits [loading, historyLoaded([])] when no GUIDs stored',
+      build: () {
+        when(() => mockStorage.getGuids()).thenReturn([]);
+        return OrderBloc(
+          repository: mockRepo,
+          guestTransactionStorage: mockStorage,
+        );
+      },
+      act: (bloc) =>
+          bloc.add(const OrderEvent.loadGuestOrderHistory()),
+      expect: () => [
+        const OrderState.loading(),
+        const OrderState.historyLoaded(orders: []),
+      ],
+    );
+
+    blocTest<OrderBloc, OrderState>(
+      'skips GUIDs that fail to fetch',
+      build: () {
+        when(() => mockStorage.getGuids())
+            .thenReturn(['guid-ok', 'guid-bad']);
+        when(() => mockRepo.getTransactionByGuid('guid-ok'))
+            .thenAnswer((_) async => tOrders.first);
+        when(() => mockRepo.getTransactionByGuid('guid-bad'))
+            .thenThrow(Exception('Not found'));
+        return OrderBloc(
+          repository: mockRepo,
+          guestTransactionStorage: mockStorage,
+        );
+      },
+      act: (bloc) =>
+          bloc.add(const OrderEvent.loadGuestOrderHistory()),
+      expect: () => [
+        const OrderState.loading(),
+        isA<HistoryLoaded>().having(
+          (s) => s.orders.length,
+          'orders.length',
+          1,
+        ),
+      ],
+    );
+
+    blocTest<OrderBloc, OrderState>(
+      'emits [loading, historyLoaded([])] when no storage provided',
+      build: () {
+        return OrderBloc(repository: mockRepo);
+      },
+      act: (bloc) =>
+          bloc.add(const OrderEvent.loadGuestOrderHistory()),
+      expect: () => [
+        const OrderState.loading(),
+        const OrderState.historyLoaded(orders: []),
       ],
     );
   });

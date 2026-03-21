@@ -29,6 +29,13 @@ class CartState extends Equatable {
   /// Alias used by tip tests.
   double get tipAmount => tip;
 
+  /// Whether delivery is disabled because the delivery charge is >= $99.
+  bool get isDeliveryDisabled => deliveryCharge >= 99.0;
+
+  /// Whether the cart subtotal meets the minimum order amount for delivery.
+  bool get meetsDeliveryMinimum =>
+      minimumOrderAmount <= 0 || subtotal >= minimumOrderAmount;
+
   double get subtotal => items.fold(0.0, (sum, item) => sum + item.lineTotal);
 
   double get taxAmount => subtotal * (taxRate / 100.0);

@@ -1,25 +1,48 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:bloc_test/bloc_test.dart';
+import 'package:mocktail/mocktail.dart';
+import 'package:jesses_pizza_app/domain/models/user.dart';
+import 'package:jesses_pizza_app/presentation/blocs/auth/auth_bloc.dart';
+import 'package:jesses_pizza_app/presentation/blocs/auth/auth_event.dart';
+import 'package:jesses_pizza_app/presentation/blocs/auth/auth_state.dart';
 import 'package:jesses_pizza_app/presentation/blocs/cart/cart_bloc.dart';
 import 'package:jesses_pizza_app/presentation/screens/cart/guest_info_screen.dart';
 
+class MockAuthBloc extends MockBloc<AuthEvent, AuthState>
+    implements AuthBloc {}
+
 void main() {
   late CartBloc cartBloc;
+  late MockAuthBloc authBloc;
 
   setUp(() {
     cartBloc = CartBloc();
+    authBloc = MockAuthBloc();
+    when(() => authBloc.state).thenReturn(AuthAuthenticated(
+      user: User(
+        token: 'tok',
+        tokenExpires: DateTime(2099),
+        isGuest: true,
+        email: 'guest@example.com',
+      ),
+    ));
   });
 
   tearDown(() {
     cartBloc.close();
+    authBloc.close();
   });
 
   Widget buildSubject() {
-    return MaterialApp(
-      home: BlocProvider<CartBloc>.value(
-        value: cartBloc,
-        child: const GuestInfoScreen(),
+    return MultiBlocProvider(
+      providers: [
+        BlocProvider<CartBloc>.value(value: cartBloc),
+        BlocProvider<AuthBloc>.value(value: authBloc),
+      ],
+      child: const MaterialApp(
+        home: GuestInfoScreen(),
       ),
     );
   }

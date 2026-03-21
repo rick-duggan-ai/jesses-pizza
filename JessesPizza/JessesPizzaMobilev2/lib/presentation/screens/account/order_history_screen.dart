@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:jesses_pizza_app/presentation/blocs/auth/auth_bloc.dart';
+import 'package:jesses_pizza_app/presentation/blocs/auth/auth_state.dart';
 import 'package:jesses_pizza_app/presentation/blocs/order/order_bloc.dart';
 import 'package:jesses_pizza_app/presentation/blocs/order/order_event.dart';
 import 'package:jesses_pizza_app/presentation/blocs/order/order_state.dart';
@@ -17,7 +19,16 @@ class _OrderHistoryScreenState extends State<OrderHistoryScreen> {
   @override
   void initState() {
     super.initState();
-    context.read<OrderBloc>().add(const OrderEvent.loadOrderHistory());
+    final authState = context.read<AuthBloc>().state;
+    final isGuest =
+        authState is AuthAuthenticated && authState.user.isGuest;
+    if (isGuest) {
+      context
+          .read<OrderBloc>()
+          .add(const OrderEvent.loadGuestOrderHistory());
+    } else {
+      context.read<OrderBloc>().add(const OrderEvent.loadOrderHistory());
+    }
   }
 
   @override
@@ -51,7 +62,7 @@ class _OrderHistoryScreenState extends State<OrderHistoryScreen> {
               },
             );
           } else if (state is OrderError) {
-            return Center(child: Text('Error: ${state.message}'));
+            return Center(child: Text('Error: \${state.message}'));
           }
           return const SizedBox.shrink();
         },

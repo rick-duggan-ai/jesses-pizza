@@ -15,5 +15,7 @@ abstract class OrderEvent with _$OrderEvent {
 
   const factory OrderEvent.loadOrderHistory() = LoadOrderHistory;
 
+  const factory OrderEvent.loadGuestOrderHistory() = LoadGuestOrderHistory;
+
   const factory OrderEvent.loadOrderDetail({required String guid}) = LoadOrderDetail;
 }

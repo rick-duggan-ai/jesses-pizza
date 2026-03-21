@@ -1,9 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:jesses_pizza_app/domain/models/store_settings.dart';
 import 'package:jesses_pizza_app/presentation/blocs/auth/auth_bloc.dart';
 import 'package:jesses_pizza_app/presentation/blocs/auth/auth_state.dart';
 import 'package:jesses_pizza_app/presentation/blocs/cart/cart_bloc.dart';
 import 'package:jesses_pizza_app/presentation/blocs/cart/cart_state.dart';
+import 'package:jesses_pizza_app/presentation/blocs/menu/menu_bloc.dart';
+import 'package:jesses_pizza_app/presentation/blocs/menu/menu_state.dart';
 import 'package:jesses_pizza_app/presentation/screens/auth/login_screen.dart';
 import 'package:jesses_pizza_app/presentation/screens/cart/delivery_mode_screen.dart';
 import 'package:jesses_pizza_app/presentation/screens/cart/guest_info_screen.dart';
@@ -12,7 +15,63 @@ import 'package:jesses_pizza_app/presentation/widgets/cart_item_tile.dart';
 class CartScreen extends StatelessWidget {
   const CartScreen({super.key});
 
+  /// Format 24h time string (e.g. "11:00") to 12h format (e.g. "11:00 AM").
+  static String _formatTime(String time24) {
+    final parts = time24.split(':');
+    if (parts.length < 2) return time24;
+    var hour = int.tryParse(parts[0]) ?? 0;
+    final minute = parts[1];
+    final period = hour >= 12 ? 'PM' : 'AM';
+    if (hour == 0) {
+      hour = 12;
+    } else if (hour > 12) {
+      hour -= 12;
+    }
+    return '$hour:$minute $period';
+  }
+
+  void _showStoreClosedDialog(BuildContext context, StoreSettings settings) {
+    // Find today's hours
+    final now = DateTime.now();
+    final apiDay = now.weekday == 7 ? 0 : now.weekday;
+    final todayHours = settings.storeHours
+        .where((h) => h.day == apiDay)
+        .toList();
+
+    String message;
+    if (todayHours.isNotEmpty &&
+        todayHours.first.openingTime != null &&
+        todayHours.first.closingTime != null) {
+      final open = _formatTime(todayHours.first.openingTime!);
+      final close = _formatTime(todayHours.first.closingTime!);
+      message = 'Sorry, we are currently closed. Today\'s hours are $open - $close.';
+    } else {
+      message = 'Sorry, we are currently closed for today.';
+    }
+
+    showDialog(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        title: const Text('Store Closed'),
+        content: Text(message),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(ctx).pop(),
+            child: const Text('OK'),
+          ),
+        ],
+      ),
+    );
+  }
+
   void _proceedToCheckout(BuildContext context) {
+    // Check store hours first
+    final menuState = context.read<MenuBloc>().state;
+    if (menuState is MenuLoaded && !menuState.isStoreOpen) {
+      _showStoreClosedDialog(context, menuState.settings);
+      return;
+    }
+
     final authState = context.read<AuthBloc>().state;
     if (authState is AuthAuthenticated) {
       if (authState.user.isGuest) {
