@@ -12,8 +12,10 @@ import 'package:jesses_pizza_app/presentation/blocs/cart/cart_state.dart';
 import 'package:jesses_pizza_app/presentation/blocs/order/order_bloc.dart';
 import 'package:jesses_pizza_app/presentation/blocs/order/order_event.dart';
 import 'package:jesses_pizza_app/presentation/blocs/order/order_state.dart';
+import 'package:jesses_pizza_app/data/services/signalr_service.dart';
 import 'package:jesses_pizza_app/presentation/screens/cart/hpp_webview_screen.dart';
 import 'package:jesses_pizza_app/presentation/screens/cart/order_confirmation_screen.dart';
+import 'package:jesses_pizza_app/presentation/screens/cart/review_order_screen.dart';
 import 'package:jesses_pizza_app/presentation/widgets/credit_card_tile.dart';
 
 class PaymentScreen extends StatefulWidget {
@@ -92,15 +94,40 @@ class _PaymentScreenState extends State<PaymentScreen> {
           );
         } else if (state is HppTokenReady) {
           final nav = Navigator.of(context);
-          nav.push<bool>(
+          final scaffoldMessenger = ScaffoldMessenger.of(context);
+          nav.push<HppResult>(
             MaterialPageRoute(
-              builder: (_) => HppWebviewScreen(tokenUrl: state.token),
+              builder: (_) => HppWebviewScreen(
+                tokenUrl: state.token,
+                transactionGuid: state.transactionGuid,
+              ),
             ),
           ).then((result) {
-            if (result == true) {
-              nav.push(
-                MaterialPageRoute(builder: (_) => const OrderConfirmationScreen()),
-              );
+            if (result == null) return;
+            switch (result.paymentResult) {
+              case HppPaymentResult.approve:
+                nav.pushAndRemoveUntil(
+                  MaterialPageRoute(
+                      builder: (_) => const OrderConfirmationScreen()),
+                  (route) => route.isFirst,
+                );
+              case HppPaymentResult.decline:
+                scaffoldMessenger.showSnackBar(
+                  SnackBar(
+                    content: Text(result.message ?? 'Card was declined'),
+                    backgroundColor: Colors.red,
+                  ),
+                );
+              case HppPaymentResult.cancel:
+                // User cancelled -- stay on payment screen
+                break;
+              case HppPaymentResult.failed:
+                scaffoldMessenger.showSnackBar(
+                  SnackBar(
+                    content: Text(result.message ?? 'Payment failed'),
+                    backgroundColor: Colors.red,
+                  ),
+                );
             }
           });
         } else if (state is OrderError) {
@@ -222,21 +249,19 @@ class _PaymentScreenState extends State<PaymentScreen> {
                                         transaction: tx,
                                         card: CreditCardRef(id: _selectedCard!.id),
                                       );
-                                      context
-                                          .read<OrderBloc>()
-                                          .add(SubmitOrder(request: postRequest));
+                                      Navigator.of(context).push(
+                                        MaterialPageRoute(
+                                          builder: (_) => ReviewOrderScreen(
+                                            selectedCard: _selectedCard!,
+                                            postRequest: postRequest,
+                                          ),
+                                        ),
+                                      );
                                     },
                               style: ElevatedButton.styleFrom(
                                 padding: const EdgeInsets.symmetric(vertical: 16),
                               ),
-                              child: isLoading
-                                  ? const SizedBox(
-                                      height: 20,
-                                      width: 20,
-                                      child: CircularProgressIndicator(
-                                          strokeWidth: 2),
-                                    )
-                                  : const Text('Pay with Selected Card'),
+                              child: const Text('Pay with Selected Card'),
                             ),
                             const SizedBox(height: 8),
                           ],

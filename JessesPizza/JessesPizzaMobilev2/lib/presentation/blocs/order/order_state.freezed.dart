@@ -137,13 +137,13 @@ return error(_that);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult maybeWhen<TResult extends Object?>({TResult Function()?  initial,TResult Function()?  loading,TResult Function()?  orderSubmitted,TResult Function( String token)?  hppTokenReady,TResult Function( List<Transaction> orders)?  historyLoaded,TResult Function( Transaction order)?  orderDetailLoaded,TResult Function( String message)?  error,required TResult orElse(),}) {final _that = this;
+@optionalTypeArgs TResult maybeWhen<TResult extends Object?>({TResult Function()?  initial,TResult Function()?  loading,TResult Function()?  orderSubmitted,TResult Function( String token,  String transactionGuid)?  hppTokenReady,TResult Function( List<Transaction> orders)?  historyLoaded,TResult Function( Transaction order)?  orderDetailLoaded,TResult Function( String message)?  error,required TResult orElse(),}) {final _that = this;
 switch (_that) {
 case OrderInitial() when initial != null:
 return initial();case OrderLoading() when loading != null:
 return loading();case OrderSubmitted() when orderSubmitted != null:
 return orderSubmitted();case HppTokenReady() when hppTokenReady != null:
-return hppTokenReady(_that.token);case HistoryLoaded() when historyLoaded != null:
+return hppTokenReady(_that.token,_that.transactionGuid);case HistoryLoaded() when historyLoaded != null:
 return historyLoaded(_that.orders);case OrderDetailLoaded() when orderDetailLoaded != null:
 return orderDetailLoaded(_that.order);case OrderError() when error != null:
 return error(_that.message);case _:
@@ -164,13 +164,13 @@ return error(_that.message);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult when<TResult extends Object?>({required TResult Function()  initial,required TResult Function()  loading,required TResult Function()  orderSubmitted,required TResult Function( String token)  hppTokenReady,required TResult Function( List<Transaction> orders)  historyLoaded,required TResult Function( Transaction order)  orderDetailLoaded,required TResult Function( String message)  error,}) {final _that = this;
+@optionalTypeArgs TResult when<TResult extends Object?>({required TResult Function()  initial,required TResult Function()  loading,required TResult Function()  orderSubmitted,required TResult Function( String token,  String transactionGuid)  hppTokenReady,required TResult Function( List<Transaction> orders)  historyLoaded,required TResult Function( Transaction order)  orderDetailLoaded,required TResult Function( String message)  error,}) {final _that = this;
 switch (_that) {
 case OrderInitial():
 return initial();case OrderLoading():
 return loading();case OrderSubmitted():
 return orderSubmitted();case HppTokenReady():
-return hppTokenReady(_that.token);case HistoryLoaded():
+return hppTokenReady(_that.token,_that.transactionGuid);case HistoryLoaded():
 return historyLoaded(_that.orders);case OrderDetailLoaded():
 return orderDetailLoaded(_that.order);case OrderError():
 return error(_that.message);case _:
@@ -190,13 +190,13 @@ return error(_that.message);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>({TResult? Function()?  initial,TResult? Function()?  loading,TResult? Function()?  orderSubmitted,TResult? Function( String token)?  hppTokenReady,TResult? Function( List<Transaction> orders)?  historyLoaded,TResult? Function( Transaction order)?  orderDetailLoaded,TResult? Function( String message)?  error,}) {final _that = this;
+@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>({TResult? Function()?  initial,TResult? Function()?  loading,TResult? Function()?  orderSubmitted,TResult? Function( String token,  String transactionGuid)?  hppTokenReady,TResult? Function( List<Transaction> orders)?  historyLoaded,TResult? Function( Transaction order)?  orderDetailLoaded,TResult? Function( String message)?  error,}) {final _that = this;
 switch (_that) {
 case OrderInitial() when initial != null:
 return initial();case OrderLoading() when loading != null:
 return loading();case OrderSubmitted() when orderSubmitted != null:
 return orderSubmitted();case HppTokenReady() when hppTokenReady != null:
-return hppTokenReady(_that.token);case HistoryLoaded() when historyLoaded != null:
+return hppTokenReady(_that.token,_that.transactionGuid);case HistoryLoaded() when historyLoaded != null:
 return historyLoaded(_that.orders);case OrderDetailLoaded() when orderDetailLoaded != null:
 return orderDetailLoaded(_that.order);case OrderError() when error != null:
 return error(_that.message);case _:
@@ -307,10 +307,11 @@ String toString() {
 
 
 class HppTokenReady implements OrderState {
-  const HppTokenReady({required this.token});
+  const HppTokenReady({required this.token, required this.transactionGuid});
   
 
  final  String token;
+ final  String transactionGuid;
 
 /// Create a copy of OrderState
 /// with the given fields replaced by the non-null parameter values.
@@ -322,16 +323,16 @@ $HppTokenReadyCopyWith<HppTokenReady> get copyWith => _$HppTokenReadyCopyWithImp
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is HppTokenReady&&(identical(other.token, token) || other.token == token));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is HppTokenReady&&(identical(other.token, token) || other.token == token)&&(identical(other.transactionGuid, transactionGuid) || other.transactionGuid == transactionGuid));
 }
 
 
 @override
-int get hashCode => Object.hash(runtimeType,token);
+int get hashCode => Object.hash(runtimeType,token,transactionGuid);
 
 @override
 String toString() {
-  return 'OrderState.hppTokenReady(token: $token)';
+  return 'OrderState.hppTokenReady(token: $token, transactionGuid: $transactionGuid)';
 }
 
 
@@ -342,7 +343,7 @@ abstract mixin class $HppTokenReadyCopyWith<$Res> implements $OrderStateCopyWith
   factory $HppTokenReadyCopyWith(HppTokenReady value, $Res Function(HppTokenReady) _then) = _$HppTokenReadyCopyWithImpl;
 @useResult
 $Res call({
- String token
+ String token, String transactionGuid
 });
 
 
@@ -359,9 +360,10 @@ class _$HppTokenReadyCopyWithImpl<$Res>
 
 /// Create a copy of OrderState
 /// with the given fields replaced by the non-null parameter values.
-@pragma('vm:prefer-inline') $Res call({Object? token = null,}) {
+@pragma('vm:prefer-inline') $Res call({Object? token = null,Object? transactionGuid = null,}) {
   return _then(HppTokenReady(
 token: null == token ? _self.token : token // ignore: cast_nullable_to_non_nullable
+as String,transactionGuid: null == transactionGuid ? _self.transactionGuid : transactionGuid // ignore: cast_nullable_to_non_nullable
 as String,
   ));
 }

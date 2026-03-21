@@ -13,6 +13,7 @@ import 'package:jesses_pizza_app/presentation/blocs/auth/auth_bloc.dart';
 import 'package:jesses_pizza_app/presentation/blocs/menu/menu_bloc.dart';
 import 'package:jesses_pizza_app/presentation/blocs/cart/cart_bloc.dart';
 import 'package:jesses_pizza_app/presentation/blocs/order/order_bloc.dart';
+import 'package:jesses_pizza_app/data/services/signalr_service.dart';
 import 'package:jesses_pizza_app/presentation/blocs/account/account_bloc.dart';
 
 final getIt = GetIt.instance;
@@ -20,6 +21,9 @@ final getIt = GetIt.instance;
 void setupDependencies() {
   getIt.registerLazySingleton<ApiClient>(
     () => ApiClient(baseUrl: 'https://services.jessespizza.com:5000'),
+  );
+  getIt.registerLazySingleton<SignalRService>(
+    () => SignalRService(baseUrl: 'https://services.jessespizza.com:5000'),
   );
   getIt.registerLazySingleton<FlutterSecureStorage>(
     () => const FlutterSecureStorage(),

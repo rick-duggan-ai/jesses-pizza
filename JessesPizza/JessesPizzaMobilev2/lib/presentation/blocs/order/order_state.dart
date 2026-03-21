@@ -8,7 +8,10 @@ abstract class OrderState with _$OrderState {
   const factory OrderState.initial() = OrderInitial;
   const factory OrderState.loading() = OrderLoading;
   const factory OrderState.orderSubmitted() = OrderSubmitted;
-  const factory OrderState.hppTokenReady({required String token}) = HppTokenReady;
+  const factory OrderState.hppTokenReady({
+    required String token,
+    required String transactionGuid,
+  }) = HppTokenReady;
   const factory OrderState.historyLoaded({
     required List<Transaction> orders,
   }) = HistoryLoaded;
