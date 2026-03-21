@@ -32,7 +32,7 @@ void main() {
     );
 
     blocTest<CartBloc, CartState>(
-      'AddItem increments quantity for existing item with same menuItemId+sizeName',
+      'AddItem adds each item as distinct entry (group selections may differ)',
       build: () => CartBloc(),
       act: (bloc) {
         bloc.add(AddItem(tItem));
@@ -40,7 +40,7 @@ void main() {
       },
       expect: () => [
         CartState(items: [tItem]),
-        CartState(items: [tItem.copyWith(quantity: 2)]),
+        CartState(items: [tItem, tItem]),
       ],
     );
 
