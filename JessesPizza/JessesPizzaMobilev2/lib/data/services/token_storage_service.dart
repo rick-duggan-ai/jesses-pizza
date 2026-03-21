@@ -10,6 +10,7 @@ class TokenStorageService {
   static const _keyExpiration = 'oauth_token_expiration';
   static const _keyIsGuest = 'oauth_token_is_guest';
   static const _keyEmail = 'oauth_user_email';
+  static const _keyFirstName = 'oauth_user_first_name';
 
   final FlutterSecureStorage _storage;
 
@@ -32,6 +33,11 @@ class TokenStorageService {
     } else {
       await _storage.delete(key: _keyEmail);
     }
+    if (user.firstName != null) {
+      await _storage.write(key: _keyFirstName, value: user.firstName);
+    } else {
+      await _storage.delete(key: _keyFirstName);
+    }
   }
 
   /// Attempt to restore a non-expired user from storage.
@@ -47,19 +53,21 @@ class TokenStorageService {
 
     final expiration = DateTime.tryParse(expirationStr);
     if (expiration == null || expiration.isBefore(DateTime.now())) {
-      // Token expired or unparseable — clear stale data
+      // Token expired or unparseable -- clear stale data
       await clearAll();
       return null;
     }
 
     final isGuest = isGuestStr.toLowerCase() == 'true';
     final email = await _storage.read(key: _keyEmail);
+    final firstName = await _storage.read(key: _keyFirstName);
 
     return User(
       token: token,
       tokenExpires: expiration,
       isGuest: isGuest,
       email: email,
+      firstName: firstName,
     );
   }
 
@@ -69,5 +77,6 @@ class TokenStorageService {
     await _storage.delete(key: _keyExpiration);
     await _storage.delete(key: _keyIsGuest);
     await _storage.delete(key: _keyEmail);
+    await _storage.delete(key: _keyFirstName);
   }
 }

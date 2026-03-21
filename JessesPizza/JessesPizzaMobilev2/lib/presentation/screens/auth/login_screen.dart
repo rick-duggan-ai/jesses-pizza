@@ -47,6 +47,16 @@ class _LoginScreenState extends State<LoginScreen> {
     return BlocListener<AuthBloc, AuthState>(
       listener: (context, state) {
         if (state is AuthAuthenticated) {
+          // Show welcome snackbar with user's first name
+          final firstName = state.user.firstName;
+          if (firstName != null && firstName.isNotEmpty) {
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(
+                content: Text('Welcome, $firstName!'),
+                duration: const Duration(seconds: 2),
+              ),
+            );
+          }
           Navigator.of(context).pop();
         } else if (state is AuthError) {
           ScaffoldMessenger.of(context).showSnackBar(

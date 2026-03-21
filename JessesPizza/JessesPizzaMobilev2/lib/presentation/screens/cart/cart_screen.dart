@@ -31,7 +31,6 @@ class CartScreen extends StatelessWidget {
   }
 
   void _showStoreClosedDialog(BuildContext context, StoreSettings settings) {
-    // Find today's hours
     final now = DateTime.now();
     final apiDay = now.weekday == 7 ? 0 : now.weekday;
     final todayHours = settings.storeHours
@@ -65,7 +64,6 @@ class CartScreen extends StatelessWidget {
   }
 
   void _proceedToCheckout(BuildContext context) {
-    // Check store hours first
     final menuState = context.read<MenuBloc>().state;
     if (menuState is MenuLoaded && !menuState.isStoreOpen) {
       _showStoreClosedDialog(context, menuState.settings);
@@ -75,7 +73,6 @@ class CartScreen extends StatelessWidget {
     final authState = context.read<AuthBloc>().state;
     if (authState is AuthAuthenticated) {
       if (authState.user.isGuest) {
-        // Guest users must provide their info before checkout
         Navigator.of(context).push(
           MaterialPageRoute(builder: (_) => const GuestInfoScreen()),
         );
@@ -113,7 +110,14 @@ class CartScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text('Cart')),
+      appBar: AppBar(
+        title: BlocBuilder<CartBloc, CartState>(
+          builder: (context, cartState) {
+            final count = cartState.items.length;
+            return Text(count > 0 ? 'Cart ($count)' : 'Cart');
+          },
+        ),
+      ),
       body: BlocBuilder<CartBloc, CartState>(
         builder: (context, state) {
           if (state.items.isEmpty) {
