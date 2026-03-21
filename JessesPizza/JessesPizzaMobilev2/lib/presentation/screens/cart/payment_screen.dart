@@ -53,7 +53,8 @@ class _PaymentScreenState extends State<PaymentScreen> {
       zipCode: cartState.address?.zipCode,
     );
 
-    // Build order totals from cart
+    // TODO: When merged with PR #102, use cartState.subtotal, taxAmount,
+    // deliveryAmount, tip for full breakdown. For now, use total only.
     final totals = OrderTotals(
       subTotal: cartState.total,
       total: cartState.total,
