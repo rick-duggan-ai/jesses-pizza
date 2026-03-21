@@ -3,6 +3,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:jesses_pizza_app/presentation/blocs/cart/cart_bloc.dart';
 import 'package:jesses_pizza_app/presentation/blocs/cart/cart_event.dart';
 import 'package:jesses_pizza_app/presentation/blocs/cart/cart_state.dart';
+import 'package:jesses_pizza_app/presentation/screens/account/order_history_screen.dart';
 
 class OrderConfirmationScreen extends StatefulWidget {
   const OrderConfirmationScreen({super.key});
@@ -104,10 +105,24 @@ class _OrderConfirmationScreenState extends State<OrderConfirmationScreen> {
             const Spacer(),
             ElevatedButton(
               onPressed: () {
-                // Pop to root (back to tabs / menu)
-                Navigator.of(context).popUntil((route) => route.isFirst);
+                Navigator.of(context).pushAndRemoveUntil(
+                  MaterialPageRoute(
+                    builder: (_) => const OrderHistoryScreen(),
+                  ),
+                  (route) => route.isFirst,
+                );
               },
               style: ElevatedButton.styleFrom(
+                padding: const EdgeInsets.symmetric(vertical: 16),
+              ),
+              child: const Text('View Orders'),
+            ),
+            const SizedBox(height: 12),
+            OutlinedButton(
+              onPressed: () {
+                Navigator.of(context).popUntil((route) => route.isFirst);
+              },
+              style: OutlinedButton.styleFrom(
                 padding: const EdgeInsets.symmetric(vertical: 16),
               ),
               child: const Text('Back to Menu'),
