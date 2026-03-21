@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:jesses_pizza_app/domain/models/credit_card.dart';
+import 'package:jesses_pizza_app/presentation/blocs/auth/auth_bloc.dart';
+import 'package:jesses_pizza_app/presentation/blocs/auth/auth_state.dart';
 import 'package:jesses_pizza_app/presentation/blocs/account/account_bloc.dart';
 import 'package:jesses_pizza_app/presentation/blocs/account/account_event.dart';
 import 'package:jesses_pizza_app/presentation/blocs/account/account_state.dart';
@@ -23,10 +25,17 @@ class PaymentScreen extends StatefulWidget {
 class _PaymentScreenState extends State<PaymentScreen> {
   CreditCard? _selectedCard;
 
+  bool get _isGuest {
+    final authState = context.read<AuthBloc>().state;
+    return authState is AuthAuthenticated && authState.user.isGuest;
+  }
+
   @override
   void initState() {
     super.initState();
-    context.read<AccountBloc>().add(const LoadCreditCards());
+    if (!_isGuest) {
+      context.read<AccountBloc>().add(const LoadCreditCards());
+    }
   }
 
   Map<String, dynamic> _buildTransaction(CartState cartState) {
@@ -130,37 +139,44 @@ class _PaymentScreenState extends State<PaymentScreen> {
                     ],
                   ),
                 ),
-                // Saved cards
-                Expanded(
-                  child: BlocBuilder<AccountBloc, AccountState>(
-                    builder: (context, accountState) {
-                      if (accountState is AccountLoading) {
-                        return const Center(child: CircularProgressIndicator());
-                      }
-                      final cards = accountState is AccountLoaded
-                          ? accountState.creditCards
-                          : <CreditCard>[];
+                // Saved cards (hidden for guests)
+                if (!_isGuest)
+                  Expanded(
+                    child: BlocBuilder<AccountBloc, AccountState>(
+                      builder: (context, accountState) {
+                        if (accountState is AccountLoading) {
+                          return const Center(child: CircularProgressIndicator());
+                        }
+                        final cards = accountState is AccountLoaded
+                            ? accountState.creditCards
+                            : <CreditCard>[];
 
-                      if (cards.isEmpty) {
-                        return const Center(
-                          child: Text('No saved cards. Use "Pay with new card".'),
-                        );
-                      }
-
-                      return ListView.builder(
-                        itemCount: cards.length,
-                        itemBuilder: (context, index) {
-                          final card = cards[index];
-                          return CreditCardTile(
-                            card: card,
-                            selected: _selectedCard?.id == card.id,
-                            onTap: () => setState(() => _selectedCard = card),
+                        if (cards.isEmpty) {
+                          return const Center(
+                            child: Text('No saved cards. Use "Pay with new card".'),
                           );
-                        },
-                      );
-                    },
+                        }
+
+                        return ListView.builder(
+                          itemCount: cards.length,
+                          itemBuilder: (context, index) {
+                            final card = cards[index];
+                            return CreditCardTile(
+                              card: card,
+                              selected: _selectedCard?.id == card.id,
+                              onTap: () => setState(() => _selectedCard = card),
+                            );
+                          },
+                        );
+                      },
+                    ),
+                  )
+                else
+                  const Expanded(
+                    child: Center(
+                      child: Text('Tap "Pay with New Card" to enter your card details.'),
+                    ),
                   ),
-                ),
                 // Action buttons
                 Padding(
                   padding: const EdgeInsets.all(16),
@@ -170,29 +186,31 @@ class _PaymentScreenState extends State<PaymentScreen> {
                       return Column(
                         crossAxisAlignment: CrossAxisAlignment.stretch,
                         children: [
-                          ElevatedButton(
-                            onPressed: (_selectedCard == null || isLoading)
-                                ? null
-                                : () {
-                                    final tx = _buildTransaction(cartState);
-                                    tx['cardId'] = _selectedCard!.id;
-                                    context
-                                        .read<OrderBloc>()
-                                        .add(SubmitOrder(transaction: tx));
-                                  },
-                            style: ElevatedButton.styleFrom(
-                              padding: const EdgeInsets.symmetric(vertical: 16),
+                          if (!_isGuest) ...[
+                            ElevatedButton(
+                              onPressed: (_selectedCard == null || isLoading)
+                                  ? null
+                                  : () {
+                                      final tx = _buildTransaction(cartState);
+                                      tx['cardId'] = _selectedCard!.id;
+                                      context
+                                          .read<OrderBloc>()
+                                          .add(SubmitOrder(transaction: tx));
+                                    },
+                              style: ElevatedButton.styleFrom(
+                                padding: const EdgeInsets.symmetric(vertical: 16),
+                              ),
+                              child: isLoading
+                                  ? const SizedBox(
+                                      height: 20,
+                                      width: 20,
+                                      child: CircularProgressIndicator(
+                                          strokeWidth: 2),
+                                    )
+                                  : const Text('Pay with Selected Card'),
                             ),
-                            child: isLoading
-                                ? const SizedBox(
-                                    height: 20,
-                                    width: 20,
-                                    child: CircularProgressIndicator(
-                                        strokeWidth: 2),
-                                  )
-                                : const Text('Pay with Selected Card'),
-                          ),
-                          const SizedBox(height: 8),
+                            const SizedBox(height: 8),
+                          ],
                           OutlinedButton(
                             onPressed: isLoading
                                 ? null

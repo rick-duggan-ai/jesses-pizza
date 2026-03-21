@@ -80,7 +80,7 @@ class _GuestInfoScreenState extends State<GuestInfoScreen> {
         firstName: _firstNameController.text.trim(),
         lastName: _lastNameController.text.trim(),
         email: _emailController.text.trim(),
-        phoneNumber: _phoneController.text.trim(),
+        phoneNumber: _phoneController.text.replaceAll(RegExp(r'[^\d]'), ''),
         addressLine1: _addressController.text.trim(),
         city: _cityController.text.trim(),
         zipCode: _zipController.text.trim(),
