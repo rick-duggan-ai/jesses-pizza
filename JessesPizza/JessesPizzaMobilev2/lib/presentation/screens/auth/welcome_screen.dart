@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:jesses_pizza_app/app/di.dart';
+import 'package:jesses_pizza_app/data/services/device_id_service.dart';
 import 'package:jesses_pizza_app/presentation/blocs/auth/auth_bloc.dart';
 import 'package:jesses_pizza_app/presentation/blocs/auth/auth_event.dart';
 import 'package:jesses_pizza_app/presentation/blocs/auth/auth_state.dart';
@@ -74,10 +76,12 @@ class WelcomeScreen extends StatelessWidget {
                     return OutlinedButton(
                       onPressed: isLoading
                           ? null
-                          : () {
+                          : () async {
+                              final deviceId = await getIt<DeviceIdService>().getDeviceId();
+                              if (!context.mounted) return;
                               context.read<AuthBloc>().add(
-                                    const AuthEvent.guestLoginRequested(
-                                      deviceId: 'mobile',
+                                    AuthEvent.guestLoginRequested(
+                                      deviceId: deviceId,
                                     ),
                                   );
                             },

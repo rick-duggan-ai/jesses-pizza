@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:jesses_pizza_app/app/di.dart';
+import 'package:jesses_pizza_app/data/services/device_id_service.dart';
 import 'package:jesses_pizza_app/presentation/blocs/auth/auth_bloc.dart';
 import 'package:jesses_pizza_app/presentation/blocs/auth/auth_event.dart';
 import 'package:jesses_pizza_app/presentation/blocs/auth/auth_state.dart';
@@ -26,13 +28,15 @@ class _LoginScreenState extends State<LoginScreen> {
     super.dispose();
   }
 
-  void _submit() {
+  void _submit() async {
     if (_formKey.currentState?.validate() ?? false) {
+      final deviceId = await getIt<DeviceIdService>().getDeviceId();
+      if (!mounted) return;
       context.read<AuthBloc>().add(
             AuthEvent.loginRequested(
               email: _emailController.text.trim(),
               password: _passwordController.text,
-              deviceId: 'mobile',
+              deviceId: deviceId,
             ),
           );
     }
