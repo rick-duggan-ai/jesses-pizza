@@ -1,7 +1,4 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:jesses_pizza_app/domain/models/menu_category.dart';
-import 'package:jesses_pizza_app/domain/models/menu_group.dart';
-import 'package:jesses_pizza_app/domain/models/store_settings.dart';
 import 'package:jesses_pizza_app/domain/repositories/i_menu_repository.dart';
 import 'menu_event.dart';
 import 'menu_state.dart';
@@ -19,21 +16,13 @@ class MenuBloc extends Bloc<MenuEvent, MenuState> {
   Future<void> _onLoadMenu(LoadMenu event, Emitter<MenuState> emit) async {
     emit(const MenuState.loading());
     try {
-      final results = await Future.wait([
-        _repo.getMenuItems(),
-        _repo.getGroups(),
-        _repo.checkHours(),
-        _repo.getSettings(),
-      ]);
-      final categories = results[0] as List<MenuCategory>;
-      final groups = results[1] as List<MenuGroup>;
-      final isStoreOpen = results[2] as bool;
-      final settings = results[3] as StoreSettings;
+      final categories = await _repo.getMenuItems();
+      final groups = await _repo.getGroups();
+      final isStoreOpen = await _repo.checkHours();
       emit(MenuState.loaded(
         categories: categories,
         groups: groups,
         isStoreOpen: isStoreOpen,
-        settings: settings,
       ));
     } catch (e) {
       emit(MenuState.error(message: e.toString()));
@@ -48,11 +37,12 @@ class MenuBloc extends Bloc<MenuEvent, MenuState> {
       if (current is MenuLoaded) {
         emit(current.copyWith(isStoreOpen: isOpen));
       }
-    } catch (_) {
-      // Don't wipe loaded menu on a transient hours-check failure.
+    } catch (e) {
       final current = state;
       if (current is MenuLoaded) {
         emit(current.copyWith(isStoreOpen: false));
+      } else {
+        emit(MenuState.error(message: e.toString()));
       }
     }
   }

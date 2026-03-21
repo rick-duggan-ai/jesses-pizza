@@ -1,38 +1,72 @@
-import 'package:freezed_annotation/freezed_annotation.dart';
 import 'package:jesses_pizza_app/domain/models/cart_item.dart';
 
-part 'transaction_request.freezed.dart';
-part 'transaction_request.g.dart';
+/// Mirrors C# PostTransactionRequestV1_1:
+///   { "transaction": LocalTransactionV1_1, "card": CreditCard }
+class PostTransactionRequest {
+  final TransactionRequest transaction;
+  final CreditCardRef card;
 
-/// Matches V1's LocalTransactionV1_1 payload sent to ValidateTransaction
-/// and GetHPPToken endpoints.
-@freezed
-abstract class TransactionRequest with _$TransactionRequest {
-  const factory TransactionRequest({
-    required CustomerInfo info,
-    required List<TransactionItem> transactionItems,
-    required OrderTotals totals,
-    required bool isDelivery,
-    @Default(false) bool noContactDelivery,
-    String? specialInstructions,
-    String? transactionId,
-  }) = _TransactionRequest;
+  const PostTransactionRequest({
+    required this.transaction,
+    required this.card,
+  });
 
-  factory TransactionRequest.fromJson(Map<String, dynamic> json) =>
-      _$TransactionRequestFromJson(json);
+  Map<String, dynamic> toJson() => {
+        'transaction': transaction.toJson(),
+        'card': card.toJson(),
+      };
+}
 
-  /// Builds a [TransactionRequest] from cart state and customer details.
-  static TransactionRequest fromCartState({
+/// Mirrors C# LocalTransactionV1_1:
+///   { "info": CustomerInfoApp, "transactionItems": [...],
+///     "totals": OrderTotals, "isDelivery": bool,
+///     "noContactDelivery": bool, "specialInstructions": string }
+class TransactionRequest {
+  final CustomerInfo info;
+  final List<TransactionItem> transactionItems;
+  final OrderTotals totals;
+  final bool isDelivery;
+  final bool noContactDelivery;
+  final String specialInstructions;
+
+  const TransactionRequest({
+    required this.info,
+    required this.transactionItems,
+    required this.totals,
+    required this.isDelivery,
+    this.noContactDelivery = false,
+    this.specialInstructions = '',
+  });
+
+  Map<String, dynamic> toJson() => {
+        'info': info.toJson(),
+        'transactionItems': transactionItems.map((i) => i.toJson()).toList(),
+        'totals': totals.toJson(),
+        'isDelivery': isDelivery,
+        'noContactDelivery': noContactDelivery,
+        'specialInstructions': specialInstructions,
+      };
+
+  /// Convenience factory to build from CartState data.
+  factory TransactionRequest.fromCartState({
     required List<CartItem> items,
     required CustomerInfo customerInfo,
     required OrderTotals totals,
     required bool isDelivery,
     bool noContactDelivery = false,
-    String? specialInstructions,
+    String specialInstructions = '',
   }) {
     return TransactionRequest(
       info: customerInfo,
-      transactionItems: items.map((i) => TransactionItem.fromCartItem(i)).toList(),
+      transactionItems: items
+          .map((item) => TransactionItem(
+                menuItemId: item.menuItemId,
+                name: item.name,
+                sizeName: item.sizeName,
+                quantity: item.quantity,
+                price: item.price,
+              ))
+          .toList(),
       totals: totals,
       isDelivery: isDelivery,
       noContactDelivery: noContactDelivery,
@@ -41,110 +75,102 @@ abstract class TransactionRequest with _$TransactionRequest {
   }
 }
 
-/// Wraps a [TransactionRequest] with a credit card for the PostTransaction
-/// endpoint. Matches V1's PostTransactionRequestV1_1.
-@freezed
-abstract class PostTransactionRequest with _$PostTransactionRequest {
-  const factory PostTransactionRequest({
-    required TransactionRequest transaction,
-    required CreditCardRef card,
-  }) = _PostTransactionRequest;
+/// Mirrors C# CustomerInfoApp fields.
+class CustomerInfo {
+  final String? firstName;
+  final String? lastName;
+  final String? phoneNumber;
+  final String? emailAddress;
+  final String? addressLine1;
+  final String? city;
+  final String? zipCode;
 
-  factory PostTransactionRequest.fromJson(Map<String, dynamic> json) =>
-      _$PostTransactionRequestFromJson(json);
+  const CustomerInfo({
+    this.firstName,
+    this.lastName,
+    this.phoneNumber,
+    this.emailAddress,
+    this.addressLine1,
+    this.city,
+    this.zipCode,
+  });
+
+  Map<String, dynamic> toJson() => {
+        'firstName': firstName ?? '',
+        'lastName': lastName ?? '',
+        'phoneNumber': phoneNumber ?? '',
+        'emailAddress': emailAddress ?? '',
+        'addressLine1': addressLine1 ?? '',
+        'city': city ?? '',
+        'zipCode': zipCode ?? '',
+      };
 }
 
-/// Minimal credit card reference for submitting with a transaction.
-@freezed
-abstract class CreditCardRef with _$CreditCardRef {
-  const factory CreditCardRef({
-    required String id,
-    String? cardNumber,
-    String? expirationDate,
-    String? shortDescription,
-  }) = _CreditCardRef;
+/// Mirrors C# OrderTotals fields.
+class OrderTotals {
+  final double subTotal;
+  final double taxTotal;
+  final double deliveryCharge;
+  final double tip;
+  final double total;
 
-  factory CreditCardRef.fromJson(Map<String, dynamic> json) =>
-      _$CreditCardRefFromJson(json);
+  const OrderTotals({
+    this.subTotal = 0.0,
+    this.taxTotal = 0.0,
+    this.deliveryCharge = 0.0,
+    this.tip = 0.0,
+    this.total = 0.0,
+  });
+
+  Map<String, dynamic> toJson() => {
+        'subTotal': subTotal,
+        'taxTotal': taxTotal,
+        'deliveryCharge': deliveryCharge,
+        'tip': tip,
+        'total': total,
+      };
 }
 
-/// Customer info matching V1's CustomerInfoApp.
-@freezed
-abstract class CustomerInfo with _$CustomerInfo {
-  const factory CustomerInfo({
-    required String firstName,
-    required String lastName,
-    required String phoneNumber,
-    required String emailAddress,
-    String? addressLine1,
-    String? city,
-    String? zipCode,
-  }) = _CustomerInfo;
+/// Mirrors C# ShoppingCartItem fields used in the transaction payload.
+class TransactionItem {
+  final String menuItemId;
+  final String name;
+  final String sizeName;
+  final int quantity;
+  final double price;
 
-  factory CustomerInfo.fromJson(Map<String, dynamic> json) =>
-      _$CustomerInfoFromJson(json);
+  const TransactionItem({
+    required this.menuItemId,
+    required this.name,
+    required this.sizeName,
+    required this.quantity,
+    required this.price,
+  });
+
+  Map<String, dynamic> toJson() => {
+        'menuItemId': menuItemId,
+        'name': name,
+        'sizeName': sizeName,
+        'quantity': quantity,
+        'price': price,
+      };
 }
 
-/// Item in a transaction, matching V1's ShoppingCartItem.
-@freezed
-abstract class TransactionItem with _$TransactionItem {
-  const factory TransactionItem({
-    required String menuItemId,
-    required String name,
-    String? description,
-    required String sizeName,
-    String? selectedSizeId,
-    String? imageUrl,
-    @Default(false) bool requiredChoicesEnabled,
-    String? requiredChoices,
-    String? requiredDelimitedString,
-    @Default(false) bool optionalChoicesEnabled,
-    String? optionalChoices,
-    String? optionalDelimitedString,
-    required int quantity,
-    required double price,
-    @Default(false) bool instructionsEnabled,
-    String? instructions,
-  }) = _TransactionItem;
+/// Reference to a saved credit card for the PostTransactionRequest.
+class CreditCardRef {
+  final String id;
+  final String? cardNumber;
+  final String? expirationDate;
 
-  factory TransactionItem.fromJson(Map<String, dynamic> json) =>
-      _$TransactionItemFromJson(json);
+  const CreditCardRef({
+    required this.id,
+    this.cardNumber,
+    this.expirationDate,
+  });
 
-  /// Converts a [CartItem] into a [TransactionItem] for the API payload.
-  static TransactionItem fromCartItem(CartItem item) {
-    return TransactionItem(
-      menuItemId: item.menuItemId,
-      name: item.name,
-      description: item.description,
-      sizeName: item.sizeName,
-      selectedSizeId: item.selectedSizeId,
-      imageUrl: item.imageUrl,
-      requiredChoicesEnabled: item.requiredChoicesEnabled,
-      requiredChoices: item.requiredChoices,
-      requiredDelimitedString: item.requiredDelimitedString,
-      optionalChoicesEnabled: item.optionalChoicesEnabled,
-      optionalChoices: item.optionalChoices,
-      optionalDelimitedString: item.optionalDelimitedString,
-      quantity: item.quantity,
-      price: item.price,
-      instructionsEnabled: item.instructionsEnabled,
-      instructions: item.instructions,
-    );
-  }
-}
-
-/// Order totals matching V1's OrderTotals.
-@freezed
-abstract class OrderTotals with _$OrderTotals {
-  const factory OrderTotals({
-    @Default(0) double taxTotal,
-    @Default(0) double deliveryCharge,
-    @Default(0) double subTotal,
-    @Default(0) double total,
-    @Default(0) double tip,
-    String? specialInstructions,
-  }) = _OrderTotals;
-
-  factory OrderTotals.fromJson(Map<String, dynamic> json) =>
-      _$OrderTotalsFromJson(json);
+  Map<String, dynamic> toJson() => {
+        'id': id,
+        if (cardNumber != null) 'cardNumber': cardNumber,
+        if (expirationDate != null) 'expirationDate': expirationDate,
+      };
 }

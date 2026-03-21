@@ -38,6 +38,7 @@ class OrderRepository implements IOrderRepository {
       data: transaction,
       apiVersion: '1.1',
     );
+    // C# property MongoTransaction.HPPToken serializes as camelCase 'hPPToken'
     return response.data!['hPPToken'] as String;
   }
 

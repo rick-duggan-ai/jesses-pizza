@@ -11,14 +11,12 @@ class CartBloc extends Bloc<CartEvent, CartState> {
     on<SetDeliveryMode>(_onSetDeliveryMode);
     on<SetAddress>(_onSetAddress);
     on<SetTip>(_onSetTip);
-    on<ClearCart>(_onClearCart);
+    on<SetGuestInfo>(_onSetGuestInfo);
     on<UpdateSettings>(_onUpdateSettings);
-    on<SetTip>(_onSetTip);
+    on<ClearCart>(_onClearCart);
   }
 
   void _onAddItem(AddItem event, Emitter<CartState> emit) {
-    // Each cart item is added as a distinct entry since group selections
-    // make items unique even with the same menuItemId + sizeName.
     emit(state.copyWith(items: [...state.items, event.item]));
   }
 
@@ -28,7 +26,8 @@ class CartBloc extends Bloc<CartEvent, CartState> {
       updated.removeAt(event.index!);
     } else {
       final idx = updated.indexWhere(
-        (i) => i.menuItemId == event.menuItemId && i.sizeName == event.sizeName,
+        (i) =>
+            i.menuItemId == event.menuItemId && i.sizeName == event.sizeName,
       );
       if (idx >= 0) updated.removeAt(idx);
     }
@@ -42,7 +41,8 @@ class CartBloc extends Bloc<CartEvent, CartState> {
           updated[event.index!].copyWith(quantity: event.quantity);
     } else {
       final idx = updated.indexWhere(
-        (i) => i.menuItemId == event.menuItemId && i.sizeName == event.sizeName,
+        (i) =>
+            i.menuItemId == event.menuItemId && i.sizeName == event.sizeName,
       );
       if (idx >= 0) {
         updated[idx] = updated[idx].copyWith(quantity: event.quantity);
@@ -67,25 +67,23 @@ class CartBloc extends Bloc<CartEvent, CartState> {
     emit(state.copyWith(tipAmount: event.amount));
   }
 
+  void _onSetGuestInfo(SetGuestInfo event, Emitter<CartState> emit) {
+    emit(state.copyWith(guestInfo: event.guestInfo));
+  }
+
+  void _onUpdateSettings(UpdateSettings event, Emitter<CartState> emit) {
+    emit(state.copyWith(
+      taxRate: event.taxRate,
+      deliveryCharge: event.deliveryCharge,
+      minimumOrderAmount: event.minimumOrderAmount,
+    ));
+  }
+
   void _onClearCart(ClearCart event, Emitter<CartState> emit) {
     emit(CartState(
       taxRate: state.taxRate,
       deliveryCharge: state.deliveryCharge,
       minimumOrderAmount: state.minimumOrderAmount,
-      settingsLoaded: state.settingsLoaded,
     ));
-  }
-
-  void _onUpdateSettings(UpdateSettings event, Emitter<CartState> emit) {
-    emit(state.copyWith(
-      taxRate: event.settings.taxRate,
-      deliveryCharge: event.settings.deliveryCharge,
-      minimumOrderAmount: event.settings.minimumOrderAmount,
-      settingsLoaded: true,
-    ));
-  }
-
-  void _onSetTip(SetTip event, Emitter<CartState> emit) {
-    emit(state.copyWith(tip: event.tip));
   }
 }

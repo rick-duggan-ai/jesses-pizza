@@ -47,8 +47,6 @@ void main() {
     },
     'card': {
       'id': 'card-1',
-      'cardNumber': '****5678',
-      'expirationDate': '06/27',
     },
   };
   final tOrders = <Transaction>[

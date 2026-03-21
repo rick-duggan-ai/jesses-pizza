@@ -13,9 +13,281 @@ part of 'menu_group.dart';
 T _$identity<T>(T value) => value;
 
 /// @nodoc
+mixin _$GroupItemOption {
+
+ String? get id; String get name; double get price; bool get isDefault;
+/// Create a copy of GroupItemOption
+/// with the given fields replaced by the non-null parameter values.
+@JsonKey(includeFromJson: false, includeToJson: false)
+@pragma('vm:prefer-inline')
+$GroupItemOptionCopyWith<GroupItemOption> get copyWith => _$GroupItemOptionCopyWithImpl<GroupItemOption>(this as GroupItemOption, _$identity);
+
+  /// Serializes this GroupItemOption to a JSON map.
+  Map<String, dynamic> toJson();
+
+
+@override
+bool operator ==(Object other) {
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is GroupItemOption&&(identical(other.id, id) || other.id == id)&&(identical(other.name, name) || other.name == name)&&(identical(other.price, price) || other.price == price)&&(identical(other.isDefault, isDefault) || other.isDefault == isDefault));
+}
+
+@JsonKey(includeFromJson: false, includeToJson: false)
+@override
+int get hashCode => Object.hash(runtimeType,id,name,price,isDefault);
+
+@override
+String toString() {
+  return 'GroupItemOption(id: $id, name: $name, price: $price, isDefault: $isDefault)';
+}
+
+
+}
+
+/// @nodoc
+abstract mixin class $GroupItemOptionCopyWith<$Res>  {
+  factory $GroupItemOptionCopyWith(GroupItemOption value, $Res Function(GroupItemOption) _then) = _$GroupItemOptionCopyWithImpl;
+@useResult
+$Res call({
+ String? id, String name, double price, bool isDefault
+});
+
+
+
+
+}
+/// @nodoc
+class _$GroupItemOptionCopyWithImpl<$Res>
+    implements $GroupItemOptionCopyWith<$Res> {
+  _$GroupItemOptionCopyWithImpl(this._self, this._then);
+
+  final GroupItemOption _self;
+  final $Res Function(GroupItemOption) _then;
+
+/// Create a copy of GroupItemOption
+/// with the given fields replaced by the non-null parameter values.
+@pragma('vm:prefer-inline') @override $Res call({Object? id = freezed,Object? name = null,Object? price = null,Object? isDefault = null,}) {
+  return _then(_self.copyWith(
+id: freezed == id ? _self.id : id // ignore: cast_nullable_to_non_nullable
+as String?,name: null == name ? _self.name : name // ignore: cast_nullable_to_non_nullable
+as String,price: null == price ? _self.price : price // ignore: cast_nullable_to_non_nullable
+as double,isDefault: null == isDefault ? _self.isDefault : isDefault // ignore: cast_nullable_to_non_nullable
+as bool,
+  ));
+}
+
+}
+
+
+/// Adds pattern-matching-related methods to [GroupItemOption].
+extension GroupItemOptionPatterns on GroupItemOption {
+/// A variant of `map` that fallback to returning `orElse`.
+///
+/// It is equivalent to doing:
+/// ```dart
+/// switch (sealedClass) {
+///   case final Subclass value:
+///     return ...;
+///   case _:
+///     return orElse();
+/// }
+/// ```
+
+@optionalTypeArgs TResult maybeMap<TResult extends Object?>(TResult Function( _GroupItemOption value)?  $default,{required TResult orElse(),}){
+final _that = this;
+switch (_that) {
+case _GroupItemOption() when $default != null:
+return $default(_that);case _:
+  return orElse();
+
+}
+}
+/// A `switch`-like method, using callbacks.
+///
+/// Callbacks receives the raw object, upcasted.
+/// It is equivalent to doing:
+/// ```dart
+/// switch (sealedClass) {
+///   case final Subclass value:
+///     return ...;
+///   case final Subclass2 value:
+///     return ...;
+/// }
+/// ```
+
+@optionalTypeArgs TResult map<TResult extends Object?>(TResult Function( _GroupItemOption value)  $default,){
+final _that = this;
+switch (_that) {
+case _GroupItemOption():
+return $default(_that);case _:
+  throw StateError('Unexpected subclass');
+
+}
+}
+/// A variant of `map` that fallback to returning `null`.
+///
+/// It is equivalent to doing:
+/// ```dart
+/// switch (sealedClass) {
+///   case final Subclass value:
+///     return ...;
+///   case _:
+///     return null;
+/// }
+/// ```
+
+@optionalTypeArgs TResult? mapOrNull<TResult extends Object?>(TResult? Function( _GroupItemOption value)?  $default,){
+final _that = this;
+switch (_that) {
+case _GroupItemOption() when $default != null:
+return $default(_that);case _:
+  return null;
+
+}
+}
+/// A variant of `when` that fallback to an `orElse` callback.
+///
+/// It is equivalent to doing:
+/// ```dart
+/// switch (sealedClass) {
+///   case Subclass(:final field):
+///     return ...;
+///   case _:
+///     return orElse();
+/// }
+/// ```
+
+@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( String? id,  String name,  double price,  bool isDefault)?  $default,{required TResult orElse(),}) {final _that = this;
+switch (_that) {
+case _GroupItemOption() when $default != null:
+return $default(_that.id,_that.name,_that.price,_that.isDefault);case _:
+  return orElse();
+
+}
+}
+/// A `switch`-like method, using callbacks.
+///
+/// As opposed to `map`, this offers destructuring.
+/// It is equivalent to doing:
+/// ```dart
+/// switch (sealedClass) {
+///   case Subclass(:final field):
+///     return ...;
+///   case Subclass2(:final field2):
+///     return ...;
+/// }
+/// ```
+
+@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( String? id,  String name,  double price,  bool isDefault)  $default,) {final _that = this;
+switch (_that) {
+case _GroupItemOption():
+return $default(_that.id,_that.name,_that.price,_that.isDefault);case _:
+  throw StateError('Unexpected subclass');
+
+}
+}
+/// A variant of `when` that fallback to returning `null`
+///
+/// It is equivalent to doing:
+/// ```dart
+/// switch (sealedClass) {
+///   case Subclass(:final field):
+///     return ...;
+///   case _:
+///     return null;
+/// }
+/// ```
+
+@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( String? id,  String name,  double price,  bool isDefault)?  $default,) {final _that = this;
+switch (_that) {
+case _GroupItemOption() when $default != null:
+return $default(_that.id,_that.name,_that.price,_that.isDefault);case _:
+  return null;
+
+}
+}
+
+}
+
+/// @nodoc
+@JsonSerializable()
+
+class _GroupItemOption implements GroupItemOption {
+  const _GroupItemOption({this.id, required this.name, this.price = 0.0, this.isDefault = false});
+  factory _GroupItemOption.fromJson(Map<String, dynamic> json) => _$GroupItemOptionFromJson(json);
+
+@override final  String? id;
+@override final  String name;
+@override@JsonKey() final  double price;
+@override@JsonKey() final  bool isDefault;
+
+/// Create a copy of GroupItemOption
+/// with the given fields replaced by the non-null parameter values.
+@override @JsonKey(includeFromJson: false, includeToJson: false)
+@pragma('vm:prefer-inline')
+_$GroupItemOptionCopyWith<_GroupItemOption> get copyWith => __$GroupItemOptionCopyWithImpl<_GroupItemOption>(this, _$identity);
+
+@override
+Map<String, dynamic> toJson() {
+  return _$GroupItemOptionToJson(this, );
+}
+
+@override
+bool operator ==(Object other) {
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is _GroupItemOption&&(identical(other.id, id) || other.id == id)&&(identical(other.name, name) || other.name == name)&&(identical(other.price, price) || other.price == price)&&(identical(other.isDefault, isDefault) || other.isDefault == isDefault));
+}
+
+@JsonKey(includeFromJson: false, includeToJson: false)
+@override
+int get hashCode => Object.hash(runtimeType,id,name,price,isDefault);
+
+@override
+String toString() {
+  return 'GroupItemOption(id: $id, name: $name, price: $price, isDefault: $isDefault)';
+}
+
+
+}
+
+/// @nodoc
+abstract mixin class _$GroupItemOptionCopyWith<$Res> implements $GroupItemOptionCopyWith<$Res> {
+  factory _$GroupItemOptionCopyWith(_GroupItemOption value, $Res Function(_GroupItemOption) _then) = __$GroupItemOptionCopyWithImpl;
+@override @useResult
+$Res call({
+ String? id, String name, double price, bool isDefault
+});
+
+
+
+
+}
+/// @nodoc
+class __$GroupItemOptionCopyWithImpl<$Res>
+    implements _$GroupItemOptionCopyWith<$Res> {
+  __$GroupItemOptionCopyWithImpl(this._self, this._then);
+
+  final _GroupItemOption _self;
+  final $Res Function(_GroupItemOption) _then;
+
+/// Create a copy of GroupItemOption
+/// with the given fields replaced by the non-null parameter values.
+@override @pragma('vm:prefer-inline') $Res call({Object? id = freezed,Object? name = null,Object? price = null,Object? isDefault = null,}) {
+  return _then(_GroupItemOption(
+id: freezed == id ? _self.id : id // ignore: cast_nullable_to_non_nullable
+as String?,name: null == name ? _self.name : name // ignore: cast_nullable_to_non_nullable
+as String,price: null == price ? _self.price : price // ignore: cast_nullable_to_non_nullable
+as double,isDefault: null == isDefault ? _self.isDefault : isDefault // ignore: cast_nullable_to_non_nullable
+as bool,
+  ));
+}
+
+
+}
+
+
+/// @nodoc
 mixin _$MenuGroupItem {
 
- String get id; String? get groupId; String? get name; String? get imageUrl; List<MenuItemSize> get sizes; List<dynamic> get sides;
+ String get id; String? get groupId; String? get name; String? get imageUrl; List<MenuItemSize> get sizes; List<GroupItemOption> get sides;
 /// Create a copy of MenuGroupItem
 /// with the given fields replaced by the non-null parameter values.
 @JsonKey(includeFromJson: false, includeToJson: false)
@@ -48,7 +320,7 @@ abstract mixin class $MenuGroupItemCopyWith<$Res>  {
   factory $MenuGroupItemCopyWith(MenuGroupItem value, $Res Function(MenuGroupItem) _then) = _$MenuGroupItemCopyWithImpl;
 @useResult
 $Res call({
- String id, String? groupId, String? name, String? imageUrl, List<MenuItemSize> sizes, List<dynamic> sides
+ String id, String? groupId, String? name, String? imageUrl, List<MenuItemSize> sizes, List<GroupItemOption> sides
 });
 
 
@@ -73,7 +345,7 @@ as String?,name: freezed == name ? _self.name : name // ignore: cast_nullable_to
 as String?,imageUrl: freezed == imageUrl ? _self.imageUrl : imageUrl // ignore: cast_nullable_to_non_nullable
 as String?,sizes: null == sizes ? _self.sizes : sizes // ignore: cast_nullable_to_non_nullable
 as List<MenuItemSize>,sides: null == sides ? _self.sides : sides // ignore: cast_nullable_to_non_nullable
-as List<dynamic>,
+as List<GroupItemOption>,
   ));
 }
 
@@ -158,7 +430,7 @@ return $default(_that);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( String id,  String? groupId,  String? name,  String? imageUrl,  List<MenuItemSize> sizes,  List<dynamic> sides)?  $default,{required TResult orElse(),}) {final _that = this;
+@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( String id,  String? groupId,  String? name,  String? imageUrl,  List<MenuItemSize> sizes,  List<GroupItemOption> sides)?  $default,{required TResult orElse(),}) {final _that = this;
 switch (_that) {
 case _MenuGroupItem() when $default != null:
 return $default(_that.id,_that.groupId,_that.name,_that.imageUrl,_that.sizes,_that.sides);case _:
@@ -179,7 +451,7 @@ return $default(_that.id,_that.groupId,_that.name,_that.imageUrl,_that.sizes,_th
 /// }
 /// ```
 
-@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( String id,  String? groupId,  String? name,  String? imageUrl,  List<MenuItemSize> sizes,  List<dynamic> sides)  $default,) {final _that = this;
+@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( String id,  String? groupId,  String? name,  String? imageUrl,  List<MenuItemSize> sizes,  List<GroupItemOption> sides)  $default,) {final _that = this;
 switch (_that) {
 case _MenuGroupItem():
 return $default(_that.id,_that.groupId,_that.name,_that.imageUrl,_that.sizes,_that.sides);case _:
@@ -199,7 +471,7 @@ return $default(_that.id,_that.groupId,_that.name,_that.imageUrl,_that.sizes,_th
 /// }
 /// ```
 
-@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( String id,  String? groupId,  String? name,  String? imageUrl,  List<MenuItemSize> sizes,  List<dynamic> sides)?  $default,) {final _that = this;
+@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( String id,  String? groupId,  String? name,  String? imageUrl,  List<MenuItemSize> sizes,  List<GroupItemOption> sides)?  $default,) {final _that = this;
 switch (_that) {
 case _MenuGroupItem() when $default != null:
 return $default(_that.id,_that.groupId,_that.name,_that.imageUrl,_that.sizes,_that.sides);case _:
@@ -214,7 +486,7 @@ return $default(_that.id,_that.groupId,_that.name,_that.imageUrl,_that.sizes,_th
 @JsonSerializable()
 
 class _MenuGroupItem implements MenuGroupItem {
-  const _MenuGroupItem({required this.id, this.groupId, this.name, this.imageUrl, final  List<MenuItemSize> sizes = const [], final  List<dynamic> sides = const []}): _sizes = sizes,_sides = sides;
+  const _MenuGroupItem({required this.id, this.groupId, this.name, this.imageUrl, final  List<MenuItemSize> sizes = const [], final  List<GroupItemOption> sides = const []}): _sizes = sizes,_sides = sides;
   factory _MenuGroupItem.fromJson(Map<String, dynamic> json) => _$MenuGroupItemFromJson(json);
 
 @override final  String id;
@@ -228,8 +500,8 @@ class _MenuGroupItem implements MenuGroupItem {
   return EqualUnmodifiableListView(_sizes);
 }
 
- final  List<dynamic> _sides;
-@override@JsonKey() List<dynamic> get sides {
+ final  List<GroupItemOption> _sides;
+@override@JsonKey() List<GroupItemOption> get sides {
   if (_sides is EqualUnmodifiableListView) return _sides;
   // ignore: implicit_dynamic_type
   return EqualUnmodifiableListView(_sides);
@@ -269,7 +541,7 @@ abstract mixin class _$MenuGroupItemCopyWith<$Res> implements $MenuGroupItemCopy
   factory _$MenuGroupItemCopyWith(_MenuGroupItem value, $Res Function(_MenuGroupItem) _then) = __$MenuGroupItemCopyWithImpl;
 @override @useResult
 $Res call({
- String id, String? groupId, String? name, String? imageUrl, List<MenuItemSize> sizes, List<dynamic> sides
+ String id, String? groupId, String? name, String? imageUrl, List<MenuItemSize> sizes, List<GroupItemOption> sides
 });
 
 
@@ -294,7 +566,7 @@ as String?,name: freezed == name ? _self.name : name // ignore: cast_nullable_to
 as String?,imageUrl: freezed == imageUrl ? _self.imageUrl : imageUrl // ignore: cast_nullable_to_non_nullable
 as String?,sizes: null == sizes ? _self._sizes : sizes // ignore: cast_nullable_to_non_nullable
 as List<MenuItemSize>,sides: null == sides ? _self._sides : sides // ignore: cast_nullable_to_non_nullable
-as List<dynamic>,
+as List<GroupItemOption>,
   ));
 }
 

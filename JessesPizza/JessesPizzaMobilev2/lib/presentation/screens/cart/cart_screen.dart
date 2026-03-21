@@ -15,7 +15,16 @@ class CartScreen extends StatelessWidget {
 
   Future<void> _proceedToCheckout(BuildContext context) async {
     final authState = context.read<AuthBloc>().state;
-    if (authState is! AuthAuthenticated) {
+    if (authState is AuthAuthenticated) {
+      final subtotal = context.read<CartBloc>().state.subtotal;
+      final tip = await TipSelectionBottomSheet.show(context, subtotal: subtotal);
+      if (tip == null) return; // user dismissed
+      if (!context.mounted) return;
+      context.read<CartBloc>().add(SetTip(tip));
+      Navigator.of(context).push(
+        MaterialPageRoute(builder: (_) => const DeliveryModeScreen()),
+      );
+    } else {
       showDialog(
         context: context,
         builder: (ctx) => AlertDialog(
@@ -38,37 +47,7 @@ class CartScreen extends StatelessWidget {
           ],
         ),
       );
-      return;
     }
-
-    final cartState = context.read<CartBloc>().state;
-    if (cartState.subtotal <= 0) return;
-
-    final result = await showTipSelectionBottomSheet(
-      context: context,
-      subtotal: cartState.subtotal,
-    );
-
-    // User cancelled the tip selection
-    if (result == null) return;
-
-    if (!context.mounted) return;
-
-    context.read<CartBloc>().add(SetTip(result.amount));
-
-    Navigator.of(context).push(
-      MaterialPageRoute(builder: (_) => const DeliveryModeScreen()),
-    );
-  }
-
-  Widget _totalsRow(BuildContext context, String label, String value) {
-    return Row(
-      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-      children: [
-        Text(label, style: Theme.of(context).textTheme.bodyMedium),
-        Text(value, style: Theme.of(context).textTheme.bodyMedium),
-      ],
-    );
   }
 
   @override
@@ -94,13 +73,18 @@ class CartScreen extends StatelessWidget {
             );
           }
 
+          final belowMinimum = state.isDelivery &&
+              state.minimumOrderAmount > 0 &&
+              state.subtotal < state.minimumOrderAmount;
+
           return Column(
             children: [
               Expanded(
                 child: ListView.builder(
                   itemCount: state.items.length,
                   itemBuilder: (context, index) {
-                    return CartItemTile(item: state.items[index]);
+                    return CartItemTile(
+                        item: state.items[index], index: index);
                   },
                 ),
               ),
@@ -119,58 +103,11 @@ class CartScreen extends StatelessWidget {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.stretch,
                   children: [
-                    _totalsRow(context, 'Subtotal',
-                        '\$${state.subtotal.toStringAsFixed(2)}'),
-                    const SizedBox(height: 4),
-                    _totalsRow(
-                        context,
-                        'Tax (${state.taxRate.toStringAsFixed(state.taxRate.truncateToDouble() == state.taxRate ? 0 : 1)}%)',
-                        '\$${state.taxAmount.toStringAsFixed(2)}'),
-                    if (state.isDelivery) ...[
-                      const SizedBox(height: 4),
-                      _totalsRow(context, 'Delivery',
-                          '\$${state.deliveryAmount.toStringAsFixed(2)}'),
-                    ],
-                    if (state.tip > 0) ...[
-                      const SizedBox(height: 4),
-                      _totalsRow(context, 'Tip',
-                          '\$${state.tip.toStringAsFixed(2)}'),
-                    ],
-                    const Divider(height: 16),
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        Text('Subtotal',
-                            style: Theme.of(context).textTheme.bodyLarge),
-                        Text(
-                          '\$${state.subtotal.toStringAsFixed(2)}',
-                          style: Theme.of(context).textTheme.bodyLarge,
-                        ),
-                      ],
-                    ),
-                    if (state.tipAmount > 0) ...[
-                      const SizedBox(height: 4),
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          Text('Tip',
-                              style: Theme.of(context).textTheme.bodyLarge),
-                          Text(
-                            '\$${state.tipAmount.toStringAsFixed(2)}',
-                            style: Theme.of(context).textTheme.bodyLarge,
-                          ),
-                        ],
-                      ),
-                    ],
-                    const Divider(height: 16),
                     Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
                         Text('Total',
-                            style: Theme.of(context)
-                                .textTheme
-                                .titleLarge
-                                ?.copyWith(fontWeight: FontWeight.bold)),
+                            style: Theme.of(context).textTheme.titleLarge),
                         Text(
                           '\$${state.total.toStringAsFixed(2)}',
                           style: Theme.of(context)
@@ -180,9 +117,22 @@ class CartScreen extends StatelessWidget {
                         ),
                       ],
                     ),
+                    if (belowMinimum) ...[
+                      const SizedBox(height: 8),
+                      Text(
+                        'Minimum order for delivery: '
+                        '\$${state.minimumOrderAmount.toStringAsFixed(2)}',
+                        style: TextStyle(
+                          color: Theme.of(context).colorScheme.error,
+                          fontSize: 13,
+                        ),
+                      ),
+                    ],
                     const SizedBox(height: 12),
                     ElevatedButton(
-                      onPressed: () => _proceedToCheckout(context),
+                      onPressed: belowMinimum
+                          ? null
+                          : () => _proceedToCheckout(context),
                       style: ElevatedButton.styleFrom(
                         padding: const EdgeInsets.symmetric(vertical: 16),
                       ),
