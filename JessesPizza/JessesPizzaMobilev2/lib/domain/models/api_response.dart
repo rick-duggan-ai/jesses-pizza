@@ -8,6 +8,7 @@ abstract class ApiResponse with _$ApiResponse {
   const factory ApiResponse({
     required bool succeeded,
     String? message,
+    String? transactionGuid,
   }) = _ApiResponse;
 
   factory ApiResponse.fromJson(Map<String, dynamic> json) =>

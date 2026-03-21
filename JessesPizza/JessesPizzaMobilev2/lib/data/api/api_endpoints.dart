@@ -24,6 +24,7 @@ class ApiEndpoints {
   static const getHppToken = '/api/Mongo/GetHPPToken';
   static const getOrders = '/api/Mongo/GetOrders';
   static const validateTransaction = '/api/Mongo/ValidateTransaction';
+  static const validateTransactionAmount = '/api/Mongo/ValidateTransactionAmount';
   static const transactionGuid = '/api/Mongo/TransactionGuid';
 
   // Account
