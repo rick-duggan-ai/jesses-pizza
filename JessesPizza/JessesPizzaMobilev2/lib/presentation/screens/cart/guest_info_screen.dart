@@ -3,13 +3,10 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:jesses_pizza_app/domain/models/guest_info.dart';
 import 'package:jesses_pizza_app/presentation/blocs/cart/cart_bloc.dart';
 import 'package:jesses_pizza_app/presentation/blocs/cart/cart_event.dart';
-import 'package:jesses_pizza_app/presentation/screens/cart/address_selection_screen.dart';
-import 'package:jesses_pizza_app/presentation/screens/cart/payment_screen.dart';
+import 'package:jesses_pizza_app/presentation/screens/cart/delivery_mode_screen.dart';
 
 class GuestInfoScreen extends StatefulWidget {
-  final bool isDelivery;
-
-  const GuestInfoScreen({super.key, required this.isDelivery});
+  const GuestInfoScreen({super.key});
 
   @override
   State<GuestInfoScreen> createState() => _GuestInfoScreenState();
@@ -67,8 +64,11 @@ class _GuestInfoScreenState extends State<GuestInfoScreen> {
   }
 
   String? _validateZip(String? value) {
-    if (value == null || value.trim().isEmpty) return 'Zip code is required';
-    if (!RegExp(r'^\d{5}(-\d{4})?$').hasMatch(value.trim())) {
+    if (value == null || value.trim().isEmpty) {
+      return 'Zip code is required';
+    }
+    final zipRegex = RegExp(r'^\d{5}(-\d{4})?$');
+    if (!zipRegex.hasMatch(value.trim())) {
       return 'Enter a valid zip code';
     }
     return null;
@@ -86,19 +86,11 @@ class _GuestInfoScreenState extends State<GuestInfoScreen> {
         zipCode: _zipController.text.trim(),
       );
 
-      final cartBloc = context.read<CartBloc>();
-      cartBloc.add(SetDeliveryMode(widget.isDelivery));
-      cartBloc.add(SetGuestInfo(guestInfo));
+      context.read<CartBloc>().add(SetGuestInfo(guestInfo));
 
-      if (widget.isDelivery) {
-        Navigator.of(context).push(
-          MaterialPageRoute(builder: (_) => const AddressSelectionScreen()),
-        );
-      } else {
-        Navigator.of(context).push(
-          MaterialPageRoute(builder: (_) => const PaymentScreen()),
-        );
-      }
+      Navigator.of(context).push(
+        MaterialPageRoute(builder: (_) => const DeliveryModeScreen()),
+      );
     }
   }
 

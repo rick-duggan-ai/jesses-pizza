@@ -17,21 +17,18 @@ class AddItem extends CartEvent {
 class RemoveItem extends CartEvent {
   final String menuItemId;
   final String sizeName;
-  final int? index;
-  const RemoveItem(this.menuItemId, this.sizeName, {this.index});
+  const RemoveItem(this.menuItemId, this.sizeName);
   @override
-  List<Object?> get props => [menuItemId, sizeName, index];
+  List<Object?> get props => [menuItemId, sizeName];
 }
 
 class UpdateQuantity extends CartEvent {
   final String menuItemId;
   final String sizeName;
   final int quantity;
-  final int? index;
-  const UpdateQuantity(this.menuItemId, this.sizeName, this.quantity,
-      {this.index});
+  const UpdateQuantity(this.menuItemId, this.sizeName, this.quantity);
   @override
-  List<Object?> get props => [menuItemId, sizeName, quantity, index];
+  List<Object?> get props => [menuItemId, sizeName, quantity];
 }
 
 class SetDeliveryMode extends CartEvent {
@@ -48,31 +45,11 @@ class SetAddress extends CartEvent {
   List<Object?> get props => [address];
 }
 
-class SetTip extends CartEvent {
-  final double amount;
-  const SetTip(this.amount);
-  @override
-  List<Object?> get props => [amount];
-}
-
 class SetGuestInfo extends CartEvent {
   final GuestInfo guestInfo;
   const SetGuestInfo(this.guestInfo);
   @override
   List<Object?> get props => [guestInfo];
-}
-
-class UpdateSettings extends CartEvent {
-  final double taxRate;
-  final double deliveryCharge;
-  final double minimumOrderAmount;
-  const UpdateSettings({
-    required this.taxRate,
-    required this.deliveryCharge,
-    required this.minimumOrderAmount,
-  });
-  @override
-  List<Object?> get props => [taxRate, deliveryCharge, minimumOrderAmount];
 }
 
 class ClearCart extends CartEvent {

@@ -1,35 +1,20 @@
-import 'package:equatable/equatable.dart';
+import 'package:freezed_annotation/freezed_annotation.dart';
 
-class GuestInfo extends Equatable {
-  final String firstName;
-  final String lastName;
-  final String email;
-  final String phoneNumber;
-  final String addressLine1;
-  final String city;
-  final String zipCode;
+part 'guest_info.freezed.dart';
+part 'guest_info.g.dart';
 
-  const GuestInfo({
-    required this.firstName,
-    required this.lastName,
-    required this.email,
-    required this.phoneNumber,
-    required this.addressLine1,
-    required this.city,
-    required this.zipCode,
-  });
+@freezed
+abstract class GuestInfo with _$GuestInfo {
+  const factory GuestInfo({
+    required String firstName,
+    required String lastName,
+    required String email,
+    required String phoneNumber,
+    required String addressLine1,
+    required String city,
+    required String zipCode,
+  }) = _GuestInfo;
 
-  Map<String, dynamic> toJson() => {
-        'firstName': firstName,
-        'lastName': lastName,
-        'email': email,
-        'phoneNumber': phoneNumber,
-        'addressLine1': addressLine1,
-        'city': city,
-        'zipCode': zipCode,
-      };
-
-  @override
-  List<Object?> get props =>
-      [firstName, lastName, email, phoneNumber, addressLine1, city, zipCode];
+  factory GuestInfo.fromJson(Map<String, dynamic> json) =>
+      _$GuestInfoFromJson(json);
 }
