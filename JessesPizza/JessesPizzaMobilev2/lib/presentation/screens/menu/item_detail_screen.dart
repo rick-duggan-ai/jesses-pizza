@@ -31,7 +31,7 @@ class _ItemDetailScreenState extends State<ItemDetailScreen> {
       body: BlocBuilder<MenuBloc, MenuState>(
         builder: (context, menuState) {
           final isStoreOpen = menuState.whenOrNull(
-                loaded: (_, __, isOpen) => isOpen,
+                loaded: (_, __, isOpen, ___) => isOpen,
               ) ??
               true;
 

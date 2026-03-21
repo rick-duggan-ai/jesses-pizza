@@ -30,7 +30,7 @@ class _MenuCategoriesScreenState extends State<MenuCategoriesScreen> {
           return state.when(
             initial: () => const Center(child: CircularProgressIndicator()),
             loading: () => const Center(child: CircularProgressIndicator()),
-            loaded: (categories, groups, isStoreOpen) {
+            loaded: (categories, groups, isStoreOpen, _) {
               return Column(
                 children: [
                   if (!isStoreOpen) const StoreClosedBanner(),

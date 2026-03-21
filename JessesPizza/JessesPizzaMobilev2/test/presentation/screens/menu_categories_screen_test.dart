@@ -5,6 +5,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:mocktail/mocktail.dart';
 import 'package:jesses_pizza_app/domain/models/menu_category.dart';
 import 'package:jesses_pizza_app/domain/models/menu_group.dart';
+import 'package:jesses_pizza_app/domain/models/store_settings.dart';
 import 'package:jesses_pizza_app/presentation/blocs/menu/menu_bloc.dart';
 import 'package:jesses_pizza_app/presentation/blocs/menu/menu_event.dart';
 import 'package:jesses_pizza_app/presentation/blocs/menu/menu_state.dart';
@@ -53,6 +54,7 @@ void main() {
           categories: categories,
           groups: const <MenuGroup>[],
           isStoreOpen: true,
+          settings: const StoreSettings(),
         ),
       );
 
@@ -69,6 +71,7 @@ void main() {
           categories: const <MenuCategory>[],
           groups: const <MenuGroup>[],
           isStoreOpen: false,
+          settings: const StoreSettings(),
         ),
       );
 
@@ -85,6 +88,7 @@ void main() {
           categories: const <MenuCategory>[],
           groups: const <MenuGroup>[],
           isStoreOpen: true,
+          settings: const StoreSettings(),
         ),
       );
 

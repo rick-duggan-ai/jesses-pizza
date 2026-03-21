@@ -24,10 +24,9 @@ class _HppWebviewScreenState extends State<HppWebviewScreen> {
           onPageStarted: (_) => setState(() => _isLoading = true),
           onPageFinished: (url) {
             setState(() => _isLoading = false);
-            // TODO(#67): Replace with SignalR-based payment result detection.
-            // These URL patterns are placeholders — the actual Converge HPP
-            // redirects to a merchant-configured ssl_result_callback URL.
-            // Once SignalR is integrated, payment results will come via hub events.
+            // TODO: These URL patterns are placeholders. Verify against the
+            // actual Converge HPP callback URL configured in the merchant's
+            // Converge dashboard.
             if (url.contains('payment-complete') ||
                 url.contains('converge_redirect')) {
               Navigator.of(context).pop(true);
