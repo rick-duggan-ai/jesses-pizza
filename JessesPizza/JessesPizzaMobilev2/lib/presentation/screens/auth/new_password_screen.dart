@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:jesses_pizza_app/app/di.dart';
+import 'package:jesses_pizza_app/core/password_validator.dart';
 import 'package:jesses_pizza_app/domain/repositories/i_auth_repository.dart';
 import 'package:jesses_pizza_app/presentation/screens/auth/login_screen.dart';
 
@@ -101,13 +102,13 @@ class _NewPasswordScreenState extends State<NewPasswordScreen> {
                   ),
                 ),
                 obscureText: _obscurePassword,
-                validator: (v) {
-                  if (v == null || v.isEmpty) return 'Password is required';
-                  if (v.length < 8) {
-                    return 'Password must be at least 8 characters';
-                  }
-                  return null;
-                },
+                validator: PasswordValidator.validate,
+              ),
+              const SizedBox(height: 4),
+              const Text(
+                'Must be 8+ characters with a letter, number, and '
+                'special character (@\$!%*#?&).',
+                style: TextStyle(fontSize: 12, color: Colors.grey),
               ),
               const SizedBox(height: 16),
               TextFormField(
