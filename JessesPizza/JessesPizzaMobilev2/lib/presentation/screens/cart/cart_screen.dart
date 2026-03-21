@@ -3,17 +3,24 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:jesses_pizza_app/presentation/blocs/auth/auth_bloc.dart';
 import 'package:jesses_pizza_app/presentation/blocs/auth/auth_state.dart';
 import 'package:jesses_pizza_app/presentation/blocs/cart/cart_bloc.dart';
+import 'package:jesses_pizza_app/presentation/blocs/cart/cart_event.dart';
 import 'package:jesses_pizza_app/presentation/blocs/cart/cart_state.dart';
 import 'package:jesses_pizza_app/presentation/screens/auth/login_screen.dart';
 import 'package:jesses_pizza_app/presentation/screens/cart/delivery_mode_screen.dart';
 import 'package:jesses_pizza_app/presentation/widgets/cart_item_tile.dart';
+import 'package:jesses_pizza_app/presentation/widgets/tip_selection_bottom_sheet.dart';
 
 class CartScreen extends StatelessWidget {
   const CartScreen({super.key});
 
-  void _proceedToCheckout(BuildContext context) {
+  Future<void> _proceedToCheckout(BuildContext context) async {
     final authState = context.read<AuthBloc>().state;
     if (authState is AuthAuthenticated) {
+      final subtotal = context.read<CartBloc>().state.subtotal;
+      final tip = await TipSelectionBottomSheet.show(context, subtotal: subtotal);
+      if (tip == null) return; // user dismissed
+      if (!context.mounted) return;
+      context.read<CartBloc>().add(SetTip(tip));
       Navigator.of(context).push(
         MaterialPageRoute(builder: (_) => const DeliveryModeScreen()),
       );
@@ -54,7 +61,8 @@ class CartScreen extends StatelessWidget {
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  Icon(Icons.shopping_cart_outlined, size: 80, color: Colors.grey),
+                  Icon(Icons.shopping_cart_outlined,
+                      size: 80, color: Colors.grey),
                   SizedBox(height: 16),
                   Text(
                     'Your cart is empty',
@@ -65,13 +73,18 @@ class CartScreen extends StatelessWidget {
             );
           }
 
+          final belowMinimum = state.isDelivery &&
+              state.minimumOrderAmount > 0 &&
+              state.subtotal < state.minimumOrderAmount;
+
           return Column(
             children: [
               Expanded(
                 child: ListView.builder(
                   itemCount: state.items.length,
                   itemBuilder: (context, index) {
-                    return CartItemTile(item: state.items[index], index: index);
+                    return CartItemTile(
+                        item: state.items[index], index: index);
                   },
                 ),
               ),
@@ -104,9 +117,22 @@ class CartScreen extends StatelessWidget {
                         ),
                       ],
                     ),
+                    if (belowMinimum) ...[
+                      const SizedBox(height: 8),
+                      Text(
+                        'Minimum order for delivery: '
+                        '\$${state.minimumOrderAmount.toStringAsFixed(2)}',
+                        style: TextStyle(
+                          color: Theme.of(context).colorScheme.error,
+                          fontSize: 13,
+                        ),
+                      ),
+                    ],
                     const SizedBox(height: 12),
                     ElevatedButton(
-                      onPressed: () => _proceedToCheckout(context),
+                      onPressed: belowMinimum
+                          ? null
+                          : () => _proceedToCheckout(context),
                       style: ElevatedButton.styleFrom(
                         padding: const EdgeInsets.symmetric(vertical: 16),
                       ),

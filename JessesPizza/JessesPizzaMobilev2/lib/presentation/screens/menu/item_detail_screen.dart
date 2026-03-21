@@ -124,12 +124,15 @@ class _ItemDetailScreenState extends State<ItemDetailScreen> {
     return Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
       Text('Select Size', style: Theme.of(context).textTheme.titleMedium?.copyWith(fontWeight: FontWeight.bold)),
       const SizedBox(height: 8),
-      ...sizes.asMap().entries.map((entry) {
-        final idx = entry.key; final size = entry.value;
-        return RadioListTile<int>(value: idx, groupValue: _selectedSizeIndex,
-          onChanged: (val) { if (val != null) setState(() { _selectedSizeIndex = val; _groupSelections = []; }); },
-          title: Text(size.name), subtitle: Text('\$${size.price.toStringAsFixed(2)}'), dense: true, contentPadding: EdgeInsets.zero);
-      }),
+      RadioGroup<int>(
+        groupValue: _selectedSizeIndex,
+        onChanged: (val) { if (val != null) setState(() { _selectedSizeIndex = val; _groupSelections = []; }); },
+        child: Column(children: sizes.asMap().entries.map((entry) {
+          final idx = entry.key; final size = entry.value;
+          return RadioListTile<int>(value: idx,
+            title: Text(size.name), subtitle: Text('\$${size.price.toStringAsFixed(2)}'), dense: true, contentPadding: EdgeInsets.zero);
+        }).toList()),
+      ),
     ]);
   }
 
@@ -153,7 +156,19 @@ class _ItemDetailScreenState extends State<ItemDetailScreen> {
           decoration: BoxDecoration(color: hasError ? Colors.red.shade100 : Colors.grey.shade200, borderRadius: BorderRadius.circular(4)),
           child: Text('Required', style: TextStyle(fontSize: 11, color: hasError ? Colors.red.shade700 : Colors.grey.shade700, fontWeight: FontWeight.w500))),
       ])),
-      ...group.items.map((gi) => _buildGroupItemTile(groupSelection, gi)),
+      if (group.groupTypeEnum == GroupType.single)
+        RadioGroup<String>(
+          groupValue: groupSelection.selectedItems.isNotEmpty ? groupSelection.selectedItems.first.groupItem.id : null,
+          onChanged: (val) {
+            if (val != null) {
+              final gi = group.items.firstWhere((i) => i.id == val);
+              _toggle(group.id, gi);
+            }
+          },
+          child: Column(children: group.items.map((gi) => _buildGroupItemTile(groupSelection, gi)).toList()),
+        )
+      else
+        ...group.items.map((gi) => _buildGroupItemTile(groupSelection, gi)),
     ]);
   }
 
@@ -179,7 +194,7 @@ class _ItemDetailScreenState extends State<ItemDetailScreen> {
         child: Padding(padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
           child: Column(children: [
             Row(children: [
-              if (isSingle) Radio<bool>(value: true, groupValue: isSelected ? true : null, onChanged: (_) => _toggle(group.id, gi),
+              if (isSingle) Radio<String>(value: gi.id,
                 materialTapTargetSize: MaterialTapTargetSize.shrinkWrap, visualDensity: VisualDensity.compact)
               else Checkbox(value: isSelected, onChanged: (_) => _toggle(group.id, gi),
                 materialTapTargetSize: MaterialTapTargetSize.shrinkWrap, visualDensity: VisualDensity.compact),

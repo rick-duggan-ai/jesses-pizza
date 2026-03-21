@@ -21,7 +21,42 @@ void main() {
   group('OrderRepository', () {
     test('validateTransaction calls correct endpoint with apiVersion 1.1',
         () async {
-      final txn = {'item': 'pizza', 'total': 14.99};
+      // Realistic V1.1 nested payload (PostTransactionRequestV1_1 shape)
+      final txn = <String, dynamic>{
+        'transaction': {
+          'info': {
+            'firstName': 'John',
+            'lastName': 'Doe',
+            'phoneNumber': '5551234567',
+            'emailAddress': 'john@example.com',
+            'addressLine1': '123 Main St',
+            'city': 'Springfield',
+            'zipCode': '62701',
+          },
+          'transactionItems': [
+            {
+              'menuItemId': 'item-1',
+              'name': 'Pepperoni Pizza',
+              'sizeName': 'Large',
+              'quantity': 1,
+              'price': 14.99,
+            },
+          ],
+          'totals': {
+            'subTotal': 14.99,
+            'taxTotal': 1.20,
+            'deliveryCharge': 3.00,
+            'tip': 2.00,
+            'total': 21.19,
+          },
+          'isDelivery': true,
+          'noContactDelivery': false,
+          'specialInstructions': '',
+        },
+        'card': {
+          'id': 'card-1',
+        },
+      };
 
       when(() => mockApiClient.post<Map<String, dynamic>>(
             ApiEndpoints.validateTransaction,
@@ -47,7 +82,42 @@ void main() {
 
     test('postTransaction calls correct endpoint with apiVersion 1.1',
         () async {
-      final txn = {'item': 'pizza', 'total': 14.99};
+      // Realistic V1.1 nested payload
+      final txn = <String, dynamic>{
+        'transaction': {
+          'info': {
+            'firstName': 'John',
+            'lastName': 'Doe',
+            'phoneNumber': '5551234567',
+            'emailAddress': 'john@example.com',
+            'addressLine1': '123 Main St',
+            'city': 'Springfield',
+            'zipCode': '62701',
+          },
+          'transactionItems': [
+            {
+              'menuItemId': 'item-1',
+              'name': 'Pepperoni Pizza',
+              'sizeName': 'Large',
+              'quantity': 1,
+              'price': 14.99,
+            },
+          ],
+          'totals': {
+            'subTotal': 14.99,
+            'taxTotal': 1.20,
+            'deliveryCharge': 3.00,
+            'tip': 2.00,
+            'total': 21.19,
+          },
+          'isDelivery': true,
+          'noContactDelivery': false,
+          'specialInstructions': '',
+        },
+        'card': {
+          'id': 'card-1',
+        },
+      };
 
       when(() => mockApiClient.post<Map<String, dynamic>>(
             ApiEndpoints.postTransaction,
@@ -65,22 +135,53 @@ void main() {
       expect(result.succeeded, true);
     });
 
-    test('getHppToken returns token string from response', () async {
-      final txn = {'item': 'pizza'};
+    test('getHppToken returns hPPToken string from response', () async {
+      // Realistic V1.1 transaction payload
+      final txn = <String, dynamic>{
+        'info': {
+          'firstName': 'John',
+          'lastName': 'Doe',
+          'phoneNumber': '5551234567',
+          'emailAddress': 'john@example.com',
+          'addressLine1': '123 Main St',
+          'city': 'Springfield',
+          'zipCode': '62701',
+        },
+        'transactionItems': [
+          {
+            'menuItemId': 'item-1',
+            'name': 'Pepperoni Pizza',
+            'sizeName': 'Large',
+            'quantity': 1,
+            'price': 14.99,
+          },
+        ],
+        'totals': {
+          'subTotal': 14.99,
+          'taxTotal': 1.20,
+          'deliveryCharge': 3.00,
+          'tip': 2.00,
+          'total': 21.19,
+        },
+        'isDelivery': true,
+        'noContactDelivery': false,
+        'specialInstructions': '',
+      };
 
       when(() => mockApiClient.post<Map<String, dynamic>>(
             ApiEndpoints.getHppToken,
             data: any(named: 'data'),
             apiVersion: '1.1',
           )).thenAnswer((_) async => Response(
-            data: {'token': 'hpp-token-abc'},
+            // API returns MongoTransaction with HPPToken property (camelCase: hPPToken)
+            data: {'hPPToken': 'https://api.convergepay.com/hosted-payments/?ssl_txn_auth_token=abc123'},
             statusCode: 200,
             requestOptions: RequestOptions(path: ApiEndpoints.getHppToken),
           ));
 
       final token = await orderRepository.getHppToken(txn);
 
-      expect(token, 'hpp-token-abc');
+      expect(token, 'https://api.convergepay.com/hosted-payments/?ssl_txn_auth_token=abc123');
     });
 
     test('getOrders calls correct endpoint with apiVersion 1.1 and returns list',

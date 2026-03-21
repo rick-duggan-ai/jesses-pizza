@@ -1,8 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:jesses_pizza_app/presentation/blocs/auth/auth_bloc.dart';
+import 'package:jesses_pizza_app/presentation/blocs/auth/auth_state.dart';
 import 'package:jesses_pizza_app/presentation/blocs/cart/cart_bloc.dart';
 import 'package:jesses_pizza_app/presentation/blocs/cart/cart_event.dart';
 import 'package:jesses_pizza_app/presentation/screens/cart/address_selection_screen.dart';
+import 'package:jesses_pizza_app/presentation/screens/cart/guest_info_screen.dart';
 import 'package:jesses_pizza_app/presentation/screens/cart/payment_screen.dart';
 
 class DeliveryModeScreen extends StatelessWidget {
@@ -29,10 +32,24 @@ class DeliveryModeScreen extends StatelessWidget {
               label: 'Pickup',
               subtitle: 'Pick up at the store',
               onTap: () {
-                context.read<CartBloc>().add(const SetDeliveryMode(false));
-                Navigator.of(context).push(
-                  MaterialPageRoute(builder: (_) => const PaymentScreen()),
-                );
+                final authState = context.read<AuthBloc>().state;
+                final isGuest = authState is AuthAuthenticated &&
+                    authState.user.isGuest;
+                if (isGuest) {
+                  Navigator.of(context).push(
+                    MaterialPageRoute(
+                        builder: (_) =>
+                            const GuestInfoScreen(isDelivery: false)),
+                  );
+                } else {
+                  context
+                      .read<CartBloc>()
+                      .add(const SetDeliveryMode(false));
+                  Navigator.of(context).push(
+                    MaterialPageRoute(
+                        builder: (_) => const PaymentScreen()),
+                  );
+                }
               },
             ),
             const SizedBox(height: 16),
@@ -41,11 +58,25 @@ class DeliveryModeScreen extends StatelessWidget {
               label: 'Delivery',
               subtitle: 'Deliver to your address',
               onTap: () {
-                context.read<CartBloc>().add(const SetDeliveryMode(true));
-                Navigator.of(context).push(
-                  MaterialPageRoute(
-                      builder: (_) => const AddressSelectionScreen()),
-                );
+                final authState = context.read<AuthBloc>().state;
+                final isGuest = authState is AuthAuthenticated &&
+                    authState.user.isGuest;
+                if (isGuest) {
+                  Navigator.of(context).push(
+                    MaterialPageRoute(
+                        builder: (_) =>
+                            const GuestInfoScreen(isDelivery: true)),
+                  );
+                } else {
+                  context
+                      .read<CartBloc>()
+                      .add(const SetDeliveryMode(true));
+                  Navigator.of(context).push(
+                    MaterialPageRoute(
+                        builder: (_) =>
+                            const AddressSelectionScreen()),
+                  );
+                }
               },
             ),
           ],

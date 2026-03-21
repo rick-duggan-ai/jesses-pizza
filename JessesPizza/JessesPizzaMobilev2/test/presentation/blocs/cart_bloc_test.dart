@@ -63,9 +63,9 @@ void main() {
     );
 
     blocTest<CartBloc, CartState>(
-      'ClearCart resets state to empty',
+      'ClearCart resets all state',
       build: () => CartBloc(),
-      seed: () => CartState(items: [tItem]),
+      seed: () => CartState(items: [tItem], isDelivery: true, tipAmount: 5.0),
       act: (bloc) => bloc.add(const ClearCart()),
       expect: () => [const CartState()],
     );

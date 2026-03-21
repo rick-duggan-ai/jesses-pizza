@@ -38,7 +38,12 @@ class MenuBloc extends Bloc<MenuEvent, MenuState> {
         emit(current.copyWith(isStoreOpen: isOpen));
       }
     } catch (e) {
-      emit(MenuState.error(message: e.toString()));
+      final current = state;
+      if (current is MenuLoaded) {
+        emit(current.copyWith(isStoreOpen: false));
+      } else {
+        emit(MenuState.error(message: e.toString()));
+      }
     }
   }
 }

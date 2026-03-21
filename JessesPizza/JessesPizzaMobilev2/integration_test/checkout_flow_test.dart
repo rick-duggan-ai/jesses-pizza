@@ -234,7 +234,7 @@ void main() {
       await tester.pumpAndSettle();
 
       // Find the Checkout button
-      final checkoutButton = find.widgetWithText(ElevatedButton, 'Checkout');
+      final checkoutButton = find.widgetWithText(ElevatedButton, 'Proceed to Checkout');
       expect(checkoutButton, findsOneWidget);
 
       await tester.tap(checkoutButton);
