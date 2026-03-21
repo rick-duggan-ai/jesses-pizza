@@ -10,11 +10,22 @@ abstract class CartItem with _$CartItem {
   const factory CartItem({
     required String menuItemId,
     required String name,
+    String? description,
     required String sizeName,
+    String? selectedSizeId,
+    String? imageUrl,
     required double price,
     required int quantity,
     @Default([]) List<SelectedGroupItem> selectedGroupItems,
     @Default('') String specialInstructions,
+    @Default(false) bool requiredChoicesEnabled,
+    String? requiredChoices,
+    String? requiredDelimitedString,
+    @Default(false) bool optionalChoicesEnabled,
+    String? optionalChoices,
+    String? optionalDelimitedString,
+    @Default(false) bool instructionsEnabled,
+    String? instructions,
   }) = _CartItem;
 
   double get totalPrice {

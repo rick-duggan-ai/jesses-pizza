@@ -8,15 +8,34 @@ class CartState extends Equatable {
   final bool isDelivery;
   final Address? address;
   final GuestInfo? guestInfo;
+  final double taxRate;
+  final double deliveryCharge;
+  final double minimumOrderAmount;
+  final double tip;
+  final bool settingsLoaded;
 
   const CartState({
     this.items = const [],
     this.isDelivery = false,
     this.address,
     this.guestInfo,
+    this.taxRate = 8.0,
+    this.deliveryCharge = 3.99,
+    this.minimumOrderAmount = 0.0,
+    this.tip = 0.0,
+    this.settingsLoaded = false,
   });
 
-  double get total => items.fold(0.0, (sum, item) => sum + item.lineTotal);
+  /// Alias used by tip tests.
+  double get tipAmount => tip;
+
+  double get subtotal => items.fold(0.0, (sum, item) => sum + item.lineTotal);
+
+  double get taxAmount => subtotal * (taxRate / 100.0);
+
+  double get deliveryAmount => isDelivery ? deliveryCharge : 0.0;
+
+  double get total => subtotal + taxAmount + deliveryAmount + tip;
 
   static const _clearAddress = Object();
   static const _clearGuestInfo = Object();
@@ -26,12 +45,26 @@ class CartState extends Equatable {
     bool? isDelivery,
     Object? address = _clearAddress,
     Object? guestInfo = _clearGuestInfo,
+    double? taxRate,
+    double? deliveryCharge,
+    double? minimumOrderAmount,
+    double? tip,
+    bool? settingsLoaded,
   }) {
     return CartState(
       items: items ?? this.items,
       isDelivery: isDelivery ?? this.isDelivery,
-      address: identical(address, _clearAddress) ? this.address : address as Address?,
-      guestInfo: identical(guestInfo, _clearGuestInfo) ? this.guestInfo : guestInfo as GuestInfo?,
+      address: identical(address, _clearAddress)
+          ? this.address
+          : address as Address?,
+      guestInfo: identical(guestInfo, _clearGuestInfo)
+          ? this.guestInfo
+          : guestInfo as GuestInfo?,
+      taxRate: taxRate ?? this.taxRate,
+      deliveryCharge: deliveryCharge ?? this.deliveryCharge,
+      minimumOrderAmount: minimumOrderAmount ?? this.minimumOrderAmount,
+      tip: tip ?? this.tip,
+      settingsLoaded: settingsLoaded ?? this.settingsLoaded,
     );
   }
 
@@ -41,9 +74,24 @@ class CartState extends Equatable {
       isDelivery: isDelivery,
       address: null,
       guestInfo: guestInfo,
+      taxRate: taxRate,
+      deliveryCharge: deliveryCharge,
+      minimumOrderAmount: minimumOrderAmount,
+      tip: tip,
+      settingsLoaded: settingsLoaded,
     );
   }
 
   @override
-  List<Object?> get props => [items, isDelivery, address, guestInfo];
+  List<Object?> get props => [
+        items,
+        isDelivery,
+        address,
+        guestInfo,
+        taxRate,
+        deliveryCharge,
+        minimumOrderAmount,
+        tip,
+        settingsLoaded,
+      ];
 }

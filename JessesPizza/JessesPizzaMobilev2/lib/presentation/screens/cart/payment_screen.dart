@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:jesses_pizza_app/domain/models/credit_card.dart';
+import 'package:jesses_pizza_app/domain/models/transaction_request.dart';
 import 'package:jesses_pizza_app/presentation/blocs/auth/auth_bloc.dart';
 import 'package:jesses_pizza_app/presentation/blocs/auth/auth_state.dart';
 import 'package:jesses_pizza_app/presentation/blocs/account/account_bloc.dart';
@@ -38,27 +39,45 @@ class _PaymentScreenState extends State<PaymentScreen> {
     }
   }
 
-  Map<String, dynamic> _buildTransaction(CartState cartState) {
-    return {
-      'items': cartState.items
-          .map((i) => {
-                'menuItemId': i.menuItemId,
-                'name': i.name,
-                'quantity': i.quantity,
-                'price': i.price,
-              })
-          .toList(),
-      'total': cartState.total,
-      'isDelivery': cartState.isDelivery,
-      if (cartState.address != null)
-        'address': {
-          'addressLine1': cartState.address!.addressLine1,
-          'city': cartState.address!.city,
-          'zipCode': cartState.address!.zipCode,
-        },
-      if (cartState.guestInfo != null)
-        'guestInfo': cartState.guestInfo!.toJson(),
-    };
+  TransactionRequest _buildTransactionRequest(CartState cartState) {
+    final authState = context.read<AuthBloc>().state;
+    CustomerInfo customerInfo;
+    if (cartState.guestInfo != null) {
+      final g = cartState.guestInfo!;
+      customerInfo = CustomerInfo(
+        firstName: g.firstName,
+        lastName: g.lastName,
+        phoneNumber: g.phoneNumber,
+        emailAddress: g.email,
+        addressLine1: g.addressLine1,
+        city: g.city,
+        zipCode: g.zipCode,
+      );
+    } else if (authState is AuthAuthenticated) {
+      customerInfo = CustomerInfo(
+        emailAddress: authState.user.email,
+        addressLine1: cartState.address?.addressLine1,
+        city: cartState.address?.city,
+        zipCode: cartState.address?.zipCode,
+      );
+    } else {
+      customerInfo = const CustomerInfo();
+    }
+
+    final totals = OrderTotals(
+      subTotal: cartState.subtotal,
+      taxTotal: cartState.taxAmount,
+      deliveryCharge: cartState.deliveryAmount,
+      tip: cartState.tip,
+      total: cartState.total,
+    );
+
+    return TransactionRequest.fromCartState(
+      items: cartState.items,
+      customerInfo: customerInfo,
+      totals: totals,
+      isDelivery: cartState.isDelivery,
+    );
   }
 
   @override
@@ -119,6 +138,13 @@ class _PaymentScreenState extends State<PaymentScreen> {
                             ),
                           )),
                       const Divider(),
+                      _totalsRow('Subtotal', cartState.subtotal),
+                      _totalsRow('Tax', cartState.taxAmount),
+                      if (cartState.isDelivery)
+                        _totalsRow('Delivery', cartState.deliveryAmount),
+                      if (cartState.tip > 0)
+                        _totalsRow('Tip', cartState.tip),
+                      const SizedBox(height: 4),
                       Row(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
@@ -191,11 +217,14 @@ class _PaymentScreenState extends State<PaymentScreen> {
                               onPressed: (_selectedCard == null || isLoading)
                                   ? null
                                   : () {
-                                      final tx = _buildTransaction(cartState);
-                                      tx['cardId'] = _selectedCard!.id;
+                                      final tx = _buildTransactionRequest(cartState);
+                                      final postRequest = PostTransactionRequest(
+                                        transaction: tx,
+                                        card: CreditCardRef(id: _selectedCard!.id),
+                                      );
                                       context
                                           .read<OrderBloc>()
-                                          .add(SubmitOrder(transaction: tx));
+                                          .add(SubmitOrder(request: postRequest));
                                     },
                               style: ElevatedButton.styleFrom(
                                 padding: const EdgeInsets.symmetric(vertical: 16),
@@ -215,7 +244,7 @@ class _PaymentScreenState extends State<PaymentScreen> {
                             onPressed: isLoading
                                 ? null
                                 : () {
-                                    final tx = _buildTransaction(cartState);
+                                    final tx = _buildTransactionRequest(cartState);
                                     context
                                         .read<OrderBloc>()
                                         .add(RequestHppToken(transaction: tx));
@@ -234,6 +263,20 @@ class _PaymentScreenState extends State<PaymentScreen> {
             );
           },
         ),
+      ),
+    );
+  }
+
+  Widget _totalsRow(String label, double amount) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 1),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: [
+          Text(label, style: Theme.of(context).textTheme.bodyMedium),
+          Text('\$${amount.toStringAsFixed(2)}',
+              style: Theme.of(context).textTheme.bodyMedium),
+        ],
       ),
     );
   }

@@ -24,6 +24,7 @@ void main() {
     blocTest<CartBloc, CartState>(
       'SetTip updates tipAmount in state',
       build: () => CartBloc(),
+      seed: () => const CartState(taxRate: 0),
       act: (bloc) {
         bloc.add(const AddItem(tItem));
         bloc.add(const SetTip(4.00));
@@ -39,6 +40,7 @@ void main() {
     blocTest<CartBloc, CartState>(
       'SetTip with 0 removes tip',
       build: () => CartBloc(),
+      seed: () => const CartState(taxRate: 0),
       act: (bloc) {
         bloc.add(const AddItem(tItem));
         bloc.add(const SetTip(5.00));
@@ -53,6 +55,7 @@ void main() {
     blocTest<CartBloc, CartState>(
       'SetTip overwrites previous tip',
       build: () => CartBloc(),
+      seed: () => const CartState(taxRate: 0),
       act: (bloc) {
         bloc.add(const AddItem(tItem));
         bloc.add(const SetTip(3.00));
@@ -67,6 +70,7 @@ void main() {
     blocTest<CartBloc, CartState>(
       'ClearCart resets tipAmount to 0',
       build: () => CartBloc(),
+      seed: () => const CartState(taxRate: 0),
       act: (bloc) {
         bloc.add(const AddItem(tItem));
         bloc.add(const SetTip(4.00));

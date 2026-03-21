@@ -29,9 +29,9 @@ void main() {
     blocTest<CartBloc, CartState>(
       'AddItem adds new item to cart',
       build: () => CartBloc(),
-      act: (bloc) => bloc.add(AddItem(tItem)),
+      act: (bloc) => bloc.add(const AddItem(tItem)),
       expect: () => [
-        CartState(items: [tItem]),
+        const CartState(items: [tItem]),
       ],
     );
 
@@ -39,19 +39,19 @@ void main() {
       'AddItem adds each item as distinct entry (group selections may differ)',
       build: () => CartBloc(),
       act: (bloc) {
-        bloc.add(AddItem(tItem));
-        bloc.add(AddItem(tItem));
+        bloc.add(const AddItem(tItem));
+        bloc.add(const AddItem(tItem));
       },
       expect: () => [
-        CartState(items: [tItem]),
-        CartState(items: [tItem, tItem]),
+        const CartState(items: [tItem]),
+        const CartState(items: [tItem, tItem]),
       ],
     );
 
     blocTest<CartBloc, CartState>(
       'RemoveItem removes item by menuItemId',
       build: () => CartBloc(),
-      seed: () => CartState(items: [tItem]),
+      seed: () => const CartState(items: [tItem]),
       act: (bloc) => bloc.add(const RemoveItem('item-1', 'Large')),
       expect: () => [const CartState(items: [])],
     );
@@ -59,7 +59,7 @@ void main() {
     blocTest<CartBloc, CartState>(
       'UpdateQuantity updates item quantity',
       build: () => CartBloc(),
-      seed: () => CartState(items: [tItem]),
+      seed: () => const CartState(items: [tItem]),
       act: (bloc) => bloc.add(const UpdateQuantity('item-1', 'Large', 3)),
       expect: () => [
         CartState(items: [tItem.copyWith(quantity: 3)]),
@@ -69,7 +69,7 @@ void main() {
     blocTest<CartBloc, CartState>(
       'ClearCart resets all state',
       build: () => CartBloc(),
-      seed: () => CartState(items: [tItem], isDelivery: true, tipAmount: 5.0),
+      seed: () => const CartState(items: [tItem], isDelivery: true, tip: 5.0),
       act: (bloc) => bloc.add(const ClearCart()),
       expect: () => [const CartState()],
     );
@@ -104,19 +104,19 @@ void main() {
         price: 2.50,
         quantity: 2,
       );
-      final state = CartState(items: [tItem, item2]);
+      const state = CartState(items: [tItem, item2]);
       // 14.99 * 1 + 2.50 * 2 = 14.99 + 5.00 = 19.99
       expect(state.subtotal, closeTo(19.99, 0.01));
     });
 
     test('taxAmount applies taxRate to subtotal', () {
-      final state = CartState(items: [tItem], taxRate: 10.0);
+      const state = CartState(items: [tItem], taxRate: 10.0);
       // 14.99 * 10% = 1.499
       expect(state.taxAmount, closeTo(1.499, 0.001));
     });
 
     test('deliveryAmount is 0 when not delivery', () {
-      final state = CartState(items: [tItem], isDelivery: false);
+      const state = CartState(items: [tItem], isDelivery: false);
       expect(state.deliveryAmount, 0.0);
     });
 
@@ -126,7 +126,7 @@ void main() {
     });
 
     test('total includes subtotal + tax + delivery + tip', () {
-      final state = CartState(
+      const state = CartState(
         items: [tItem],
         isDelivery: true,
         taxRate: 10.0,
@@ -142,7 +142,7 @@ void main() {
     });
 
     test('total excludes delivery when not delivery mode', () {
-      final state = CartState(
+      const state = CartState(
         items: [tItem],
         isDelivery: false,
         taxRate: 8.0,

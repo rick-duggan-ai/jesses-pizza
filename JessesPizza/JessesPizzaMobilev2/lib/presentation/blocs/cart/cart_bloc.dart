@@ -11,41 +11,51 @@ class CartBloc extends Bloc<CartEvent, CartState> {
     on<SetDeliveryMode>(_onSetDeliveryMode);
     on<SetAddress>(_onSetAddress);
     on<SetGuestInfo>(_onSetGuestInfo);
+    on<SetTip>(_onSetTip);
+    on<UpdateSettings>(_onUpdateSettings);
     on<ClearCart>(_onClearCart);
   }
 
   void _onAddItem(AddItem event, Emitter<CartState> emit) {
-    final existing = state.items.indexWhere(
-      (i) =>
-          i.menuItemId == event.item.menuItemId &&
-          i.sizeName == event.item.sizeName,
-    );
-    if (existing >= 0) {
-      final updated = List<CartItem>.from(state.items);
-      updated[existing] =
-          updated[existing].copyWith(quantity: updated[existing].quantity + event.item.quantity);
-      emit(state.copyWith(items: updated));
-    } else {
-      emit(state.copyWith(items: [...state.items, event.item]));
-    }
+    // Each item is added as a distinct entry (group selections may differ).
+    emit(state.copyWith(items: [...state.items, event.item]));
   }
 
   void _onRemoveItem(RemoveItem event, Emitter<CartState> emit) {
-    emit(state.copyWith(
-      items: state.items
-          .where((i) => !(i.menuItemId == event.menuItemId && i.sizeName == event.sizeName))
-          .toList(),
-    ));
+    if (event.index != null) {
+      final updated = List<CartItem>.from(state.items);
+      if (event.index! >= 0 && event.index! < updated.length) {
+        updated.removeAt(event.index!);
+      }
+      emit(state.copyWith(items: updated));
+    } else {
+      emit(state.copyWith(
+        items: state.items
+            .where((i) =>
+                !(i.menuItemId == event.menuItemId &&
+                    i.sizeName == event.sizeName))
+            .toList(),
+      ));
+    }
   }
 
   void _onUpdateQuantity(UpdateQuantity event, Emitter<CartState> emit) {
-    final updated = state.items.map((i) {
-      if (i.menuItemId == event.menuItemId && i.sizeName == event.sizeName) {
-        return i.copyWith(quantity: event.quantity);
+    if (event.index != null) {
+      final updated = List<CartItem>.from(state.items);
+      if (event.index! >= 0 && event.index! < updated.length) {
+        updated[event.index!] =
+            updated[event.index!].copyWith(quantity: event.quantity);
       }
-      return i;
-    }).toList();
-    emit(state.copyWith(items: updated));
+      emit(state.copyWith(items: updated));
+    } else {
+      final updated = state.items.map((i) {
+        if (i.menuItemId == event.menuItemId && i.sizeName == event.sizeName) {
+          return i.copyWith(quantity: event.quantity);
+        }
+        return i;
+      }).toList();
+      emit(state.copyWith(items: updated));
+    }
   }
 
   void _onSetDeliveryMode(SetDeliveryMode event, Emitter<CartState> emit) {
@@ -62,6 +72,19 @@ class CartBloc extends Bloc<CartEvent, CartState> {
 
   void _onSetGuestInfo(SetGuestInfo event, Emitter<CartState> emit) {
     emit(state.copyWith(guestInfo: event.guestInfo));
+  }
+
+  void _onSetTip(SetTip event, Emitter<CartState> emit) {
+    emit(state.copyWith(tip: event.amount));
+  }
+
+  void _onUpdateSettings(UpdateSettings event, Emitter<CartState> emit) {
+    emit(state.copyWith(
+      taxRate: event.settings.taxRate,
+      deliveryCharge: event.settings.deliveryCharge,
+      minimumOrderAmount: event.settings.minimumOrderAmount,
+      settingsLoaded: true,
+    ));
   }
 
   void _onClearCart(ClearCart event, Emitter<CartState> emit) {

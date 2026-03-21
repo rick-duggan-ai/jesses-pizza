@@ -73,8 +73,12 @@ class _ItemDetailScreenState extends State<ItemDetailScreen> {
       appBar: AppBar(title: Text(item.name ?? '')),
       body: BlocBuilder<MenuBloc, MenuState>(
         builder: (context, menuState) {
-          final isStoreOpen = menuState.whenOrNull(loaded: (_, __, isOpen) => isOpen) ?? true;
-          final allGroups = menuState.whenOrNull(loaded: (_, groups, __) => groups) ?? [];
+          bool isStoreOpen = true;
+          List<MenuGroup> allGroups = [];
+          if (menuState is MenuLoaded) {
+            isStoreOpen = menuState.isStoreOpen;
+            allGroups = menuState.groups;
+          }
           final sizeGroups = _getGroupsForSize(allGroups);
           _updateGroupSelections(sizeGroups);
           final total = _calculateTotal();
@@ -124,15 +128,14 @@ class _ItemDetailScreenState extends State<ItemDetailScreen> {
     return Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
       Text('Select Size', style: Theme.of(context).textTheme.titleMedium?.copyWith(fontWeight: FontWeight.bold)),
       const SizedBox(height: 8),
-      RadioGroup<int>(
-        groupValue: _selectedSizeIndex,
-        onChanged: (val) { if (val != null) setState(() { _selectedSizeIndex = val; _groupSelections = []; }); },
-        child: Column(children: sizes.asMap().entries.map((entry) {
-          final idx = entry.key; final size = entry.value;
-          return RadioListTile<int>(value: idx,
-            title: Text(size.name), subtitle: Text('\$${size.price.toStringAsFixed(2)}'), dense: true, contentPadding: EdgeInsets.zero);
-        }).toList()),
-      ),
+      Column(children: sizes.asMap().entries.map((entry) {
+        final idx = entry.key; final size = entry.value;
+        return RadioListTile<int>(
+          value: idx,
+          groupValue: _selectedSizeIndex,
+          onChanged: (val) { if (val != null) setState(() { _selectedSizeIndex = val; _groupSelections = []; }); },
+          title: Text(size.name), subtitle: Text('\$${size.price.toStringAsFixed(2)}'), dense: true, contentPadding: EdgeInsets.zero);
+      }).toList()),
     ]);
   }
 
@@ -157,16 +160,22 @@ class _ItemDetailScreenState extends State<ItemDetailScreen> {
           child: Text('Required', style: TextStyle(fontSize: 11, color: hasError ? Colors.red.shade700 : Colors.grey.shade700, fontWeight: FontWeight.w500))),
       ])),
       if (group.groupTypeEnum == GroupType.single)
-        RadioGroup<String>(
-          groupValue: groupSelection.selectedItems.isNotEmpty ? groupSelection.selectedItems.first.groupItem.id : null,
-          onChanged: (val) {
-            if (val != null) {
-              final gi = group.items.firstWhere((i) => i.id == val);
-              _toggle(group.id, gi);
-            }
-          },
-          child: Column(children: group.items.map((gi) => _buildGroupItemTile(groupSelection, gi)).toList()),
-        )
+        Column(children: group.items.map((gi) {
+          final isSelected = groupSelection.isItemSelected(gi);
+          return RadioListTile<String>(
+            value: gi.id,
+            groupValue: groupSelection.selectedItems.isNotEmpty ? groupSelection.selectedItems.first.groupItem.id : null,
+            onChanged: (val) {
+              if (val != null) {
+                final item = group.items.firstWhere((i) => i.id == val);
+                _toggle(group.id, item);
+              }
+            },
+            title: Text(_giLabel(gi, isSelected ? groupSelection.selectedItems.where((s) => s.groupItem.id == gi.id).firstOrNull : null)),
+            dense: true,
+            contentPadding: EdgeInsets.zero,
+          );
+        }).toList())
       else
         ...group.items.map((gi) => _buildGroupItemTile(groupSelection, gi)),
     ]);
@@ -183,7 +192,6 @@ class _ItemDetailScreenState extends State<ItemDetailScreen> {
   Widget _buildGroupItemTile(GroupSelection gs, MenuGroupItem gi) {
     final isSelected = gs.isItemSelected(gi);
     final group = gs.group;
-    final isSingle = group.groupTypeEnum == GroupType.single;
     SelectedGroupItem? sd;
     if (isSelected) sd = gs.selectedItems.where((s) => s.groupItem.id == gi.id).firstOrNull;
     return Card(
@@ -194,9 +202,7 @@ class _ItemDetailScreenState extends State<ItemDetailScreen> {
         child: Padding(padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
           child: Column(children: [
             Row(children: [
-              if (isSingle) Radio<String>(value: gi.id,
-                materialTapTargetSize: MaterialTapTargetSize.shrinkWrap, visualDensity: VisualDensity.compact)
-              else Checkbox(value: isSelected, onChanged: (_) => _toggle(group.id, gi),
+              Checkbox(value: isSelected, onChanged: (_) => _toggle(group.id, gi),
                 materialTapTargetSize: MaterialTapTargetSize.shrinkWrap, visualDensity: VisualDensity.compact),
               if (gi.imageUrl != null && gi.imageUrl!.isNotEmpty) ...[const SizedBox(width: 4),
                 ClipRRect(borderRadius: BorderRadius.circular(4),

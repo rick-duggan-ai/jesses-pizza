@@ -232,7 +232,7 @@ $Res call({
 });
 
 
-$PostTransactionRequestCopyWith<$Res> get request;
+
 
 }
 /// @nodoc
@@ -252,16 +252,7 @@ as PostTransactionRequest,
   ));
 }
 
-/// Create a copy of OrderEvent
-/// with the given fields replaced by the non-null parameter values.
-@override
-@pragma('vm:prefer-inline')
-$PostTransactionRequestCopyWith<$Res> get request {
-  
-  return $PostTransactionRequestCopyWith<$Res>(_self.request, (value) {
-    return _then(_self.copyWith(request: value));
-  });
-}
+
 }
 
 /// @nodoc
@@ -307,7 +298,7 @@ $Res call({
 });
 
 
-$TransactionRequestCopyWith<$Res> get transaction;
+
 
 }
 /// @nodoc
@@ -327,16 +318,7 @@ as TransactionRequest,
   ));
 }
 
-/// Create a copy of OrderEvent
-/// with the given fields replaced by the non-null parameter values.
-@override
-@pragma('vm:prefer-inline')
-$TransactionRequestCopyWith<$Res> get transaction {
-  
-  return $TransactionRequestCopyWith<$Res>(_self.transaction, (value) {
-    return _then(_self.copyWith(transaction: value));
-  });
-}
+
 }
 
 /// @nodoc

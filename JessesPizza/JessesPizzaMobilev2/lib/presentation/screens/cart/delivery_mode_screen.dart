@@ -35,16 +35,13 @@ class DeliveryModeScreen extends StatelessWidget {
                 final authState = context.read<AuthBloc>().state;
                 final isGuest = authState is AuthAuthenticated &&
                     authState.user.isGuest;
+                context.read<CartBloc>().add(const SetDeliveryMode(false));
                 if (isGuest) {
                   Navigator.of(context).push(
                     MaterialPageRoute(
-                        builder: (_) =>
-                            const GuestInfoScreen(isDelivery: false)),
+                        builder: (_) => const GuestInfoScreen()),
                   );
                 } else {
-                  context
-                      .read<CartBloc>()
-                      .add(const SetDeliveryMode(false));
                   Navigator.of(context).push(
                     MaterialPageRoute(
                         builder: (_) => const PaymentScreen()),
@@ -61,16 +58,13 @@ class DeliveryModeScreen extends StatelessWidget {
                 final authState = context.read<AuthBloc>().state;
                 final isGuest = authState is AuthAuthenticated &&
                     authState.user.isGuest;
+                context.read<CartBloc>().add(const SetDeliveryMode(true));
                 if (isGuest) {
                   Navigator.of(context).push(
                     MaterialPageRoute(
-                        builder: (_) =>
-                            const GuestInfoScreen(isDelivery: true)),
+                        builder: (_) => const GuestInfoScreen()),
                   );
                 } else {
-                  context
-                      .read<CartBloc>()
-                      .add(const SetDeliveryMode(true));
                   Navigator.of(context).push(
                     MaterialPageRoute(
                         builder: (_) =>

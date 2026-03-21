@@ -2,6 +2,7 @@ import 'package:equatable/equatable.dart';
 import 'package:jesses_pizza_app/domain/models/address.dart';
 import 'package:jesses_pizza_app/domain/models/cart_item.dart';
 import 'package:jesses_pizza_app/domain/models/guest_info.dart';
+import 'package:jesses_pizza_app/domain/models/store_settings.dart';
 
 abstract class CartEvent extends Equatable {
   const CartEvent();
@@ -17,18 +18,21 @@ class AddItem extends CartEvent {
 class RemoveItem extends CartEvent {
   final String menuItemId;
   final String sizeName;
-  const RemoveItem(this.menuItemId, this.sizeName);
+  final int? index;
+  const RemoveItem(this.menuItemId, this.sizeName, {this.index});
   @override
-  List<Object?> get props => [menuItemId, sizeName];
+  List<Object?> get props => [menuItemId, sizeName, index];
 }
 
 class UpdateQuantity extends CartEvent {
   final String menuItemId;
   final String sizeName;
   final int quantity;
-  const UpdateQuantity(this.menuItemId, this.sizeName, this.quantity);
+  final int? index;
+  const UpdateQuantity(this.menuItemId, this.sizeName, this.quantity,
+      {this.index});
   @override
-  List<Object?> get props => [menuItemId, sizeName, quantity];
+  List<Object?> get props => [menuItemId, sizeName, quantity, index];
 }
 
 class SetDeliveryMode extends CartEvent {
@@ -50,6 +54,20 @@ class SetGuestInfo extends CartEvent {
   const SetGuestInfo(this.guestInfo);
   @override
   List<Object?> get props => [guestInfo];
+}
+
+class SetTip extends CartEvent {
+  final double amount;
+  const SetTip(this.amount);
+  @override
+  List<Object?> get props => [amount];
+}
+
+class UpdateSettings extends CartEvent {
+  final StoreSettings settings;
+  const UpdateSettings(this.settings);
+  @override
+  List<Object?> get props => [settings];
 }
 
 class ClearCart extends CartEvent {

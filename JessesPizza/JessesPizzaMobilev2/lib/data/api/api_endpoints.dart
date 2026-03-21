@@ -37,9 +37,6 @@ class ApiEndpoints {
   static const deleteCard = '/api/Mongo/DeleteCard';
   static const getAccountInfo = '/api/Mongo/GetAccountInfo';
 
-  // Settings
-  static const orderInfo = '/api/Mongo/OrderInfo';
-
   // Other
   static const privacy = '/api/Mongo/Privacy';
 }

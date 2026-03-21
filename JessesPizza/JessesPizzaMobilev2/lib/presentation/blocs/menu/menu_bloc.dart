@@ -19,10 +19,12 @@ class MenuBloc extends Bloc<MenuEvent, MenuState> {
       final categories = await _repo.getMenuItems();
       final groups = await _repo.getGroups();
       final isStoreOpen = await _repo.checkHours();
+      final settings = await _repo.getSettings();
       emit(MenuState.loaded(
         categories: categories,
         groups: groups,
         isStoreOpen: isStoreOpen,
+        settings: settings,
       ));
     } catch (e) {
       emit(MenuState.error(message: e.toString()));
