@@ -4,6 +4,7 @@ import 'package:jesses_pizza_app/domain/models/store_settings.dart';
 import 'package:jesses_pizza_app/presentation/blocs/auth/auth_bloc.dart';
 import 'package:jesses_pizza_app/presentation/blocs/auth/auth_state.dart';
 import 'package:jesses_pizza_app/presentation/blocs/cart/cart_bloc.dart';
+import 'package:jesses_pizza_app/presentation/blocs/cart/cart_event.dart';
 import 'package:jesses_pizza_app/presentation/blocs/cart/cart_state.dart';
 import 'package:jesses_pizza_app/presentation/blocs/menu/menu_bloc.dart';
 import 'package:jesses_pizza_app/presentation/blocs/menu/menu_state.dart';
@@ -12,8 +13,15 @@ import 'package:jesses_pizza_app/presentation/screens/cart/delivery_mode_screen.
 import 'package:jesses_pizza_app/presentation/screens/cart/guest_info_screen.dart';
 import 'package:jesses_pizza_app/presentation/widgets/cart_item_tile.dart';
 
-class CartScreen extends StatelessWidget {
+class CartScreen extends StatefulWidget {
   const CartScreen({super.key});
+
+  @override
+  State<CartScreen> createState() => _CartScreenState();
+}
+
+class _CartScreenState extends State<CartScreen> {
+  bool _checkoutInProgress = false;
 
   /// Format 24h time string (e.g. "11:00") to 12h format (e.g. "11:00 AM").
   static String _formatTime(String time24) {
@@ -63,10 +71,42 @@ class CartScreen extends StatelessWidget {
     );
   }
 
+  void _validateCartAgainstMenu(BuildContext context) {
+    final menuState = context.read<MenuBloc>().state;
+    if (menuState is! MenuLoaded) return;
+    final validIds = <String>{};
+    for (final category in menuState.categories) {
+      for (final item in category.menuItems) {
+        if (item.id != null) validIds.add(item.id!);
+      }
+    }
+    final cartState = context.read<CartBloc>().state;
+    final staleCount =
+        cartState.items.where((i) => !validIds.contains(i.menuItemId)).length;
+    if (staleCount > 0) {
+      context.read<CartBloc>().add(ValidateCart(validIds));
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(
+            '$staleCount item${staleCount > 1 ? 's' : ''} removed (no longer on menu)',
+          ),
+        ),
+      );
+    }
+  }
+
   void _proceedToCheckout(BuildContext context) {
+    if (_checkoutInProgress) return;
+    setState(() => _checkoutInProgress = true);
+
+    void resetFlag() {
+      if (mounted) setState(() => _checkoutInProgress = false);
+    }
+
     final menuState = context.read<MenuBloc>().state;
     if (menuState is MenuLoaded && !menuState.isStoreOpen) {
       _showStoreClosedDialog(context, menuState.settings);
+      resetFlag();
       return;
     }
 
@@ -75,11 +115,11 @@ class CartScreen extends StatelessWidget {
       if (authState.user.isGuest) {
         Navigator.of(context).push(
           MaterialPageRoute(builder: (_) => const GuestInfoScreen()),
-        );
+        ).then((_) => resetFlag());
       } else {
         Navigator.of(context).push(
           MaterialPageRoute(builder: (_) => const DeliveryModeScreen()),
-        );
+        ).then((_) => resetFlag());
       }
     } else {
       showDialog(
@@ -103,13 +143,19 @@ class CartScreen extends StatelessWidget {
             ),
           ],
         ),
-      );
+      ).then((_) => resetFlag());
     }
   }
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
+    return BlocListener<MenuBloc, MenuState>(
+      listener: (context, state) {
+        if (state is MenuLoaded) {
+          _validateCartAgainstMenu(context);
+        }
+      },
+      child: Scaffold(
       appBar: AppBar(
         title: BlocBuilder<CartBloc, CartState>(
           builder: (context, cartState) {
@@ -177,11 +223,17 @@ class CartScreen extends StatelessWidget {
                     ),
                     const SizedBox(height: 12),
                     ElevatedButton(
-                      onPressed: () => _proceedToCheckout(context),
+                      onPressed: _checkoutInProgress ? null : () => _proceedToCheckout(context),
                       style: ElevatedButton.styleFrom(
                         padding: const EdgeInsets.symmetric(vertical: 16),
                       ),
-                      child: const Text('Proceed to Checkout'),
+                      child: _checkoutInProgress
+                          ? const SizedBox(
+                              height: 20,
+                              width: 20,
+                              child: CircularProgressIndicator(strokeWidth: 2),
+                            )
+                          : const Text('Proceed to Checkout'),
                     ),
                   ],
                 ),
@@ -189,6 +241,7 @@ class CartScreen extends StatelessWidget {
             ],
           );
         },
+      ),
       ),
     );
   }

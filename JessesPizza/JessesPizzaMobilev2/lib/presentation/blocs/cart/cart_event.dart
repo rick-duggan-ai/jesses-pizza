@@ -70,6 +70,21 @@ class UpdateSettings extends CartEvent {
   List<Object?> get props => [settings];
 }
 
+class UpdateItem extends CartEvent {
+  final int index;
+  final CartItem item;
+  const UpdateItem({required this.index, required this.item});
+  @override
+  List<Object?> get props => [index, item];
+}
+
+class ValidateCart extends CartEvent {
+  final Set<String> validMenuItemIds;
+  const ValidateCart(this.validMenuItemIds);
+  @override
+  List<Object?> get props => [validMenuItemIds];
+}
+
 class ClearCart extends CartEvent {
   const ClearCart();
   @override

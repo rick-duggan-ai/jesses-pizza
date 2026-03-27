@@ -12,7 +12,10 @@ import 'package:jesses_pizza_app/presentation/blocs/menu/menu_state.dart';
 
 class ItemDetailScreen extends StatefulWidget {
   final MenuItem item;
-  const ItemDetailScreen({super.key, required this.item});
+  /// When editing an existing cart item, pass the cart item and its index.
+  final CartItem? existingCartItem;
+  final int? existingCartIndex;
+  const ItemDetailScreen({super.key, required this.item, this.existingCartItem, this.existingCartIndex});
   @override
   State<ItemDetailScreen> createState() => _ItemDetailScreenState();
 }
@@ -23,16 +26,34 @@ class _ItemDetailScreenState extends State<ItemDetailScreen> {
   String _specialInstructions = '';
   late List<GroupSelection> _groupSelections;
   bool _showValidationErrors = false;
+  bool _isAddingToCart = false;
+  late final TextEditingController _instructionsController;
+
+  bool get _isEditMode => widget.existingCartItem != null;
 
   @override
   void initState() {
     super.initState();
     _groupSelections = [];
     final sizes = widget.item.sizes;
-    if (sizes.isNotEmpty) {
+    final existing = widget.existingCartItem;
+    if (existing != null) {
+      // Pre-fill from existing cart item
+      _quantity = existing.quantity;
+      _specialInstructions = existing.specialInstructions;
+      final sizeIdx = sizes.indexWhere((s) => s.name == existing.sizeName);
+      if (sizeIdx >= 0) _selectedSizeIndex = sizeIdx;
+    } else if (sizes.isNotEmpty) {
       final defaultIdx = sizes.indexWhere((s) => s.isDefault);
       if (defaultIdx >= 0) _selectedSizeIndex = defaultIdx;
     }
+    _instructionsController = TextEditingController(text: _specialInstructions);
+  }
+
+  @override
+  void dispose() {
+    _instructionsController.dispose();
+    super.dispose();
   }
 
   List<MenuGroup> _getGroupsForSize(List<MenuGroup> allGroups) {
@@ -43,8 +64,33 @@ class _ItemDetailScreenState extends State<ItemDetailScreen> {
     return allGroups.where((g) => selectedSize.groupIds.contains(g.id)).toList();
   }
 
+  bool _groupsInitializedFromCart = false;
+
   void _updateGroupSelections(List<MenuGroup> groups) {
     final existingMap = {for (final gs in _groupSelections) gs.group.id: gs};
+
+    // On first call in edit mode, pre-select items from the existing cart item.
+    if (_isEditMode && !_groupsInitializedFromCart && groups.isNotEmpty) {
+      _groupsInitializedFromCart = true;
+      final cartSelections = widget.existingCartItem!.selectedGroupItems;
+      final cartItemIds = {for (final s in cartSelections) s.groupItem.id: s};
+      _groupSelections = groups.map((g) {
+        final preSelected = <SelectedGroupItem>[];
+        for (final gi in g.items) {
+          if (cartItemIds.containsKey(gi.id)) {
+            final saved = cartItemIds[gi.id]!;
+            preSelected.add(SelectedGroupItem(
+              groupItem: gi,
+              sizeIndex: saved.sizeIndex,
+              sideIndex: saved.sideIndex,
+            ));
+          }
+        }
+        return GroupSelection(group: g, selectedItems: preSelected);
+      }).toList();
+      return;
+    }
+
     _groupSelections = groups.map((g) {
       if (existingMap.containsKey(g.id)) return existingMap[g.id]!;
       return GroupSelection(group: g);
@@ -257,7 +303,7 @@ class _ItemDetailScreenState extends State<ItemDetailScreen> {
   }
 
   Widget _buildSpecialInstructions() {
-    return TextField(decoration: const InputDecoration(labelText: 'Special Instructions', hintText: 'Tap to add special instructions',
+    return TextField(controller: _instructionsController, decoration: const InputDecoration(labelText: 'Special Instructions', hintText: 'Tap to add special instructions',
       border: OutlineInputBorder(), contentPadding: EdgeInsets.symmetric(horizontal: 12, vertical: 8)), maxLines: 2, onChanged: (val) => _specialInstructions = val);
   }
 
@@ -271,30 +317,42 @@ class _ItemDetailScreenState extends State<ItemDetailScreen> {
   }
 
   Widget _buildBottomBar(bool isStoreOpen, bool hasSizes, double total) {
+    final buttonLabel = _isEditMode
+        ? 'Update Item - \$${total.toStringAsFixed(2)}'
+        : 'Add to Cart - \$${total.toStringAsFixed(2)}';
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(color: Theme.of(context).scaffoldBackgroundColor,
         boxShadow: [BoxShadow(color: Colors.black.withAlpha(26), blurRadius: 8, offset: const Offset(0, -2))]),
       child: SafeArea(child: ElevatedButton(
-        onPressed: isStoreOpen && hasSizes ? _addToCart : null,
+        onPressed: isStoreOpen && hasSizes && !_isAddingToCart ? _addToCart : null,
         style: ElevatedButton.styleFrom(padding: const EdgeInsets.symmetric(vertical: 16)),
-        child: Text('Add to Cart - \$${total.toStringAsFixed(2)}', style: const TextStyle(fontSize: 16)))),
+        child: _isAddingToCart
+            ? const SizedBox(height: 20, width: 20, child: CircularProgressIndicator(strokeWidth: 2))
+            : Text(buttonLabel, style: const TextStyle(fontSize: 16)))),
     );
   }
 
   void _addToCart() {
+    if (_isAddingToCart) return;
     if (!_validateSelections()) {
       setState(() => _showValidationErrors = true);
       ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Please complete all required selections'), backgroundColor: Colors.red));
       return;
     }
+    setState(() => _isAddingToCart = true);
     final item = widget.item;
     final size = item.sizes[_selectedSizeIndex];
     final allSelectedItems = _groupSelections.expand((gs) => gs.selectedItems).toList();
     final cartItem = CartItem(menuItemId: item.id ?? '', name: item.name ?? '', sizeName: size.name, price: size.price, quantity: _quantity,
       selectedGroupItems: allSelectedItems, specialInstructions: _specialInstructions.trim());
-    context.read<CartBloc>().add(AddItem(cartItem));
-    ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Added to cart')));
+    if (_isEditMode) {
+      context.read<CartBloc>().add(UpdateItem(index: widget.existingCartIndex!, item: cartItem));
+      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Cart item updated')));
+    } else {
+      context.read<CartBloc>().add(AddItem(cartItem));
+      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Added to cart')));
+    }
     Navigator.of(context).pop();
   }
 }

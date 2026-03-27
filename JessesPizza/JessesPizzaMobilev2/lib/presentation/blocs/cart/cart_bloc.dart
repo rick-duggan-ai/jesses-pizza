@@ -13,6 +13,8 @@ class CartBloc extends Bloc<CartEvent, CartState> {
     on<SetGuestInfo>(_onSetGuestInfo);
     on<SetTip>(_onSetTip);
     on<UpdateSettings>(_onUpdateSettings);
+    on<UpdateItem>(_onUpdateItem);
+    on<ValidateCart>(_onValidateCart);
     on<ClearCart>(_onClearCart);
   }
 
@@ -85,6 +87,23 @@ class CartBloc extends Bloc<CartEvent, CartState> {
       minimumOrderAmount: event.settings.minimumOrderAmount,
       settingsLoaded: true,
     ));
+  }
+
+  void _onUpdateItem(UpdateItem event, Emitter<CartState> emit) {
+    final updated = List<CartItem>.from(state.items);
+    if (event.index >= 0 && event.index < updated.length) {
+      updated[event.index] = event.item;
+    }
+    emit(state.copyWith(items: updated));
+  }
+
+  void _onValidateCart(ValidateCart event, Emitter<CartState> emit) {
+    final validIds = event.validMenuItemIds;
+    final validItems =
+        state.items.where((i) => validIds.contains(i.menuItemId)).toList();
+    if (validItems.length != state.items.length) {
+      emit(state.copyWith(items: validItems));
+    }
   }
 
   void _onClearCart(ClearCart event, Emitter<CartState> emit) {
