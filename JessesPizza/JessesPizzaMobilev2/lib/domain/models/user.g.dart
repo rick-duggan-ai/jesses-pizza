@@ -9,7 +9,8 @@ part of 'user.dart';
 _User _$UserFromJson(Map<String, dynamic> json) => _User(
   token: json['token'] as String,
   tokenExpires: DateTime.parse(json['tokenExpires'] as String),
-  isGuest: json['isGuest'] as bool,
+  isGuest: json['isGuest'] as bool? ?? false,
+  accountConfirmed: json['accountConfirmed'] as bool? ?? false,
   email: json['email'] as String?,
   firstName: json['firstName'] as String?,
 );
@@ -18,6 +19,7 @@ Map<String, dynamic> _$UserToJson(_User instance) => <String, dynamic>{
   'token': instance.token,
   'tokenExpires': instance.tokenExpires.toIso8601String(),
   'isGuest': instance.isGuest,
+  'accountConfirmed': instance.accountConfirmed,
   'email': instance.email,
   'firstName': instance.firstName,
 };

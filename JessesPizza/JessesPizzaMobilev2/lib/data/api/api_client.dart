@@ -34,11 +34,11 @@ class ApiClient {
     Map<String, dynamic>? queryParameters,
     String? apiVersion,
   }) async {
-    final options = Options();
-    if (apiVersion != null) {
-      options.headers = {'X-Version': apiVersion};
-    }
-    return dio.get<T>(path, queryParameters: queryParameters, options: options);
+    return dio.get<T>(
+      path,
+      queryParameters: queryParameters,
+      options: apiVersion != null ? Options(headers: {'X-Version': apiVersion}) : null,
+    );
   }
 
   Future<Response<T>> post<T>(
@@ -46,10 +46,10 @@ class ApiClient {
     dynamic data,
     String? apiVersion,
   }) async {
-    final options = Options();
-    if (apiVersion != null) {
-      options.headers = {'X-Version': apiVersion};
-    }
-    return dio.post<T>(path, data: data, options: options);
+    return dio.post<T>(
+      path,
+      data: data,
+      options: apiVersion != null ? Options(headers: {'X-Version': apiVersion}) : null,
+    );
   }
 }

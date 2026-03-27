@@ -16,7 +16,7 @@ class AuthRepository implements IAuthRepository {
       data: {'email': email, 'password': password, 'deviceId': deviceId},
       apiVersion: '1.0',
     );
-    return User.fromJson(response.data!);
+    return User.fromLoginResponse(response.data!, isGuest: false);
   }
 
   @override
@@ -26,7 +26,7 @@ class AuthRepository implements IAuthRepository {
       data: {'secret': 'JessesPizzaAppSecret', 'deviceId': deviceId},
       apiVersion: '1.0',
     );
-    return User.fromJson(response.data!);
+    return User.fromLoginResponse(response.data!, isGuest: true);
   }
 
   @override

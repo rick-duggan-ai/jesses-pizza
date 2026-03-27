@@ -15,7 +15,7 @@ T _$identity<T>(T value) => value;
 /// @nodoc
 mixin _$User {
 
- String get token; DateTime get tokenExpires; bool get isGuest; String? get email; String? get firstName;
+ String get token; DateTime get tokenExpires; bool get isGuest; bool get accountConfirmed; String? get email; String? get firstName;
 /// Create a copy of User
 /// with the given fields replaced by the non-null parameter values.
 @JsonKey(includeFromJson: false, includeToJson: false)
@@ -28,16 +28,16 @@ $UserCopyWith<User> get copyWith => _$UserCopyWithImpl<User>(this as User, _$ide
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is User&&(identical(other.token, token) || other.token == token)&&(identical(other.tokenExpires, tokenExpires) || other.tokenExpires == tokenExpires)&&(identical(other.isGuest, isGuest) || other.isGuest == isGuest)&&(identical(other.email, email) || other.email == email)&&(identical(other.firstName, firstName) || other.firstName == firstName));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is User&&(identical(other.token, token) || other.token == token)&&(identical(other.tokenExpires, tokenExpires) || other.tokenExpires == tokenExpires)&&(identical(other.isGuest, isGuest) || other.isGuest == isGuest)&&(identical(other.accountConfirmed, accountConfirmed) || other.accountConfirmed == accountConfirmed)&&(identical(other.email, email) || other.email == email)&&(identical(other.firstName, firstName) || other.firstName == firstName));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
 @override
-int get hashCode => Object.hash(runtimeType,token,tokenExpires,isGuest,email,firstName);
+int get hashCode => Object.hash(runtimeType,token,tokenExpires,isGuest,accountConfirmed,email,firstName);
 
 @override
 String toString() {
-  return 'User(token: $token, tokenExpires: $tokenExpires, isGuest: $isGuest, email: $email, firstName: $firstName)';
+  return 'User(token: $token, tokenExpires: $tokenExpires, isGuest: $isGuest, accountConfirmed: $accountConfirmed, email: $email, firstName: $firstName)';
 }
 
 
@@ -48,7 +48,7 @@ abstract mixin class $UserCopyWith<$Res>  {
   factory $UserCopyWith(User value, $Res Function(User) _then) = _$UserCopyWithImpl;
 @useResult
 $Res call({
- String token, DateTime tokenExpires, bool isGuest, String? email, String? firstName
+ String token, DateTime tokenExpires, bool isGuest, bool accountConfirmed, String? email, String? firstName
 });
 
 
@@ -65,11 +65,12 @@ class _$UserCopyWithImpl<$Res>
 
 /// Create a copy of User
 /// with the given fields replaced by the non-null parameter values.
-@pragma('vm:prefer-inline') @override $Res call({Object? token = null,Object? tokenExpires = null,Object? isGuest = null,Object? email = freezed,Object? firstName = freezed,}) {
+@pragma('vm:prefer-inline') @override $Res call({Object? token = null,Object? tokenExpires = null,Object? isGuest = null,Object? accountConfirmed = null,Object? email = freezed,Object? firstName = freezed,}) {
   return _then(_self.copyWith(
 token: null == token ? _self.token : token // ignore: cast_nullable_to_non_nullable
 as String,tokenExpires: null == tokenExpires ? _self.tokenExpires : tokenExpires // ignore: cast_nullable_to_non_nullable
 as DateTime,isGuest: null == isGuest ? _self.isGuest : isGuest // ignore: cast_nullable_to_non_nullable
+as bool,accountConfirmed: null == accountConfirmed ? _self.accountConfirmed : accountConfirmed // ignore: cast_nullable_to_non_nullable
 as bool,email: freezed == email ? _self.email : email // ignore: cast_nullable_to_non_nullable
 as String?,firstName: freezed == firstName ? _self.firstName : firstName // ignore: cast_nullable_to_non_nullable
 as String?,
@@ -157,10 +158,10 @@ return $default(_that);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( String token,  DateTime tokenExpires,  bool isGuest,  String? email,  String? firstName)?  $default,{required TResult orElse(),}) {final _that = this;
+@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( String token,  DateTime tokenExpires,  bool isGuest,  bool accountConfirmed,  String? email,  String? firstName)?  $default,{required TResult orElse(),}) {final _that = this;
 switch (_that) {
 case _User() when $default != null:
-return $default(_that.token,_that.tokenExpires,_that.isGuest,_that.email,_that.firstName);case _:
+return $default(_that.token,_that.tokenExpires,_that.isGuest,_that.accountConfirmed,_that.email,_that.firstName);case _:
   return orElse();
 
 }
@@ -178,10 +179,10 @@ return $default(_that.token,_that.tokenExpires,_that.isGuest,_that.email,_that.f
 /// }
 /// ```
 
-@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( String token,  DateTime tokenExpires,  bool isGuest,  String? email,  String? firstName)  $default,) {final _that = this;
+@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( String token,  DateTime tokenExpires,  bool isGuest,  bool accountConfirmed,  String? email,  String? firstName)  $default,) {final _that = this;
 switch (_that) {
 case _User():
-return $default(_that.token,_that.tokenExpires,_that.isGuest,_that.email,_that.firstName);case _:
+return $default(_that.token,_that.tokenExpires,_that.isGuest,_that.accountConfirmed,_that.email,_that.firstName);case _:
   throw StateError('Unexpected subclass');
 
 }
@@ -198,10 +199,10 @@ return $default(_that.token,_that.tokenExpires,_that.isGuest,_that.email,_that.f
 /// }
 /// ```
 
-@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( String token,  DateTime tokenExpires,  bool isGuest,  String? email,  String? firstName)?  $default,) {final _that = this;
+@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( String token,  DateTime tokenExpires,  bool isGuest,  bool accountConfirmed,  String? email,  String? firstName)?  $default,) {final _that = this;
 switch (_that) {
 case _User() when $default != null:
-return $default(_that.token,_that.tokenExpires,_that.isGuest,_that.email,_that.firstName);case _:
+return $default(_that.token,_that.tokenExpires,_that.isGuest,_that.accountConfirmed,_that.email,_that.firstName);case _:
   return null;
 
 }
@@ -213,12 +214,13 @@ return $default(_that.token,_that.tokenExpires,_that.isGuest,_that.email,_that.f
 @JsonSerializable()
 
 class _User implements User {
-  const _User({required this.token, required this.tokenExpires, required this.isGuest, this.email, this.firstName});
+  const _User({required this.token, required this.tokenExpires, this.isGuest = false, this.accountConfirmed = false, this.email, this.firstName});
   factory _User.fromJson(Map<String, dynamic> json) => _$UserFromJson(json);
 
 @override final  String token;
 @override final  DateTime tokenExpires;
-@override final  bool isGuest;
+@override@JsonKey() final  bool isGuest;
+@override@JsonKey() final  bool accountConfirmed;
 @override final  String? email;
 @override final  String? firstName;
 
@@ -235,16 +237,16 @@ Map<String, dynamic> toJson() {
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is _User&&(identical(other.token, token) || other.token == token)&&(identical(other.tokenExpires, tokenExpires) || other.tokenExpires == tokenExpires)&&(identical(other.isGuest, isGuest) || other.isGuest == isGuest)&&(identical(other.email, email) || other.email == email)&&(identical(other.firstName, firstName) || other.firstName == firstName));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is _User&&(identical(other.token, token) || other.token == token)&&(identical(other.tokenExpires, tokenExpires) || other.tokenExpires == tokenExpires)&&(identical(other.isGuest, isGuest) || other.isGuest == isGuest)&&(identical(other.accountConfirmed, accountConfirmed) || other.accountConfirmed == accountConfirmed)&&(identical(other.email, email) || other.email == email)&&(identical(other.firstName, firstName) || other.firstName == firstName));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
 @override
-int get hashCode => Object.hash(runtimeType,token,tokenExpires,isGuest,email,firstName);
+int get hashCode => Object.hash(runtimeType,token,tokenExpires,isGuest,accountConfirmed,email,firstName);
 
 @override
 String toString() {
-  return 'User(token: $token, tokenExpires: $tokenExpires, isGuest: $isGuest, email: $email, firstName: $firstName)';
+  return 'User(token: $token, tokenExpires: $tokenExpires, isGuest: $isGuest, accountConfirmed: $accountConfirmed, email: $email, firstName: $firstName)';
 }
 
 
@@ -255,7 +257,7 @@ abstract mixin class _$UserCopyWith<$Res> implements $UserCopyWith<$Res> {
   factory _$UserCopyWith(_User value, $Res Function(_User) _then) = __$UserCopyWithImpl;
 @override @useResult
 $Res call({
- String token, DateTime tokenExpires, bool isGuest, String? email, String? firstName
+ String token, DateTime tokenExpires, bool isGuest, bool accountConfirmed, String? email, String? firstName
 });
 
 
@@ -272,11 +274,12 @@ class __$UserCopyWithImpl<$Res>
 
 /// Create a copy of User
 /// with the given fields replaced by the non-null parameter values.
-@override @pragma('vm:prefer-inline') $Res call({Object? token = null,Object? tokenExpires = null,Object? isGuest = null,Object? email = freezed,Object? firstName = freezed,}) {
+@override @pragma('vm:prefer-inline') $Res call({Object? token = null,Object? tokenExpires = null,Object? isGuest = null,Object? accountConfirmed = null,Object? email = freezed,Object? firstName = freezed,}) {
   return _then(_User(
 token: null == token ? _self.token : token // ignore: cast_nullable_to_non_nullable
 as String,tokenExpires: null == tokenExpires ? _self.tokenExpires : tokenExpires // ignore: cast_nullable_to_non_nullable
 as DateTime,isGuest: null == isGuest ? _self.isGuest : isGuest // ignore: cast_nullable_to_non_nullable
+as bool,accountConfirmed: null == accountConfirmed ? _self.accountConfirmed : accountConfirmed // ignore: cast_nullable_to_non_nullable
 as bool,email: freezed == email ? _self.email : email // ignore: cast_nullable_to_non_nullable
 as String?,firstName: freezed == firstName ? _self.firstName : firstName // ignore: cast_nullable_to_non_nullable
 as String?,
