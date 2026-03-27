@@ -198,7 +198,11 @@ void main() {
       await tester.pumpWidget(buildSubject());
 
       await tester.tap(find.text('Proceed to Checkout'));
-      await tester.pumpAndSettle();
+      // Use pump() instead of pumpAndSettle() because the checkout button
+      // shows a CircularProgressIndicator while the dialog is open,
+      // and its infinite animation prevents pumpAndSettle from completing.
+      await tester.pump();
+      await tester.pump(const Duration(milliseconds: 100));
 
       // Should NOT show store closed dialog
       expect(find.text('Store Closed'), findsNothing);

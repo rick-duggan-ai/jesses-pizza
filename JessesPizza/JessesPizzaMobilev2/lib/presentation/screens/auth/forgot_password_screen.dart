@@ -72,7 +72,7 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
               const Icon(Icons.lock_outline, size: 64, color: Colors.orange),
               const SizedBox(height: 16),
               const Text(
-                'Enter your phone number and we'\''ll send you a verification code to reset your password.',
+                "Enter your phone number and we'll send you a verification code to reset your password.",
                 textAlign: TextAlign.center,
                 style: TextStyle(fontSize: 16),
               ),

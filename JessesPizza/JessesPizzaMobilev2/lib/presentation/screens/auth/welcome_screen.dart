@@ -78,10 +78,12 @@ class WelcomeScreen extends StatelessWidget {
                       return OutlinedButton(
                         onPressed: isLoading
                             ? null
-                            : () {
+                            : () async {
+                                final deviceId = await getIt<DeviceIdService>().getDeviceId();
+                                if (!context.mounted) return;
                                 context.read<AuthBloc>().add(
-                                      const AuthEvent.guestLoginRequested(
-                                        deviceId: 'mobile',
+                                      AuthEvent.guestLoginRequested(
+                                        deviceId: deviceId,
                                       ),
                                     );
                               },
@@ -101,42 +103,9 @@ class WelcomeScreen extends StatelessWidget {
                       );
                     },
                   ),
-                  child: const Text('Sign Up', style: TextStyle(fontSize: 16)),
-                ),
-                const SizedBox(height: 12),
-                BlocBuilder<AuthBloc, AuthState>(
-                  builder: (context, state) {
-                    final isLoading = state is AuthLoading;
-                    return OutlinedButton(
-                      onPressed: isLoading
-                          ? null
-                          : () async {
-                              final deviceId = await getIt<DeviceIdService>().getDeviceId();
-                              if (!context.mounted) return;
-                              context.read<AuthBloc>().add(
-                                    AuthEvent.guestLoginRequested(
-                                      deviceId: deviceId,
-                                    ),
-                                  );
-                            },
-                      style: OutlinedButton.styleFrom(
-                        padding: const EdgeInsets.symmetric(vertical: 16),
-                      ),
-                      child: isLoading
-                          ? const SizedBox(
-                              height: 20,
-                              width: 20,
-                              child: CircularProgressIndicator(strokeWidth: 2),
-                            )
-                          : const Text(
-                              'Continue as Guest',
-                              style: TextStyle(fontSize: 16),
-                            ),
-                    );
-                  },
-                ),
-                const SizedBox(height: 32),
-              ],
+                  const SizedBox(height: 32),
+                ],
+              ),
             ),
           ),
         ),
