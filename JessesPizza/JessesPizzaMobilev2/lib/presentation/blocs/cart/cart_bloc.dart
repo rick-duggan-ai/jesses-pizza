@@ -1,10 +1,15 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:jesses_pizza_app/data/services/cart_storage_service.dart';
 import 'package:jesses_pizza_app/domain/models/cart_item.dart';
 import 'cart_event.dart';
 import 'cart_state.dart';
 
 class CartBloc extends Bloc<CartEvent, CartState> {
-  CartBloc() : super(const CartState()) {
+  final CartStorageService? _cartStorage;
+
+  CartBloc({CartStorageService? cartStorage})
+      : _cartStorage = cartStorage,
+        super(const CartState()) {
     on<AddItem>(_onAddItem);
     on<RemoveItem>(_onRemoveItem);
     on<UpdateQuantity>(_onUpdateQuantity);
@@ -16,11 +21,12 @@ class CartBloc extends Bloc<CartEvent, CartState> {
     on<UpdateItem>(_onUpdateItem);
     on<ValidateCart>(_onValidateCart);
     on<ClearCart>(_onClearCart);
+    on<LoadPersistedCart>(_onLoadPersistedCart);
   }
 
   void _onAddItem(AddItem event, Emitter<CartState> emit) {
-    // Each item is added as a distinct entry (group selections may differ).
     emit(state.copyWith(items: [...state.items, event.item]));
+    _persistItems();
   }
 
   void _onRemoveItem(RemoveItem event, Emitter<CartState> emit) {
@@ -39,6 +45,7 @@ class CartBloc extends Bloc<CartEvent, CartState> {
             .toList(),
       ));
     }
+    _persistItems();
   }
 
   void _onUpdateQuantity(UpdateQuantity event, Emitter<CartState> emit) {
@@ -58,6 +65,7 @@ class CartBloc extends Bloc<CartEvent, CartState> {
       }).toList();
       emit(state.copyWith(items: updated));
     }
+    _persistItems();
   }
 
   void _onSetDeliveryMode(SetDeliveryMode event, Emitter<CartState> emit) {
@@ -95,6 +103,7 @@ class CartBloc extends Bloc<CartEvent, CartState> {
       updated[event.index] = event.item;
     }
     emit(state.copyWith(items: updated));
+    _persistItems();
   }
 
   void _onValidateCart(ValidateCart event, Emitter<CartState> emit) {
@@ -103,10 +112,25 @@ class CartBloc extends Bloc<CartEvent, CartState> {
         state.items.where((i) => validIds.contains(i.menuItemId)).toList();
     if (validItems.length != state.items.length) {
       emit(state.copyWith(items: validItems));
+      _persistItems();
     }
   }
 
   void _onClearCart(ClearCart event, Emitter<CartState> emit) {
     emit(const CartState());
+    _cartStorage?.clear();
+  }
+
+  void _onLoadPersistedCart(
+      LoadPersistedCart event, Emitter<CartState> emit) {
+    final items = _cartStorage?.load() ?? [];
+    if (items.isNotEmpty) {
+      emit(state.copyWith(items: items));
+    }
+  }
+
+  /// Fire-and-forget save of current items to local storage.
+  void _persistItems() {
+    _cartStorage?.save(state.items);
   }
 }
