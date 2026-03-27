@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:jesses_pizza_app/app/di.dart';
 import 'package:jesses_pizza_app/app/theme.dart';
+import 'package:jesses_pizza_app/data/services/cart_storage_service.dart';
 import 'package:jesses_pizza_app/presentation/blocs/auth/auth_bloc.dart';
 import 'package:jesses_pizza_app/presentation/blocs/auth/auth_event.dart';
 import 'package:jesses_pizza_app/presentation/blocs/auth/auth_state.dart';
@@ -26,7 +27,7 @@ class JessesPizzaApp extends StatelessWidget {
       providers: [
         BlocProvider(create: (_) => getIt<AuthBloc>()..add(const AuthEvent.checkStoredAuth())),
         BlocProvider(create: (_) => getIt<MenuBloc>()),
-        BlocProvider(create: (_) => getIt<CartBloc>()),
+        BlocProvider(create: (_) => getIt<CartBloc>()..add(const LoadPersistedCart())),
         BlocProvider(create: (_) => getIt<OrderBloc>()),
         BlocProvider(create: (_) => getIt<AccountBloc>()),
       ],
@@ -64,7 +65,7 @@ class AppShell extends StatefulWidget {
   State<AppShell> createState() => _AppShellState();
 }
 
-class _AppShellState extends State<AppShell> {
+class _AppShellState extends State<AppShell> with WidgetsBindingObserver {
   int _currentIndex = 0;
 
   final _navigatorKeys = [
@@ -72,6 +73,28 @@ class _AppShellState extends State<AppShell> {
     GlobalKey<NavigatorState>(),
     GlobalKey<NavigatorState>(),
   ];
+
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addObserver(this);
+  }
+
+  @override
+  void dispose() {
+    WidgetsBinding.instance.removeObserver(this);
+    super.dispose();
+  }
+
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    if (state == AppLifecycleState.paused ||
+        state == AppLifecycleState.inactive) {
+      final cartBloc = context.read<CartBloc>();
+      final storage = getIt<CartStorageService>();
+      storage.save(cartBloc.state.items);
+    }
+  }
 
   @override
   Widget build(BuildContext context) {

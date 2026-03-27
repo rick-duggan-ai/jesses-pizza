@@ -1,10 +1,12 @@
 import 'package:flutter_test/flutter_test.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:jesses_pizza_app/app/app.dart';
 import 'package:jesses_pizza_app/app/di.dart';
 
 void main() {
-  setUpAll(() {
-    setupDependencies();
+  setUpAll(() async {
+    SharedPreferences.setMockInitialValues({});
+    await setupDependencies();
   });
 
   testWidgets('App smoke test', (WidgetTester tester) async {

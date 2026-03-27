@@ -90,3 +90,9 @@ class ClearCart extends CartEvent {
   @override
   List<Object?> get props => [];
 }
+
+class LoadPersistedCart extends CartEvent {
+  const LoadPersistedCart();
+  @override
+  List<Object?> get props => [];
+}
