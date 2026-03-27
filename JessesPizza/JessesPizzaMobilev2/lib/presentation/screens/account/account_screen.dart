@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:jesses_pizza_app/domain/models/user.dart';
 import 'package:jesses_pizza_app/presentation/blocs/auth/auth_bloc.dart';
 import 'package:jesses_pizza_app/presentation/blocs/auth/auth_event.dart';
 import 'package:jesses_pizza_app/presentation/blocs/auth/auth_state.dart';
@@ -64,75 +65,89 @@ class _UnauthenticatedView extends StatelessWidget {
 }
 
 class _AuthenticatedView extends StatelessWidget {
-  final dynamic user;
+  final User user;
   const _AuthenticatedView({required this.user});
 
   @override
   Widget build(BuildContext context) {
-    final items = <_SettingsItem>[
-      _SettingsItem(
-        title: 'Order History',
-        icon: Icons.history,
-        onTap: () => Navigator.of(context).push(
-          MaterialPageRoute(builder: (_) => const OrderHistoryScreen()),
-        ),
-      ),
-      _SettingsItem(
-        title: 'View Profile',
-        icon: Icons.person,
-        onTap: () => Navigator.of(context).push(
-          MaterialPageRoute(builder: (_) => const ProfileScreen()),
-        ),
-      ),
-      _SettingsItem(
-        title: 'Manage Addresses',
-        icon: Icons.location_on,
-        onTap: () => Navigator.of(context).push(
-          MaterialPageRoute(builder: (_) => const AddressesScreen()),
-        ),
-      ),
-      _SettingsItem(
-        title: 'Manage Credit Cards',
-        icon: Icons.credit_card,
-        onTap: () => Navigator.of(context).push(
-          MaterialPageRoute(builder: (_) => const CreditCardsScreen()),
-        ),
-      ),
-      _SettingsItem(
-        title: 'Contact Us',
-        icon: Icons.contact_support,
-        onTap: () => Navigator.of(context).push(
-          MaterialPageRoute(builder: (_) => const ContactScreen()),
-        ),
-      ),
-      _SettingsItem(
-        title: 'About',
-        icon: Icons.info_outline,
-        onTap: () => Navigator.of(context).push(
-          MaterialPageRoute(builder: (_) => const AboutScreen()),
-        ),
-      ),
-    ];
+    final isGuest = user.isGuest;
 
     return ListView(
       children: [
-        ...items.map(
-          (item) => ListTile(
-            leading: Icon(item.icon),
-            title: Text(item.title),
+        // Guest users get a "Log In / Sign Up" prompt at the top
+        if (isGuest)
+          ListTile(
+            leading: const Icon(Icons.login, color: Colors.blue),
+            title: const Text('Log In / Sign Up',
+                style: TextStyle(color: Colors.blue, fontWeight: FontWeight.bold)),
             trailing: const Icon(Icons.chevron_right),
-            onTap: item.onTap,
+            onTap: () => Navigator.of(context).push(
+              MaterialPageRoute(builder: (_) => const LoginScreen()),
+            ),
+          ),
+        // Registered-only features
+        if (!isGuest) ...[
+          ListTile(
+            leading: const Icon(Icons.history),
+            title: const Text('Order History'),
+            trailing: const Icon(Icons.chevron_right),
+            onTap: () => Navigator.of(context).push(
+              MaterialPageRoute(builder: (_) => const OrderHistoryScreen()),
+            ),
+          ),
+          ListTile(
+            leading: const Icon(Icons.person),
+            title: const Text('View Profile'),
+            trailing: const Icon(Icons.chevron_right),
+            onTap: () => Navigator.of(context).push(
+              MaterialPageRoute(builder: (_) => const ProfileScreen()),
+            ),
+          ),
+          ListTile(
+            leading: const Icon(Icons.location_on),
+            title: const Text('Manage Addresses'),
+            trailing: const Icon(Icons.chevron_right),
+            onTap: () => Navigator.of(context).push(
+              MaterialPageRoute(builder: (_) => const AddressesScreen()),
+            ),
+          ),
+          ListTile(
+            leading: const Icon(Icons.credit_card),
+            title: const Text('Manage Credit Cards'),
+            trailing: const Icon(Icons.chevron_right),
+            onTap: () => Navigator.of(context).push(
+              MaterialPageRoute(builder: (_) => const CreditCardsScreen()),
+            ),
+          ),
+        ],
+        // Available to all users
+        ListTile(
+          leading: const Icon(Icons.contact_support),
+          title: const Text('Contact Us'),
+          trailing: const Icon(Icons.chevron_right),
+          onTap: () => Navigator.of(context).push(
+            MaterialPageRoute(builder: (_) => const ContactScreen()),
+          ),
+        ),
+        ListTile(
+          leading: const Icon(Icons.info_outline),
+          title: const Text('About'),
+          trailing: const Icon(Icons.chevron_right),
+          onTap: () => Navigator.of(context).push(
+            MaterialPageRoute(builder: (_) => const AboutScreen()),
           ),
         ),
         const Divider(),
-        ListTile(
-          leading: const Icon(Icons.delete_forever, color: Colors.red),
-          title: const Text('Delete Account', style: TextStyle(color: Colors.red)),
-          onTap: () => _confirmDeleteAccount(context),
-        ),
+        // No "Delete Account" for guests
+        if (!isGuest)
+          ListTile(
+            leading: const Icon(Icons.delete_forever, color: Colors.red),
+            title: const Text('Delete Account', style: TextStyle(color: Colors.red)),
+            onTap: () => _confirmDeleteAccount(context),
+          ),
         ListTile(
           leading: const Icon(Icons.logout),
-          title: const Text('Log Out'),
+          title: Text(isGuest ? 'Exit Guest Mode' : 'Log Out'),
           onTap: () {
             context.read<AuthBloc>().add(const AuthEvent.logoutRequested());
           },
@@ -168,9 +183,3 @@ class _AuthenticatedView extends StatelessWidget {
   }
 }
 
-class _SettingsItem {
-  final String title;
-  final IconData icon;
-  final VoidCallback onTap;
-  const _SettingsItem({required this.title, required this.icon, required this.onTap});
-}
