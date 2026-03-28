@@ -31,7 +31,10 @@ class ContactScreen extends StatelessWidget {
       body: ListView(
         padding: const EdgeInsets.all(24),
         children: [
-          const Icon(Icons.local_pizza, size: 64, color: Colors.red),
+          ClipRRect(
+            borderRadius: BorderRadius.circular(16),
+            child: Image.asset('assets/images/logo.png', width: 80, height: 80),
+          ),
           const SizedBox(height: 16),
           const Text(
             "Jesse's Pizza",

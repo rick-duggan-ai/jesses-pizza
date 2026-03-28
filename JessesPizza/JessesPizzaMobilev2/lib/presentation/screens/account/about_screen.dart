@@ -14,7 +14,10 @@ class AboutScreen extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-          const Icon(Icons.local_pizza, size: 64, color: Colors.red),
+          ClipRRect(
+            borderRadius: BorderRadius.circular(16),
+            child: Image.asset('assets/images/logo.png', width: 80, height: 80),
+          ),
           const SizedBox(height: 16),
           Text(
             "Jesse's Pizza",

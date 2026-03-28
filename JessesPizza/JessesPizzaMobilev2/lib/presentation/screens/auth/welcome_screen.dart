@@ -35,7 +35,10 @@ class WelcomeScreen extends StatelessWidget {
                 crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: [
                   const Spacer(),
-                  const Icon(Icons.local_pizza, size: 80, color: Colors.red),
+                  ClipRRect(
+                    borderRadius: BorderRadius.circular(20),
+                    child: Image.asset('assets/images/logo.png', width: 120, height: 120),
+                  ),
                   const SizedBox(height: 16),
                   const Text(
                     "Jesse's Pizza",
