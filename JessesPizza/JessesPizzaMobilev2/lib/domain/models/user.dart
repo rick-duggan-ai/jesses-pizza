@@ -20,9 +20,23 @@ abstract class User with _$User {
   /// {token, tokenExpires, succeeded, accountConfirmed, name} —
   /// NOT the same shape as our model's toJson.
   factory User.fromLoginResponse(Map<String, dynamic> json, {bool isGuest = false}) {
+    final tokenValue = json['token'];
+    if (tokenValue == null || tokenValue is! String || tokenValue.isEmpty) {
+      throw Exception(json['message'] as String? ?? 'Login failed — no token received');
+    }
+
+    // tokenExpires can be String or null — default to 6 months if missing
+    DateTime expires;
+    final expiresValue = json['tokenExpires'];
+    if (expiresValue is String) {
+      expires = DateTime.parse(expiresValue);
+    } else {
+      expires = DateTime.now().add(const Duration(days: 180));
+    }
+
     return User(
-      token: json['token'] as String,
-      tokenExpires: DateTime.parse(json['tokenExpires'] as String),
+      token: tokenValue,
+      tokenExpires: expires,
       isGuest: isGuest,
       accountConfirmed: json['accountConfirmed'] as bool? ?? false,
       email: json['email'] as String?,
