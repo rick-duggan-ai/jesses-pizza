@@ -16,7 +16,11 @@ class AuthRepository implements IAuthRepository {
       data: {'email': email, 'password': password, 'deviceId': deviceId},
       apiVersion: '1.0',
     );
-    return User.fromLoginResponse(response.data!, isGuest: false);
+    final data = response.data!;
+    if (data['succeeded'] != true) {
+      throw Exception(data['message'] as String? ?? 'Login failed');
+    }
+    return User.fromLoginResponse(data, isGuest: false);
   }
 
   @override
@@ -26,7 +30,12 @@ class AuthRepository implements IAuthRepository {
       data: {'secret': 'JessesPizzaAppSecret', 'deviceId': deviceId},
       apiVersion: '1.0',
     );
-    return User.fromLoginResponse(response.data!, isGuest: true);
+    final data = response.data!;
+    // Guest login returns AppUser (no 'succeeded' field) — if token is null, it failed
+    if (data['token'] == null) {
+      throw Exception('Guest login failed');
+    }
+    return User.fromLoginResponse(data, isGuest: true);
   }
 
   @override

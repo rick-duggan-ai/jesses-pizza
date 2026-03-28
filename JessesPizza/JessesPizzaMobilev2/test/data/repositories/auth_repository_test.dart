@@ -18,12 +18,14 @@ void main() {
   });
 
   group('AuthRepository', () {
-    test('login returns User on success', () async {
+    test('login returns User on success (real API shape)', () async {
+      // Real C# LoginResponse: {token, tokenExpires, succeeded, accountConfirmed, name}
       final responseData = {
         'token': 'jwt-token-123',
         'tokenExpires': '2026-09-16T00:00:00Z',
-        'isGuest': false,
-        'email': 'test@example.com',
+        'succeeded': true,
+        'accountConfirmed': true,
+        'name': 'Jack',
       };
 
       when(() => mockApiClient.post<Map<String, dynamic>>(
@@ -42,10 +44,42 @@ void main() {
       expect(user, isA<User>());
       expect(user.token, 'jwt-token-123');
       expect(user.isGuest, false);
-      expect(user.email, 'test@example.com');
+      expect(user.firstName, 'Jack');
+      expect(user.accountConfirmed, true);
+    });
+
+    test('login throws on failed credentials (#110)', () async {
+      // API returns succeeded=false with null token on bad credentials
+      final responseData = {
+        'succeeded': false,
+        'message': 'Invalid username or password',
+        'token': null,
+        'tokenExpires': null,
+        'accountConfirmed': false,
+      };
+
+      when(() => mockApiClient.post<Map<String, dynamic>>(
+            ApiEndpoints.login,
+            data: any(named: 'data'),
+            apiVersion: '1.0',
+          )).thenAnswer((_) async => Response(
+            data: responseData,
+            statusCode: 200,
+            requestOptions: RequestOptions(path: ApiEndpoints.login),
+          ));
+
+      expect(
+        () => authRepository.login('bad@email.com', 'wrongpass', 'device'),
+        throwsA(isA<Exception>().having(
+          (e) => e.toString(),
+          'message',
+          contains('Invalid username or password'),
+        )),
+      );
     });
 
     test('guestLogin returns User with isGuest true', () async {
+      // Real C# AppUser: {token, tokenExpires, isGuest}
       final responseData = {
         'token': 'guest-token',
         'tokenExpires': '2026-09-16T00:00:00Z',
@@ -68,31 +102,31 @@ void main() {
       expect(user.token, 'guest-token');
     });
 
-    test('login calls correct endpoint with apiVersion 1.0', () async {
+    test('guestLogin throws when token is null', () async {
       final responseData = {
-        'token': 'jwt-token-123',
-        'tokenExpires': '2026-09-16T00:00:00Z',
+        'token': null,
+        'tokenExpires': null,
         'isGuest': false,
-        'email': 'test@example.com',
       };
 
       when(() => mockApiClient.post<Map<String, dynamic>>(
-            ApiEndpoints.login,
+            ApiEndpoints.guestLogin,
             data: any(named: 'data'),
             apiVersion: '1.0',
           )).thenAnswer((_) async => Response(
             data: responseData,
             statusCode: 200,
-            requestOptions: RequestOptions(path: ApiEndpoints.login),
+            requestOptions: RequestOptions(path: ApiEndpoints.guestLogin),
           ));
 
-      await authRepository.login('test@example.com', 'password123', 'device');
-
-      verify(() => mockApiClient.post<Map<String, dynamic>>(
-            ApiEndpoints.login,
-            data: any(named: 'data'),
-            apiVersion: '1.0',
-          )).called(1);
+      expect(
+        () => authRepository.guestLogin('device'),
+        throwsA(isA<Exception>().having(
+          (e) => e.toString(),
+          'message',
+          contains('Guest login failed'),
+        )),
+      );
     });
   });
 }
