@@ -46,6 +46,7 @@ void main() {
       expect(user.isGuest, false);
       expect(user.firstName, 'Jack');
       expect(user.accountConfirmed, true);
+      expect(user.email, 'test@example.com'); // from login form, not API
     });
 
     test('login throws on failed credentials (#110)', () async {
