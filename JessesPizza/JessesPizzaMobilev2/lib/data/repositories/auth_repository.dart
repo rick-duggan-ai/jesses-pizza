@@ -20,7 +20,24 @@ class AuthRepository implements IAuthRepository {
     if (data['succeeded'] != true) {
       throw Exception(data['message'] as String? ?? 'Login failed');
     }
-    return User.fromLoginResponse(data, isGuest: false);
+    // V1 approach: only grab token + expiration from API, set everything else locally
+    final token = data['token'] as String?;
+    if (token == null || token.isEmpty) {
+      throw Exception('Login failed — no token received');
+    }
+    final expiresRaw = data['tokenExpires'];
+    final expires = expiresRaw is String
+        ? DateTime.parse(expiresRaw)
+        : DateTime.now().add(const Duration(days: 180));
+
+    return User(
+      token: token,
+      tokenExpires: expires,
+      isGuest: false,
+      accountConfirmed: data['accountConfirmed'] as bool? ?? false,
+      email: email, // from the login form, not the API
+      firstName: data['name'] as String?,
+    );
   }
 
   @override
@@ -31,11 +48,20 @@ class AuthRepository implements IAuthRepository {
       apiVersion: '1.0',
     );
     final data = response.data!;
-    // Guest login returns AppUser (no 'succeeded' field) — if token is null, it failed
-    if (data['token'] == null) {
+    final token = data['token'] as String?;
+    if (token == null || token.isEmpty) {
       throw Exception('Guest login failed');
     }
-    return User.fromLoginResponse(data, isGuest: true);
+    final expiresRaw = data['tokenExpires'];
+    final expires = expiresRaw is String
+        ? DateTime.parse(expiresRaw)
+        : DateTime.now().add(const Duration(days: 180));
+
+    return User(
+      token: token,
+      tokenExpires: expires,
+      isGuest: true, // set locally, not from API
+    );
   }
 
   @override
