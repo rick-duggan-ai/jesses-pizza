@@ -97,26 +97,27 @@ void main() {
       expect(result.succeeded, true);
     });
 
-    test('getHppToken returns hPPToken string from response', () async {
+    test('getHppToken returns token and transactionGuid from response',
+        () async {
       when(() => mockApiClient.post<Map<String, dynamic>>(
             ApiEndpoints.getHppToken,
             data: any(named: 'data'),
             apiVersion: '1.1',
           )).thenAnswer((_) async => Response(
-            // API returns MongoTransaction with HPPToken property (camelCase: hPPToken)
             data: {
-              'hPPToken':
-                  'https://api.convergepay.com/hosted-payments/?ssl_txn_auth_token=abc123'
+              'hppToken':
+                  'https://api.convergepay.com/hosted-payments/?ssl_txn_auth_token=abc123',
+              'transactionGuid': 'test-guid-1234',
             },
             statusCode: 200,
             requestOptions: RequestOptions(path: ApiEndpoints.getHppToken),
           ));
 
-      final token =
-          await orderRepository.getHppToken(tTransactionRequest);
+      final result = await orderRepository.getHppToken(tTransactionRequest);
 
-      expect(token,
+      expect(result.token,
           'https://api.convergepay.com/hosted-payments/?ssl_txn_auth_token=abc123');
+      expect(result.transactionGuid, 'test-guid-1234');
     });
 
     test(

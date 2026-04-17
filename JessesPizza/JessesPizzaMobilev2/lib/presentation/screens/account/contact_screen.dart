@@ -14,14 +14,15 @@ class ContactScreen extends StatelessWidget {
   static const _addressLine2 = 'Henderson, NV 89012';
   static const _fullAddress = '$_addressLine1\n$_addressLine2';
 
+  // Matches the C# DayOfTheWeek enum: Monday=0 .. Sunday=6
   static const _dayNames = [
-    'Sunday',
     'Monday',
     'Tuesday',
     'Wednesday',
     'Thursday',
     'Friday',
     'Saturday',
+    'Sunday',
   ];
 
   @override
@@ -88,18 +89,16 @@ class ContactScreen extends StatelessWidget {
     }
   }
 
-  /// Format a 24-hour time string (e.g. "11:00") to 12-hour (e.g. "11:00 AM").
-  static String _formatTime(String time24) {
-    final parts = time24.split(':');
-    if (parts.length < 2) return time24;
-    final hour = int.tryParse(parts[0]) ?? 0;
-    final minute = parts[1];
+  /// Format an ISO 8601 or "HH:mm" time string to 12-hour (e.g. "11:00 AM").
+  static String _formatTime(String time) {
+    // Server sends ISO 8601 datetimes; extract hour/minute from parsed value.
+    final dt = DateTime.tryParse(time);
+    final hour = dt?.hour ?? int.tryParse(time.split(':').first) ?? 0;
+    final minute = (dt?.minute ?? int.tryParse(time.split(':').elementAtOrNull(1) ?? '') ?? 0)
+        .toString()
+        .padLeft(2, '0');
     final period = hour >= 12 ? 'PM' : 'AM';
-    final hour12 = hour == 0
-        ? 12
-        : hour > 12
-            ? hour - 12
-            : hour;
+    final hour12 = hour == 0 ? 12 : hour > 12 ? hour - 12 : hour;
     return '$hour12:$minute $period';
   }
 }
@@ -137,7 +136,7 @@ class _StoreHoursSection extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: List.generate(7, (index) {
-        // API: 0 = Sunday, 1 = Monday, ... 6 = Saturday
+        // API: 0 = Monday, 1 = Tuesday, ... 6 = Sunday (C# DayOfTheWeek enum)
         final dayHours = hoursMap[index];
         final dayName = ContactScreen._dayNames[index];
         final timeText = dayHours != null &&

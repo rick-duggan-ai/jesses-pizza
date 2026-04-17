@@ -326,7 +326,7 @@ class _ItemDetailScreenState extends State<ItemDetailScreen> {
         boxShadow: [BoxShadow(color: Colors.black.withAlpha(26), blurRadius: 8, offset: const Offset(0, -2))]),
       child: SafeArea(child: ElevatedButton(
         onPressed: isStoreOpen && hasSizes && !_isAddingToCart ? _addToCart : null,
-        style: ElevatedButton.styleFrom(padding: const EdgeInsets.symmetric(vertical: 16)),
+        style: ElevatedButton.styleFrom(padding: const EdgeInsets.symmetric(vertical: 16), minimumSize: const Size(double.infinity, 0)),
         child: _isAddingToCart
             ? const SizedBox(height: 20, width: 20, child: CircularProgressIndicator(strokeWidth: 2))
             : Text(buttonLabel, style: const TextStyle(fontSize: 16)))),

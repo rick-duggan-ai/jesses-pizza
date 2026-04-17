@@ -16,17 +16,19 @@ class AccountRepository implements IAccountRepository {
       ApiEndpoints.getAccountInfo,
       apiVersion: '1.0',
     );
-    return response.data!;
+    return response.data!['info'] as Map<String, dynamic>? ?? {};
   }
 
   @override
   Future<List<Address>> getAddresses() async {
-    final response = await apiClient.get<List<dynamic>>(
+    final response = await apiClient.get<Map<String, dynamic>>(
       ApiEndpoints.addresses,
       apiVersion: '1.0',
     );
-    return (response.data as List)
+    final list = response.data!['addresses'] as List<dynamic>? ?? [];
+    return list
         .map((json) => Address.fromJson(json as Map<String, dynamic>))
+        .where((a) => a.addressLine1.isNotEmpty)
         .toList();
   }
 
@@ -52,13 +54,12 @@ class AccountRepository implements IAccountRepository {
 
   @override
   Future<List<CreditCard>> getCreditCards() async {
-    final response = await apiClient.get<List<dynamic>>(
+    final response = await apiClient.get<Map<String, dynamic>>(
       ApiEndpoints.creditCards,
       apiVersion: '1.0',
     );
-    return (response.data as List)
-        .map((json) => CreditCard.fromJson(json as Map<String, dynamic>))
-        .toList();
+    final list = response.data!['creditCards'] as List<dynamic>? ?? [];
+    return list.map((json) => CreditCard.fromJson(json as Map<String, dynamic>)).toList();
   }
 
   @override

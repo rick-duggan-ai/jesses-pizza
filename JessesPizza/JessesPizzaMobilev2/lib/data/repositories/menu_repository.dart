@@ -34,11 +34,8 @@ class MenuRepository implements IMenuRepository {
 
   @override
   Future<bool> checkHours() async {
-    final response = await apiClient.get<bool>(
-      ApiEndpoints.checkHours,
-      apiVersion: '1.0',
-    );
-    return response.data!;
+    final settings = await getSettings();
+    return settings.isOpen();
   }
 
   @override

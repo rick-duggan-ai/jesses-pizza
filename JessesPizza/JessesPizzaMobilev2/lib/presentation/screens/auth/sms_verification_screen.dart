@@ -138,7 +138,7 @@ class _SmsVerificationScreenState extends State<SmsVerificationScreen> {
           );
           Navigator.of(context).pushAndRemoveUntil(
             MaterialPageRoute(builder: (_) => const LoginScreen()),
-            (route) => false,
+            (route) => route.isFirst,
           );
         } else if (state is AuthError) {
           ScaffoldMessenger.of(context).showSnackBar(

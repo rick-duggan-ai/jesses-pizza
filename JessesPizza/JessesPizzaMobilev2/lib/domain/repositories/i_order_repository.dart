@@ -6,7 +6,7 @@ abstract class IOrderRepository {
   Future<ApiResponse> validateTransaction(TransactionRequest transaction);
   Future<ApiResponse> validateTransactionAmount(double amount);
   Future<ApiResponse> postTransaction(PostTransactionRequest request);
-  Future<String> getHppToken(TransactionRequest transaction);
+  Future<({String token, String transactionGuid})> getHppToken(TransactionRequest transaction);
   Future<List<Transaction>> getOrders();
   Future<Transaction> getTransactionByGuid(String guid);
 }

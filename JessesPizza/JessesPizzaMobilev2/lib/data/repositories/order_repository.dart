@@ -25,7 +25,7 @@ class OrderRepository implements IOrderRepository {
   Future<ApiResponse> validateTransactionAmount(double amount) async {
     final response = await apiClient.post<Map<String, dynamic>>(
       ApiEndpoints.validateTransactionAmount,
-      data: {'amount': amount},
+      data: amount,
       apiVersion: '1.1',
     );
     return ApiResponse.fromJson(response.data!);
@@ -43,14 +43,21 @@ class OrderRepository implements IOrderRepository {
   }
 
   @override
-  Future<String> getHppToken(TransactionRequest transaction) async {
+  Future<({String token, String transactionGuid})> getHppToken(
+      TransactionRequest transaction) async {
     final response = await apiClient.post<Map<String, dynamic>>(
       ApiEndpoints.getHppToken,
       data: transaction.toJson(),
       apiVersion: '1.1',
     );
-    // C# property MongoTransaction.HPPToken serializes as camelCase 'hPPToken'
-    return response.data!['hPPToken'] as String;
+    // Newtonsoft (netcoreapp2.2) lowercases all leading uppercase letters:
+    // HPPToken → hppToken. Fall back to hPPToken for System.Text.Json servers.
+    final data = response.data!;
+    final token = (data['hppToken'] ?? data['hPPToken']) as String?;
+    if (token == null) throw Exception('HPP token missing from response');
+    // TransactionGuid from the server is the customerCode used in SignalR events.
+    final transactionGuid = data['transactionGuid']?.toString() ?? '';
+    return (token: token, transactionGuid: transactionGuid);
   }
 
   @override

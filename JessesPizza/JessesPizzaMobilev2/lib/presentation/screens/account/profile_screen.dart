@@ -35,7 +35,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                 const SizedBox(height: 16),
                 _ProfileField(label: 'First Name', value: profile['firstName']?.toString() ?? ''),
                 _ProfileField(label: 'Last Name', value: profile['lastName']?.toString() ?? ''),
-                _ProfileField(label: 'Email', value: profile['email']?.toString() ?? ''),
+                _ProfileField(label: 'Email', value: profile['emailAddress']?.toString() ?? ''),
                 _ProfileField(label: 'Phone', value: profile['phoneNumber']?.toString() ?? ''),
               ],
             );

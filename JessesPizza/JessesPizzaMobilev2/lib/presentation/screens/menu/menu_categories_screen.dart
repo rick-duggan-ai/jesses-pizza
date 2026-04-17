@@ -39,29 +39,7 @@ class _MenuCategoriesScreenState extends State<MenuCategoriesScreen> {
                       itemCount: categories.length,
                       itemBuilder: (context, index) {
                         final category = categories[index];
-                        return ListTile(
-                          leading: category.imageUrl != null
-                              ? ClipRRect(
-                                  borderRadius: BorderRadius.circular(8),
-                                  child: CachedNetworkImage(
-                                    imageUrl: category.imageUrl!,
-                                    width: 56,
-                                    height: 56,
-                                    fit: BoxFit.cover,
-                                    placeholder: (_, __) => const SizedBox(
-                                      width: 56,
-                                      height: 56,
-                                      child: Center(
-                                          child: CircularProgressIndicator(
-                                              strokeWidth: 2)),
-                                    ),
-                                    errorWidget: (_, __, ___) =>
-                                        const Icon(Icons.fastfood, size: 40),
-                                  ),
-                                )
-                              : const Icon(Icons.fastfood, size: 40),
-                          title: Text(category.name),
-                          trailing: const Icon(Icons.chevron_right),
+                        return InkWell(
                           onTap: () {
                             Navigator.of(context).push(
                               MaterialPageRoute(
@@ -70,6 +48,57 @@ class _MenuCategoriesScreenState extends State<MenuCategoriesScreen> {
                               ),
                             );
                           },
+                          child: Padding(
+                            padding: const EdgeInsets.symmetric(
+                                horizontal: 16, vertical: 8),
+                            child: Row(
+                              children: [
+                                ClipRRect(
+                                  borderRadius: BorderRadius.circular(8),
+                                  child: category.imageUrl != null
+                                      ? CachedNetworkImage(
+                                          imageUrl: category.imageUrl!,
+                                          width: 112,
+                                          height: 112,
+                                          fit: BoxFit.cover,
+                                          placeholder: (_, __) =>
+                                              const SizedBox(
+                                            width: 112,
+                                            height: 112,
+                                            child: Center(
+                                                child:
+                                                    CircularProgressIndicator(
+                                                        strokeWidth: 2)),
+                                          ),
+                                          errorWidget: (_, __, ___) =>
+                                              const SizedBox(
+                                            width: 112,
+                                            height: 112,
+                                            child: Center(
+                                                child: Icon(Icons.fastfood,
+                                                    size: 40)),
+                                          ),
+                                        )
+                                      : const SizedBox(
+                                          width: 112,
+                                          height: 112,
+                                          child: Center(
+                                              child: Icon(Icons.fastfood,
+                                                  size: 40)),
+                                        ),
+                                ),
+                                const SizedBox(width: 16),
+                                Expanded(
+                                  child: Text(
+                                    category.name,
+                                    style:
+                                        Theme.of(context).textTheme.titleMedium,
+                                  ),
+                                ),
+                                const Icon(Icons.chevron_right),
+                              ],
+                            ),
+                          ),
                         );
                       },
                     ),

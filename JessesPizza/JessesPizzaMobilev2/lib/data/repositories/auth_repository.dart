@@ -87,9 +87,15 @@ class AuthRepository implements IAuthRepository {
       data: {
         'email': email,
         'password': password,
-        'firstName': firstName,
-        'lastName': lastName,
-        'phoneNumber': phoneNumber,
+        'info': {
+          'firstName': firstName,
+          'lastName': lastName,
+          'phoneNumber': phoneNumber,
+          'email': email,
+          'address': '',
+          'city': '',
+          'zipCode': '',
+        },
       },
       apiVersion: '1.0',
     );

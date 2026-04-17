@@ -23,34 +23,27 @@ class CartScreen extends StatefulWidget {
 class _CartScreenState extends State<CartScreen> {
   bool _checkoutInProgress = false;
 
-  /// Format 24h time string (e.g. "11:00") to 12h format (e.g. "11:00 AM").
-  static String _formatTime(String time24) {
-    final parts = time24.split(':');
-    if (parts.length < 2) return time24;
-    var hour = int.tryParse(parts[0]) ?? 0;
-    final minute = parts[1];
+  /// Format an ISO 8601 or "HH:mm" time string to 12-hour (e.g. "11:00 AM").
+  static String _formatTime(String time) {
+    final dt = DateTime.tryParse(time);
+    final hour = dt?.hour ?? int.tryParse(time.split(':').first) ?? 0;
+    final minute = (dt?.minute ?? int.tryParse(time.split(':').elementAtOrNull(1) ?? '') ?? 0)
+        .toString()
+        .padLeft(2, '0');
     final period = hour >= 12 ? 'PM' : 'AM';
-    if (hour == 0) {
-      hour = 12;
-    } else if (hour > 12) {
-      hour -= 12;
-    }
-    return '$hour:$minute $period';
+    final hour12 = hour == 0 ? 12 : hour > 12 ? hour - 12 : hour;
+    return '$hour12:$minute $period';
   }
 
   void _showStoreClosedDialog(BuildContext context, StoreSettings settings) {
-    final now = DateTime.now();
-    final apiDay = now.weekday == 7 ? 0 : now.weekday;
-    final todayHours = settings.storeHours
-        .where((h) => h.day == apiDay)
-        .toList();
+    final todayHours = settings.todayHours();
 
     String message;
-    if (todayHours.isNotEmpty &&
-        todayHours.first.openingTime != null &&
-        todayHours.first.closingTime != null) {
-      final open = _formatTime(todayHours.first.openingTime!);
-      final close = _formatTime(todayHours.first.closingTime!);
+    if (todayHours != null &&
+        todayHours.openingTime != null &&
+        todayHours.closingTime != null) {
+      final open = _formatTime(todayHours.openingTime!);
+      final close = _formatTime(todayHours.closingTime!);
       message = 'Sorry, we are currently closed. Today\'s hours are $open - $close.';
     } else {
       message = 'Sorry, we are currently closed for today.';
