@@ -5,6 +5,7 @@ import 'package:jesses_pizza_app/presentation/blocs/menu/menu_bloc.dart';
 import 'package:jesses_pizza_app/presentation/blocs/menu/menu_event.dart';
 import 'package:jesses_pizza_app/presentation/blocs/menu/menu_state.dart';
 import 'package:jesses_pizza_app/presentation/screens/menu/category_items_screen.dart';
+import 'package:jesses_pizza_app/presentation/screens/menu/item_detail_screen.dart';
 import 'package:jesses_pizza_app/presentation/widgets/store_closed_banner.dart';
 
 class MenuCategoriesScreen extends StatefulWidget {
@@ -41,11 +42,12 @@ class _MenuCategoriesScreenState extends State<MenuCategoriesScreen> {
                         final category = categories[index];
                         return InkWell(
                           onTap: () {
+                            final items = category.menuItems;
+                            final destination = items.length == 1
+                                ? ItemDetailScreen(item: items.first)
+                                : CategoryItemsScreen(category: category);
                             Navigator.of(context).push(
-                              MaterialPageRoute(
-                                builder: (_) =>
-                                    CategoryItemsScreen(category: category),
-                              ),
+                              MaterialPageRoute(builder: (_) => destination),
                             );
                           },
                           child: Padding(
