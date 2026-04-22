@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:jesses_pizza_app/domain/repositories/i_menu_repository.dart';
 import 'menu_event.dart';
@@ -5,12 +6,23 @@ import 'menu_state.dart';
 
 class MenuBloc extends Bloc<MenuEvent, MenuState> {
   final IMenuRepository _repo;
+  Timer? _storeHoursTimer;
 
   MenuBloc({required IMenuRepository repository})
       : _repo = repository,
         super(const MenuState.initial()) {
     on<LoadMenu>(_onLoadMenu);
     on<CheckStoreHours>(_onCheckStoreHours);
+    _storeHoursTimer = Timer.periodic(
+      const Duration(minutes: 1),
+      (_) => add(const CheckStoreHours()),
+    );
+  }
+
+  @override
+  Future<void> close() {
+    _storeHoursTimer?.cancel();
+    return super.close();
   }
 
   Future<void> _onLoadMenu(LoadMenu event, Emitter<MenuState> emit) async {
