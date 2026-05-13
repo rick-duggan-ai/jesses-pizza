@@ -46,7 +46,7 @@ class _NewPasswordScreenState extends State<NewPasswordScreen> {
         );
         Navigator.of(context).pushAndRemoveUntil(
           MaterialPageRoute(builder: (_) => const LoginScreen()),
-          (route) => false,
+          (route) => route.isFirst,
         );
       }
     } catch (e) {
