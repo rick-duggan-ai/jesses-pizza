@@ -41,6 +41,7 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
       final phoneNumber = _normalizePhone(_phoneController.text.trim());
       await repo.forgotPassword(phoneNumber);
       if (mounted) {
+        setState(() => _isLoading = false);
         Navigator.of(context).push(
           MaterialPageRoute(
             builder: (_) => SmsVerificationScreen(
@@ -52,7 +53,8 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
       }
     } catch (e) {
       setState(() {
-        _error = e.toString();
+        // Remove "Exception: " prefix if present
+        _error = e.toString().replaceFirst(RegExp(r'^Exception:\s*'), '');
         _isLoading = false;
       });
     }

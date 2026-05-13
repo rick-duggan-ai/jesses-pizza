@@ -129,7 +129,11 @@ class AuthRepository implements IAuthRepository {
       data: {'phoneNumber': phoneNumber},
       apiVersion: '1.0',
     );
-    return ApiResponse.fromJson(response.data!);
+    final result = ApiResponse.fromJson(response.data!);
+    if (!result.succeeded) {
+      throw Exception(result.message ?? 'Failed to send reset code');
+    }
+    return result;
   }
 
   @override
