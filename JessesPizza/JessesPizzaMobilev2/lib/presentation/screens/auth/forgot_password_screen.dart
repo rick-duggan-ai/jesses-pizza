@@ -23,11 +23,13 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
     super.dispose();
   }
 
+  // For forgot password, we're assuming US phone numbers, so drop any + or +1
   String _normalizePhone(String input) {
     final digits = input.replaceAll(RegExp(r'\D'), '');
-    if (digits.length == 10) return '+1$digits';
-    if (digits.length == 11 && digits.startsWith('1')) return '+$digits';
-    return '+$digits';
+    if (digits.length == 11 && digits.startsWith('1')) {
+      return digits.substring(1); // Drop leading '1'
+    }
+    return digits;
   }
 
   Future<void> _sendResetCode() async {
