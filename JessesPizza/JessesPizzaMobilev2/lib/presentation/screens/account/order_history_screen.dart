@@ -62,7 +62,7 @@ class _OrderHistoryScreenState extends State<OrderHistoryScreen> {
               },
             );
           } else if (state is OrderError) {
-            return Center(child: Text('Error: \${state.message}'));
+            return Center(child: Text('Error: ${state.message}'));
           }
           return const SizedBox.shrink();
         },

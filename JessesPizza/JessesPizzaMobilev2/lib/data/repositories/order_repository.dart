@@ -66,7 +66,11 @@ class OrderRepository implements IOrderRepository {
       ApiEndpoints.getOrders,
       apiVersion: '1.1',
     );
-    final transactions = response.data!['transactions'] as List<dynamic>;
+    final data = response.data!;
+    if (data['succeeded'] == false) {
+      throw Exception(data['message'] as String? ?? 'Failed to load orders');
+    }
+    final transactions = data['transactions'] as List<dynamic>? ?? [];
     return transactions
         .map((json) => Transaction.fromJson(json as Map<String, dynamic>))
         .toList();

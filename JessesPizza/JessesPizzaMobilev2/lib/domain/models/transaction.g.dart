@@ -7,12 +7,12 @@ part of 'transaction.dart';
 // **************************************************************************
 
 _Transaction _$TransactionFromJson(Map<String, dynamic> json) => _Transaction(
-  id: json['id'] as String,
+  id: (json['transactionGuid'] ?? json['id'] ?? '').toString(),
   date: DateTime.parse(json['date'] as String),
   total: (json['total'] as num).toDouble(),
   isDelivery: json['isDelivery'] as bool,
   name: json['name'] as String?,
-  transactionState: json['transactionState'] as String?,
+  transactionState: json['transactionState']?.toString(),
   convergeTransactionId: json['convergeTransactionId'] as String?,
   items:
       (json['items'] as List<dynamic>?)
