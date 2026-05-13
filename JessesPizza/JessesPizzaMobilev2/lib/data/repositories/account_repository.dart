@@ -34,9 +34,15 @@ class AccountRepository implements IAccountRepository {
 
   @override
   Future<ApiResponse> saveAddress(Address address) async {
+    final addressData = <String, dynamic>{
+      'addressLine1': address.addressLine1,
+      'city': address.city,
+      'zipCode': address.zipCode,
+    };
+    if (address.id != null) addressData['id'] = address.id;
     final response = await apiClient.post<Map<String, dynamic>>(
       ApiEndpoints.saveAddress,
-      data: address.toJson(),
+      data: {'address': addressData},
       apiVersion: '1.0',
     );
     return ApiResponse.fromJson(response.data!);
@@ -44,9 +50,15 @@ class AccountRepository implements IAccountRepository {
 
   @override
   Future<ApiResponse> deleteAddress(Address address) async {
+    final addressData = <String, dynamic>{
+      'addressLine1': address.addressLine1,
+      'city': address.city,
+      'zipCode': address.zipCode,
+    };
+    if (address.id != null) addressData['id'] = address.id;
     final response = await apiClient.post<Map<String, dynamic>>(
       ApiEndpoints.deleteAddress,
-      data: address.toJson(),
+      data: {'address': addressData},
       apiVersion: '1.0',
     );
     return ApiResponse.fromJson(response.data!);
