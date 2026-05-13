@@ -1,3 +1,5 @@
+import 'dart:math';
+
 import 'package:jesses_pizza_app/data/api/api_client.dart';
 import 'package:jesses_pizza_app/data/api/api_endpoints.dart';
 import 'package:jesses_pizza_app/domain/models/address.dart';
@@ -9,6 +11,12 @@ class AccountRepository implements IAccountRepository {
   final ApiClient apiClient;
 
   AccountRepository({required this.apiClient});
+
+  static String _newGuid() {
+    final rng = Random.secure();
+    String hex(int count) => List.generate(count, (_) => rng.nextInt(16).toRadixString(16)).join();
+    return '${hex(8)}-${hex(4)}-4${hex(3)}-${(8 + rng.nextInt(4)).toRadixString(16)}${hex(3)}-${hex(12)}';
+  }
 
   @override
   Future<Map<String, dynamic>> getAccountInfo() async {
@@ -35,11 +43,11 @@ class AccountRepository implements IAccountRepository {
   @override
   Future<ApiResponse> saveAddress(Address address) async {
     final addressData = <String, dynamic>{
+      'id': address.id ?? _newGuid(),
       'addressLine1': address.addressLine1,
       'city': address.city,
       'zipCode': address.zipCode,
     };
-    if (address.id != null) addressData['id'] = address.id;
     final response = await apiClient.post<Map<String, dynamic>>(
       ApiEndpoints.saveAddress,
       data: {'address': addressData},
