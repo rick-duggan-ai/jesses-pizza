@@ -93,6 +93,7 @@ class _LoginScreenState extends State<LoginScreen> {
                       ),
                       keyboardType: TextInputType.emailAddress,
                       textCapitalization: TextCapitalization.none,
+                      autocorrect: false,
                       textInputAction: TextInputAction.next,
                       validator: (v) {
                         if (v == null || v.isEmpty) return 'Email is required';

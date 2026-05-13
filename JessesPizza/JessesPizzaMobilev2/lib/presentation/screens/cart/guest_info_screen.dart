@@ -141,6 +141,7 @@ class _GuestInfoScreenState extends State<GuestInfoScreen> {
                 ),
                 keyboardType: TextInputType.emailAddress,
                 textCapitalization: TextCapitalization.none,
+                autocorrect: false,
                 textInputAction: TextInputAction.next,
                 validator: _validateEmail,
               ),

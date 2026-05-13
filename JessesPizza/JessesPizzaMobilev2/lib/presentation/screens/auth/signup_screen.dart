@@ -150,6 +150,7 @@ class _SignupScreenState extends State<SignupScreen> {
                           ),
                           keyboardType: TextInputType.emailAddress,
                           textCapitalization: TextCapitalization.none,
+                          autocorrect: false,
                           validator: (v) {
                             if (v == null || v.isEmpty) {
                               return 'Email is required';
