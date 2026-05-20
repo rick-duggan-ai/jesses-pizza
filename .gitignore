@@ -267,3 +267,6 @@ JessesPizza.WebApp/wwwroot/JessesImages/
 
 # Compiled source of migrated KDS
 kds/source/*
+
+# FVM Version Cache
+.fvm/

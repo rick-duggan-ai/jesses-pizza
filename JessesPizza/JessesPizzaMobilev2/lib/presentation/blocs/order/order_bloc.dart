@@ -73,11 +73,7 @@ class OrderBloc extends Bloc<OrderEvent, OrderState> {
             message: amountValidation.message ?? 'Amount validation failed'));
         return;
       }
-      final txWithGuid = validation.transactionGuid != null
-          ? event.transaction.copyWith(
-              transactionId: validation.transactionGuid)
-          : event.transaction;
-      final hppResult = await _repo.getHppToken(txWithGuid);
+      final hppResult = await _repo.getHppToken(event.transaction);
       emit(OrderState.hppTokenReady(
         token: hppResult.token,
         transactionGuid: hppResult.transactionGuid,

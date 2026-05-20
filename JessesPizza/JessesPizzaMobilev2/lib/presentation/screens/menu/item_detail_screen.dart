@@ -333,6 +333,25 @@ class _ItemDetailScreenState extends State<ItemDetailScreen> {
     );
   }
 
+  String _buildDelimitedEntry(SelectedGroupItem s) {
+    final sizeLabel = s.groupItem.sizes.length > 1 ? (s.selectedSize?.name ?? '') : '';
+    final sideLabel = s.groupItem.sides.length > 1 ? (s.selectedSide?.name ?? '') : '';
+    if (sideLabel.isNotEmpty) return '${s.groupItem.id}/$sizeLabel/$sideLabel';
+    if (sizeLabel.isNotEmpty) return '${s.groupItem.id}/$sizeLabel';
+    return s.groupItem.id;
+  }
+
+  String? _buildDelimitedString(bool required) {
+    final parts = <String>[];
+    for (final gs in _groupSelections) {
+      if (gs.group.isRequired != required) continue;
+      for (final s in gs.selectedItems) {
+        parts.add(_buildDelimitedEntry(s));
+      }
+    }
+    return parts.isEmpty ? null : parts.join(', ');
+  }
+
   void _addToCart() {
     if (_isAddingToCart) return;
     if (!_validateSelections()) {
@@ -344,8 +363,22 @@ class _ItemDetailScreenState extends State<ItemDetailScreen> {
     final item = widget.item;
     final size = item.sizes[_selectedSizeIndex];
     final allSelectedItems = _groupSelections.expand((gs) => gs.selectedItems).toList();
-    final cartItem = CartItem(menuItemId: item.id ?? '', name: item.name ?? '', sizeName: size.name, price: size.price, quantity: _quantity,
-      selectedGroupItems: allSelectedItems, specialInstructions: _specialInstructions.trim());
+    final reqDelimited = _buildDelimitedString(true);
+    final optDelimited = _buildDelimitedString(false);
+    final cartItem = CartItem(
+      menuItemId: item.id ?? '',
+      name: item.name ?? '',
+      sizeName: size.name,
+      selectedSizeId: size.id,
+      price: size.price,
+      quantity: _quantity,
+      selectedGroupItems: allSelectedItems,
+      specialInstructions: _specialInstructions.trim(),
+      requiredChoicesEnabled: reqDelimited != null,
+      requiredDelimitedString: reqDelimited,
+      optionalChoicesEnabled: optDelimited != null,
+      optionalDelimitedString: optDelimited,
+    );
     if (_isEditMode) {
       context.read<CartBloc>().add(UpdateItem(index: widget.existingCartIndex!, item: cartItem));
       ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Cart item updated')));
